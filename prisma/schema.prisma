@@ -1,0 +1,313 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id                          String   @id @default(uuid())
+  username                    String   @unique
+  password                    String?
+  email_address               String?
+  roles                       UserRole[]
+  accountStatus               Boolean      @default(false)
+  isAdmin                     Boolean       @default(false)
+  resetPasswordToken          String?
+  resetPasswordTokenExpireAt  DateTime?
+  refreshToken                String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model UserRole {
+  id     String   @id @default(uuid())
+  userId String
+  role   Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role]) 
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  price       Float    @db.Float
+  stock       Int
+  images      Json     @db.Json
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems  OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Customer {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  orders    Order[]
+  payments  Payment[]
+  refunds   Refund[]
+  invoices  Invoice[]
+  createdAt DateTime  @default(now())
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  userId     String
+  total      Float      @db.Float
+  status     OrderStatus @default(PENDING)
+  orderItems OrderItem[]
+  payment    Payment?
+  invoice    Invoice?
+  couponId   String?   
+  user       Customer   @relation(fields: [userId], references: [id])
+  coupon     Coupon?    @relation(fields: [couponId], references: [id])
+  createdAt  DateTime   @default(now())
+
+  @@index([userId])
+  @@index([couponId])
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float   @db.Float
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model Payment {
+  id        String       @id @default(uuid())
+  orderId   String       @unique
+  userId    String
+  user      Customer     @relation(fields: [userId], references: [id])
+  order     Order        @relation(fields: [orderId], references: [id])
+  amount    Float        @db.Float
+  status    PaymentStatus @default(PENDING)
+  method    PaymentMethod
+  refund    Refund?
+  createdAt DateTime     @default(now())
+
+  @@index([userId])
+}
+
+model Refund {
+  id        String       @id @default(uuid())
+  paymentId String       @unique
+  userId    String
+  payment   Payment      @relation(fields: [paymentId], references: [id])
+  user      Customer     @relation(fields: [userId], references: [id])
+  amount    Float        @db.Float
+  reason    String
+  status    RefundStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+
+  @@index([userId])
+}
+
+model Invoice {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  userId    String
+  customer  Customer @relation(fields: [userId], references: [id])
+  total     Float    @db.Float
+  issuedAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Coupon {
+  id        String    @id @default(uuid())
+  code      String    @unique
+  discount  Float     @db.Float
+  expiresAt DateTime
+  orders    Order[]
+  createdAt DateTime  @default(now())
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String   @unique
+  description String?
+  price       Float?    @db.Float
+  asset       Json?
+  isPublished Boolean  @default(false)
+  categoryId  String?
+  category    CourseCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  chapters    Chapter[]
+  attachments Attachment[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+model CourseCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  slug        String
+  userId      String
+  title       String   @unique
+  description String 
+  categoryId  String?
+  mediaType   MediaType
+  mediaDoc    Json?
+  category    ProjectCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+model ProjectCategory {
+  id          String   @id @default(uuid())
+  title       String   @unique
+  projects    Project[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  name      String   @db.Text
+  asset     Json?
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model Chapter {
+  id            String   @id @default(uuid())
+  title         String
+  description   String? @db.Text
+  videoUrl      String? @db.Text
+  position      Int
+  isFree        Boolean @default(false)
+  isPublished   Boolean @default(false)
+  mediaType     MediaType?
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  userProgress  UserProgress[]
+  muxData       MuxData?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([courseId])
+}
+
+model MuxData {
+  id        String   @id @default(uuid())
+  playbackId String?
+  assetId   String
+  chapterId String  @unique
+  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([chapterId])
+}
+
+model UserProgress {
+  id            String   @id @default(uuid())
+  userId        String
+  chapterId     String
+  chapter       Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  isCompleted   Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([chapterId])
+  @@unique([userId, chapterId])
+  
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  title       String   @unique
+  content     String? @db.Text
+  images    Json     @db.Json
+  isPublished Boolean  @default(false)
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+model BlogCategory{
+  id        String   @id @default(uuid())
+  name      String   @unique
+  blogs     Blog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  CASH_ON_DELIVERY
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
