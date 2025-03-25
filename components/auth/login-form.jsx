@@ -64,7 +64,7 @@ export function LoginForm() {
     if (user) {
       router.replace(redirectUrl);
     }
-  }, [user, router]);
+  }, [user, router, redirectUrl]);
 
   useEffect(() => {
     // Get redirect URL from cookies

@@ -1,6 +1,14 @@
+"use client";
+import { useAuthStore } from "@/store/authStore";
+import { redirect } from "next/navigation";
 import React from "react";
 
 const DashboardMenu = () => {
+  const { user } = useAuthStore();
+
+  if (!user) {
+    redirect(`/auth/login`);
+  }
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-[--app-primary-bg]">
