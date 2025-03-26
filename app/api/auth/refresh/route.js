@@ -5,7 +5,7 @@ import { customMessage } from "@/lib/utils/customMessage";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const refreshToken = cookieStore.get("refreshToken")?.value;
 
     if (!refreshToken) {

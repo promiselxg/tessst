@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 import { Combobox } from "@/components/ui/combobox";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   categoryId: z.string().min(1),
@@ -28,6 +29,7 @@ const formSchema = z.object({
 const CategoryForm = ({ initialData, courseId, options }) => {
   const { user } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter();
   const [currentData, setCurrentData] = useState(
     options.find((option) => option.value === initialData?.categoryId) || null
   );
@@ -60,7 +62,7 @@ const CategoryForm = ({ initialData, courseId, options }) => {
       if (response) {
         toast.success(response.message);
         toggleEdit();
-
+        router.refresh();
         // ✅ Update state with new category
         const updatedCategory = options.find(
           (option) => option.value === values.categoryId

@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 
-export const middleware = async (req) => {
+export const middleware = (req) => {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
   const isAuthPage = pathname.startsWith("/auth/login");
 
+  console.log("🔎 Checking token in middleware:", token);
+
   if (!token) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return NextResponse.redirect(
+      new URL("/auth/login?from=middleware", req.url)
+    );
   }
 
   // Create a response object
@@ -21,5 +25,5 @@ export const middleware = async (req) => {
 };
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/api/uploadthing/:path*"],
+  matcher: ["/dashboard/:path*"],
 };
