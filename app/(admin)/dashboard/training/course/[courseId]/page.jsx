@@ -28,7 +28,7 @@ const CourseEditPage = () => {
   const { courseId } = params;
 
   if (!isValidUUID(courseId)) {
-    //router.replace("/dashboard");
+    router.replace("/dashboard");
   }
 
   const requiredFields = [
@@ -55,7 +55,7 @@ const CourseEditPage = () => {
       setCourse(response?.course);
     } catch (error) {
       console.log(error);
-      //router.replace("/dashboard");
+      router.replace("/dashboard");
     } finally {
       setLoading(false);
     }
@@ -74,22 +74,26 @@ const CourseEditPage = () => {
 
   useEffect(() => {
     fetchCourseInfo();
-    //fetchCourseCategories();
+    fetchCourseCategories();
   }, [courseId, fetchCourseInfo]);
 
   if (!params) return null;
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center h-screen">
-  //       Loading...
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  }
 
   if (!course) {
-    //router.replace("/dashboard");
+    router.replace("/dashboard");
   }
+
+  console.log("COURSE", course);
+  console.log("=========================");
+  console.log("CATEGORIES", categories);
 
   return (
     <div className="p-6 bg-[whitesmoke]">
