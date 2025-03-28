@@ -5,9 +5,8 @@ import { redirect } from "next/navigation";
 import React from "react";
 
 const DashboardMenu = () => {
-  const { user } = useAuth();
-
-  console.log(user);
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) redirect("/auth/login");
   return (
     <>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-[--app-primary-bg]">

@@ -22,12 +22,14 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import ChapterList from "./chapter-list";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/authProvider";
 
 const formSchema = z.object({
   title: z.string().min(1),
 });
 
 const ChaptersForm = ({ initialData, courseId }) => {
+  const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [chapters, setChapters] = useState(initialData?.chapters || []);

@@ -1,16 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { useImageContext } from "@/context/imageUpload.context";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 
-import FileUpload from "@/components/image/file-upload";
 import DocumentFileUpload from "@/components/document/file-upload";
 
 const AttachmentForm = ({ initialData, courseId }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const { uploadedFile, uploadStatus, setUploadStatus, setSelectedImages } =
+  const { uploadStatus, setUploadStatus, setSelectedImages } =
     useImageContext();
 
   const toggleEdit = () => {
@@ -29,7 +27,7 @@ const AttachmentForm = ({ initialData, courseId }) => {
     <>
       <div className="mt-6 border bg-slate-100 rounded-md p-4 transition-all">
         <div className="font-medium flex items-center justify-between">
-          Course attachment
+          course attachments
           <Button
             variant="ghost"
             onClick={() => toggleEdit()}

@@ -1,17 +1,10 @@
 "use client";
 
-import AttachmentForm from "@/components/training/attachment-form";
-import CategoryForm from "@/components/training/category-form";
-import ChaptersForm from "@/components/training/chapters-form";
-import DescriptionForm from "@/components/training/description-form";
-import ImageFileUploadForm from "@/components/training/image-upload-form";
-import TitleForm from "@/components/training/title-form";
 import { apiCall } from "@/lib/utils/api";
 import { isValidUUID } from "@/lib/utils/validateUUID";
 
-import { Book } from "lucide-react";
-import Link from "next/link";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import TabsComponent from "../../../_components/dashboard/tap-component";
 
@@ -21,9 +14,6 @@ const CourseEditPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const params = useParams();
-
-  const searchParams = useSearchParams();
-  const type = searchParams.get("type");
 
   const { courseId } = params;
 
@@ -81,8 +71,13 @@ const CourseEditPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="flex justify-center items-center h-screen bg-[rgba(0,0,0,0.2)]">
+        <div className="flex flex-col justify-center items-center mt-20">
+          <Loader2 className=" animate-spin" />
+          <p className="text-sm text-slate-500 italic">
+            loading course information...
+          </p>
+        </div>
       </div>
     );
   }
@@ -91,12 +86,8 @@ const CourseEditPage = () => {
     router.replace("/dashboard");
   }
 
-  console.log("COURSE", course);
-  console.log("=========================");
-  console.log("CATEGORIES", categories);
-
   return (
-    <div className="p-6 bg-[whitesmoke]">
+    <div className="p-6 bg-[whitesmoke] min-h-screen">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-y-2">
           <h1 className="text-2xl font-medium">Course setup</h1>
@@ -106,7 +97,7 @@ const CourseEditPage = () => {
         </div>
       </div>
       <div className="flex items-center gap-x-2 mt-3">
-        <h2 className="text-xl">Customize your course</h2>
+        <h2 className="text-xl">Customize this training course.</h2>
       </div>
       {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
@@ -128,7 +119,7 @@ const CourseEditPage = () => {
           <AttachmentForm initialData={course} courseId={course.id} />
         </div>
       </div> */}
-      <TabsComponent />
+      <TabsComponent initialData={course} courseId={course.id} />
     </div>
   );
 };

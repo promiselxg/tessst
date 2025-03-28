@@ -553,6 +553,7 @@ const updateCourseChapter = async (req, params) => {
       const titleExist = await prisma.chapter.findFirst({
         where: {
           title: sanitize(updates.title),
+          id: chapterId,
         },
       });
       if (titleExist) {

@@ -28,7 +28,7 @@ const ImageFileUploadForm = ({ initialData, courseId }) => {
     <>
       <div className="mt-6 border bg-slate-100 rounded-md p-4 transition-all">
         <div className="font-medium flex items-center justify-between">
-          Course image
+          course image
           <Button
             variant="ghost"
             onClick={() => toggleEdit()}
@@ -56,7 +56,7 @@ const ImageFileUploadForm = ({ initialData, courseId }) => {
             alt="uploaded image"
             width={100}
             height={110}
-            className={`object-contain w-full ${
+            className={`object-contain ${
               uploadedFile.length > 0 ? "h-[110px]" : "h-[110px]"
             } border-[2px] border-[--primary-btn] p-[2px] rounded-[5px] cursor-pointer`}
           />

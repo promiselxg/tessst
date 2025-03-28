@@ -40,10 +40,6 @@ export function LoginForm() {
 
   const [isMounted, setIsMounted] = useState(false);
 
-  // Get redirect URL from either:
-  // 1. URL search params (from middleware)
-  // 2. Redirect cookie (from previous visit)
-  // 3. Default to dashboard
   const callbackUrl =
     searchParams.get("callbackUrl")?.toString() ||
     getCookie("redirectUrl")?.toString() ||
