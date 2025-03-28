@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@/context/authProvider";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -32,7 +33,7 @@ const formSchema = z.object({
 
 const CourseTitle = () => {
   const router = useRouter();
-  //const { user } = useAuth();
+  const { user } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -60,11 +61,11 @@ const CourseTitle = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     router?.push("/auth/login");
-  //   }
-  // }, [user, router]);
+  useEffect(() => {
+    if (!user) {
+      router?.push("/auth/login");
+    }
+  }, [user, router]);
 
   return (
     <>

@@ -79,7 +79,7 @@ export async function middleware(req) {
   // ✅ Try refreshing token if expired
   if (refreshToken) {
     console.log("Access token expired, attempting refresh...");
-    return await generateRefreshToken(); // ✅ Return the response from refresh function
+    return await generateRefreshToken();
   }
 
   console.log("No valid tokens, redirecting to login...");
