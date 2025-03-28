@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Pencil } from "lucide-react";
 import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
-import { useAuthStore } from "@/store/authStore";
+
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +29,6 @@ const formSchema = z.object({
 });
 
 const DescriptionForm = ({ initialData, courseId }) => {
-  const { user } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [course, setCourse] = useState("");
 

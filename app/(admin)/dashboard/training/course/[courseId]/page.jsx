@@ -8,11 +8,12 @@ import ImageFileUploadForm from "@/components/training/image-upload-form";
 import TitleForm from "@/components/training/title-form";
 import { apiCall } from "@/lib/utils/api";
 import { isValidUUID } from "@/lib/utils/validateUUID";
-import { useAuthStore } from "@/store/authStore";
+
 import { Book } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
+import TabsComponent from "../../../_components/dashboard/tap-component";
 
 const CourseEditPage = () => {
   const [course, setCourse] = useState({});
@@ -20,18 +21,14 @@ const CourseEditPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const params = useParams();
-  const { user } = useAuthStore();
+
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
 
   const { courseId } = params;
 
   if (!isValidUUID(courseId)) {
-    router.replace("/dashboard");
-  }
-
-  if (!user) {
-    router.replace("/auth/login");
+    //router.replace("/dashboard");
   }
 
   const requiredFields = [
@@ -57,7 +54,8 @@ const CourseEditPage = () => {
 
       setCourse(response?.course);
     } catch (error) {
-      router.replace("/dashboard");
+      console.log(error);
+      //router.replace("/dashboard");
     } finally {
       setLoading(false);
     }
@@ -76,7 +74,7 @@ const CourseEditPage = () => {
 
   useEffect(() => {
     fetchCourseInfo();
-    fetchCourseCategories();
+    //fetchCourseCategories();
   }, [courseId, fetchCourseInfo]);
 
   if (!params) return null;
@@ -90,9 +88,9 @@ const CourseEditPage = () => {
   // }
 
   if (!course) {
-    router.replace("/dashboard");
+    //router.replace("/dashboard");
   }
-  console.log(type);
+
   return (
     <div className="p-6 bg-[whitesmoke]">
       <div className="flex items-center justify-between">
@@ -126,19 +124,7 @@ const CourseEditPage = () => {
           <AttachmentForm initialData={course} courseId={course.id} />
         </div>
       </div> */}
-      <div className="w-full bg-[#ccc]">
-        <div className="flex w-full mt-5">
-          <div className="flex items-center gap-2 bg-white p-4">
-            <Book className="w-5 h-5" />
-            <Link href="?type=course">Courses</Link>
-          </div>
-          <div className="flex items-center gap-2 bg-white p-4">
-            <Book className="w-5 h-5" />
-            <Link href="?type=meta">Courses</Link>
-          </div>
-        </div>
-        <div className="w-full h-fit bg-white shadow"></div>
-      </div>
+      <TabsComponent />
     </div>
   );
 };

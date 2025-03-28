@@ -29,6 +29,8 @@
     "cloudinary": "^2.6.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "cookies-next": "^4.3.0",
+    "jose": "^6.0.10",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.483.0",

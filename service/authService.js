@@ -1,7 +1,7 @@
 import { apiCall } from "@/lib/utils/api";
 
 export const signin = async (username, password) => {
-  return await apiCall("POST", `/auth/login`, { username, password });
+  return await apiCall("post", `/auth/login`, { username, password });
 };
 
 export const signout = async () => {

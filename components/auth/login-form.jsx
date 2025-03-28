@@ -2,14 +2,11 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -24,21 +21,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { getCookie } from "cookies-next";
+import { useAuthStore } from "@/lib/authStore";
 
 const formSchema = z.object({
   username: z.string().min(2, {
     message: "Username is required",
   }),
-  password: z.string().min(2, {
-    message: "Password is required",
+  password: z.string().min(5, {
+    message: "Password must be at least 5 characters",
   }),
 });
 
 export function LoginForm() {
-  const { user, login, loading, error } = useAuthStore();
-  const [redirectUrl, setRedirectUrl] = useState("/dashboard");
-
   const router = useRouter();
+  const { loginUser } = useAuthStore();
+
+  const searchParams = useSearchParams();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Get redirect URL from either:
+  // 1. URL search params (from middleware)
+  // 2. Redirect cookie (from previous visit)
+  // 3. Default to dashboard
+  const redirectUrl =
+    searchParams.get("redirect") ||
+    getCookie("redirectUrl")?.toString() ||
+    "/dashboard";
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -51,32 +60,22 @@ export function LoginForm() {
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values) => {
-    await login(values.username, values.password);
+    try {
+      await loginUser(values.username, values.password);
+      toast.success("Login successful");
+      router.push(redirectUrl);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+    }
   };
 
   useEffect(() => {
-    if (error && error.message) {
-      toast.error(error.message);
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (user) {
-      router.replace(redirectUrl);
-    }
-  }, [user, router, redirectUrl]);
-
-  useEffect(() => {
-    // Get redirect URL from cookies
-    const storedRedirect = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("redirectUrl="))
-      ?.split("=")[1];
-
-    if (storedRedirect) {
-      setRedirectUrl(decodeURIComponent(storedRedirect));
-    }
+    setIsMounted(true);
   }, []);
+
+  if (!isMounted) return null;
 
   return (
     <div className={cn("flex flex-col gap-6")}>
@@ -87,13 +86,14 @@ export function LoginForm() {
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-muted-foreground">
-                  Login to your YSFON account
+                  Login to your account
                 </p>
               </div>
+
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-8 mt-3"
+                  className="space-y-6 mt-3"
                 >
                   <FormField
                     control={form.control}
@@ -105,13 +105,15 @@ export function LoginForm() {
                           <Input
                             disabled={isSubmitting}
                             {...field}
-                            placeholder="Username"
+                            placeholder="Enter your username"
+                            autoComplete="username"
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name="password"
@@ -123,14 +125,15 @@ export function LoginForm() {
                             href="/"
                             className="ml-auto text-sm underline-offset-2 hover:underline"
                           >
-                            Forgot your password?
+                            Forgot password?
                           </Link>
                         </div>
                         <FormControl>
                           <Input
                             disabled={isSubmitting}
                             type="password"
-                            placeholder="Password"
+                            placeholder="Enter your password"
+                            autoComplete="current-password"
                             {...field}
                           />
                         </FormControl>
@@ -138,14 +141,16 @@ export function LoginForm() {
                       </FormItem>
                     )}
                   />
+
                   <Button
                     type="submit"
-                    disabled={!isValid || isSubmitting || loading}
-                    className="w-full cursor-pointer"
+                    disabled={!isValid || isSubmitting}
+                    className="w-full gap-2"
                   >
-                    {loading ? (
+                    {isSubmitting ? (
                       <>
-                        <Loader2 className=" animate-spin" /> Please wait...
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Authenticating...
                       </>
                     ) : (
                       "Login"
@@ -155,13 +160,15 @@ export function LoginForm() {
               </Form>
             </div>
           </div>
+
           <div className="relative hidden bg-muted md:block">
             <Image
               src="/placeholder.svg"
-              alt="Image"
-              layout="fill"
-              objectFit="cover"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+              alt="Authentication"
+              fill
+              priority
+              className="object-cover"
+              quality={80}
             />
           </div>
         </CardContent>

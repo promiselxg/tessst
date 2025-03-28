@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, PlusCircle } from "lucide-react";
 import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
-import { useAuthStore } from "@/store/authStore";
+
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import ChapterList from "./chapter-list";
@@ -28,7 +28,6 @@ const formSchema = z.object({
 });
 
 const ChaptersForm = ({ initialData, courseId }) => {
-  const { user } = useAuthStore();
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [chapters, setChapters] = useState(initialData?.chapters || []);

@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useAuthStore } from "@/store/authStore";
+
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -31,8 +31,8 @@ const formSchema = z.object({
 });
 
 const CourseTitle = () => {
-  const { user } = useAuthStore();
   const router = useRouter();
+  //const { user } = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -47,7 +47,7 @@ const CourseTitle = () => {
     try {
       const response = await apiCall("POST", "/training/course/create", {
         title: values.title,
-        userId: user.id,
+        userId: user?.id,
       });
       if (response) {
         toast.success(`${response.message}`);
@@ -60,11 +60,11 @@ const CourseTitle = () => {
     }
   };
 
-  useEffect(() => {
-    if (!user) {
-      router?.push("/auth/login");
-    }
-  }, [user, router]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     router?.push("/auth/login");
+  //   }
+  // }, [user, router]);
 
   return (
     <>

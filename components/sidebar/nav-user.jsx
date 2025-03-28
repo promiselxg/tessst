@@ -25,11 +25,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuthStore } from "@/store/authStore";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user, logout } = useAuthStore();
+  const user = {
+    username: "promiselxg",
+    email: "lxg",
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -65,6 +68,7 @@ export function NavUser() {
                   <span className="truncate font-semibold">
                     {user?.username}
                   </span>
+                  <span className="truncate font-semibold">{user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

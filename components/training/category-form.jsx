@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Pencil } from "lucide-react";
 import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
-import { useAuthStore } from "@/store/authStore";
+
 import { cn } from "@/lib/utils";
 import { Combobox } from "@/components/ui/combobox";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,6 @@ const formSchema = z.object({
 });
 
 const CategoryForm = ({ initialData, courseId, options }) => {
-  const { user } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const [currentData, setCurrentData] = useState(

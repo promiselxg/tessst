@@ -19,7 +19,7 @@ import { Loader2, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
-import { useAuthStore } from "@/store/authStore";
+
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
@@ -29,7 +29,6 @@ const formSchema = z.object({
 });
 
 const TitleForm = ({ initialData, courseId }) => {
-  const { user } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [course, setCourse] = useState("");
 
