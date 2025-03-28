@@ -99,26 +99,6 @@ const CourseEditPage = () => {
       <div className="flex items-center gap-x-2 mt-3">
         <h2 className="text-xl">Customize this training course.</h2>
       </div>
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <TitleForm initialData={course} courseId={course.id} />
-          <DescriptionForm initialData={course} courseId={course.id} />
-          <CategoryForm
-            initialData={course}
-            courseId={course.id}
-            options={categories.map((category) => ({
-              label: category.name,
-              value: category.id,
-            }))}
-          />
-          <ImageFileUploadForm initialData={course} courseId={course.id} />
-        </div>
-        <div>
-          <ChaptersForm initialData={course} courseId={course.id} />
-
-          <AttachmentForm initialData={course} courseId={course.id} />
-        </div>
-      </div> */}
       <TabsComponent initialData={course} courseId={course.id} />
     </div>
   );

@@ -15,3 +15,9 @@ export const DELETE = async (req, { params }) =>
     req,
     () => trainingControllers.deleteCourseChapter(req, params)
   );
+
+export const GET = async (req, { params }) =>
+  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin, ROLES.moderator))(
+    req,
+    () => trainingControllers.getSingleChapter(req, params)
+  );

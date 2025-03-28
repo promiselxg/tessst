@@ -759,6 +759,41 @@ const getSingleCourse = async (req, params) => {
   }
 };
 
+const getSingleChapter = async (req, params) => {
+  const { chapterId, id } = await params;
+
+  const userId = req.user.id;
+  console.log(params.id);
+  if (!chapterId) {
+    return customMessage("chapter ID is required", {}, 400);
+  }
+
+  if (!userId) {
+    return customMessage("User ID is required", {}, 400);
+  }
+
+  if (!isValidUUID(chapterId) || !isValidUUID(id)) {
+    return customMessage("Invalid IDs", {}, 400);
+  }
+
+  try {
+    const chapter = await prisma.chapter.findUnique({
+      where: { id: chapterId, courseId: id },
+      include: {
+        muxData: true,
+      },
+    });
+
+    if (!chapter) {
+      return customMessage("Chapter not found", {}, 404);
+    }
+
+    return customMessage("chapter found", { chapter }, 200);
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
 const deleteCategory = async (req, params) => {
   const { id } = await params;
 
@@ -909,6 +944,7 @@ export const trainingControllers = {
   getAllCategories,
   getAllCourses,
   getSingleCourse,
+  getSingleChapter,
   deleteCategory,
   deleteCourse,
   deleteCourseChapter,
