@@ -36,16 +36,16 @@ const formSchema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const { loginUser } = useAuthStore();
-
   const searchParams = useSearchParams();
+
   const [isMounted, setIsMounted] = useState(false);
 
   // Get redirect URL from either:
   // 1. URL search params (from middleware)
   // 2. Redirect cookie (from previous visit)
   // 3. Default to dashboard
-  const redirectUrl =
-    searchParams.get("redirect") ||
+  const callbackUrl =
+    searchParams.get("callbackUrl")?.toString() ||
     getCookie("redirectUrl")?.toString() ||
     "/dashboard";
 
@@ -63,7 +63,7 @@ export function LoginForm() {
     try {
       await loginUser(values.username, values.password);
       toast.success("Login successful");
-      router.push(redirectUrl);
+      router.replace(callbackUrl);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "An unknown error occurred"

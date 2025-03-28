@@ -4,7 +4,7 @@ import { verifyAccessToken } from "./lib/utils/jwt";
 export async function middleware(req) {
   const accessToken = req.cookies.get("accessToken")?.value;
   const refreshToken = req.cookies.get("refreshToken")?.value;
-  const { pathname } = req.nextUrl;
+  const { pathname, search, origin } = req.nextUrl;
 
   const isAuthPage = pathname.startsWith("/auth/login");
   const isApiRoute = pathname.startsWith("/api");
@@ -21,13 +21,10 @@ export async function middleware(req) {
   // ✅ Function to refresh tokens
   const generateRefreshToken = async () => {
     try {
-      const refreshResponse = await fetch(
-        `${req.nextUrl.origin}/api/auth/refresh`,
-        {
-          method: "POST",
-          headers: { Cookie: req.headers.get("cookie") }, // ✅ Forward cookies
-        }
-      );
+      const refreshResponse = await fetch(`${origin}/api/auth/refresh`, {
+        method: "POST",
+        headers: { Cookie: req.headers.get("cookie") },
+      });
 
       if (refreshResponse.ok) {
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
@@ -60,7 +57,14 @@ export async function middleware(req) {
       console.error("Token refresh failed:", error);
     }
 
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return redirectToLogin(req);
+  };
+
+  // ✅ Function to redirect user to login with a "callbackUrl"
+  const redirectToLogin = (req) => {
+    const loginUrl = new URL("/auth/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", `${pathname}${search}`);
+    return NextResponse.redirect(loginUrl);
   };
 
   // ✅ Check access token
@@ -71,7 +75,7 @@ export async function middleware(req) {
     } catch (error) {
       if (error.message !== "TokenExpired") {
         console.log("Invalid access token. Redirecting to login...");
-        return NextResponse.redirect(new URL("/auth/login", req.url));
+        return redirectToLogin(req);
       }
     }
   }
@@ -83,7 +87,7 @@ export async function middleware(req) {
   }
 
   console.log("No valid tokens, redirecting to login...");
-  return NextResponse.redirect(new URL("/auth/login", req.url));
+  return redirectToLogin(req);
 }
 
 // Apply middleware to protected routes

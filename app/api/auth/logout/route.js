@@ -10,7 +10,7 @@ export const POST = async () => {
 
   if (refreshToken) {
     try {
-      const decoded = verifyRefreshToken(refreshToken); // Ensure this is synchronous
+      const decoded = verifyRefreshToken(refreshToken);
       if (decoded?.id) {
         await prisma.refreshToken.deleteMany({
           where: { userId: decoded.id },
