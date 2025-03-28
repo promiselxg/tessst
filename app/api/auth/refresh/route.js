@@ -64,7 +64,6 @@ export const POST = async (req) => {
 
     return response;
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { message: "Invalid refresh token", error: error.message },
       { status: 403 }

@@ -9,27 +9,17 @@ export async function middleware(req) {
   const isAuthPage = pathname.startsWith("/auth/login");
   const isApiRoute = pathname.startsWith("/api");
 
+  console.log("ACCESS TOKEN", accessToken);
+  console.log("==============================");
+  console.log("REFRESH TOKEN", refreshToken);
+
   // Allow API routes and login page to proceed without authentication checks
   if (isApiRoute || isAuthPage) {
     return NextResponse.next();
   }
 
-  // ✅ Check access token
-  if (accessToken) {
-    try {
-      await verifyAccessToken(accessToken);
-      return NextResponse.next();
-    } catch (error) {
-      if (error.message !== "TokenExpired") {
-        console.log("Invalid access token. Redirecting to login...");
-        return NextResponse.redirect(new URL("/auth/login", req.url));
-      }
-    }
-  }
-
-  // ✅ Try refreshing token if expired
-  if (refreshToken) {
-    console.log("Access token expired, attempting refresh...");
+  // ✅ Function to refresh tokens
+  const generateRefreshToken = async () => {
     try {
       const refreshResponse = await fetch(
         `${req.nextUrl.origin}/api/auth/refresh`,
@@ -69,6 +59,27 @@ export async function middleware(req) {
     } catch (error) {
       console.error("Token refresh failed:", error);
     }
+
+    return NextResponse.redirect(new URL("/auth/login", req.url));
+  };
+
+  // ✅ Check access token
+  if (accessToken) {
+    try {
+      await verifyAccessToken(accessToken);
+      return NextResponse.next();
+    } catch (error) {
+      if (error.message !== "TokenExpired") {
+        console.log("Invalid access token. Redirecting to login...");
+        return NextResponse.redirect(new URL("/auth/login", req.url));
+      }
+    }
+  }
+
+  // ✅ Try refreshing token if expired
+  if (refreshToken) {
+    console.log("Access token expired, attempting refresh...");
+    return await generateRefreshToken(); // ✅ Return the response from refresh function
   }
 
   console.log("No valid tokens, redirecting to login...");
