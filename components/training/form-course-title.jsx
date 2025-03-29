@@ -56,7 +56,7 @@ const CourseTitle = () => {
       }
     } catch (error) {
       toast?.error("Something went wrong!", {
-        description: `${error?.message}`,
+        description: `${error?.response?.data?.message}`,
       });
     }
   };

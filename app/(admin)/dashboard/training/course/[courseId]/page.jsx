@@ -6,7 +6,7 @@ import { isValidUUID } from "@/lib/utils/validateUUID";
 import { Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
-import TabsComponent from "../../../_components/dashboard/tap-component";
+import TabsComponent from "../../../_components/dashboard/course-tap-component";
 
 const CourseEditPage = () => {
   const [course, setCourse] = useState({});

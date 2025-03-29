@@ -27,7 +27,7 @@ const formSchema = z.object({
   }),
 });
 
-const CourseTitleForm = ({ initialData, courseId }) => {
+const CourseTitleForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
   const { user } = useAuth();
 
   const form = useForm({
@@ -45,10 +45,12 @@ const CourseTitleForm = ({ initialData, courseId }) => {
       });
       if (response) {
         toast.success(`${response.message}`);
+        onSuccessfulSubmit();
       }
     } catch (error) {
+      console.log(error);
       toast?.error("Something went wrong!", {
-        description: `${error?.message}`,
+        description: `${error?.response?.data?.message}`,
       });
     }
   };

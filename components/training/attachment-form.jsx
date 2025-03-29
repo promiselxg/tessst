@@ -6,7 +6,7 @@ import { PlusCircle } from "lucide-react";
 
 import DocumentFileUpload from "@/components/document/file-upload";
 
-const AttachmentForm = ({ initialData, courseId }) => {
+const AttachmentForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const { uploadStatus, setUploadStatus, setSelectedImages } =
     useImageContext();
@@ -44,7 +44,12 @@ const AttachmentForm = ({ initialData, courseId }) => {
           </Button>
         </div>
 
-        {isEditing && <DocumentFileUpload courseId={courseId} />}
+        {isEditing && (
+          <DocumentFileUpload
+            courseId={courseId}
+            onSuccessfulSubmit={onSuccessfulSubmit}
+          />
+        )}
         {!isEditing && initialData?.attachments?.length === 0 && (
           <p className="text-sm mt-2 text-slate-500 italic">
             No attachments yet

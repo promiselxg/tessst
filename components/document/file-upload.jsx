@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
-const DocumentFileUpload = ({ courseId }) => {
+const DocumentFileUpload = ({ courseId, onSuccessfulSubmit }) => {
   const [files, setFiles] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -48,9 +48,9 @@ const DocumentFileUpload = ({ courseId }) => {
       if (!response.ok)
         toast.error("An error occurred while uploading the document.");
 
-      const data = await response.json();
+      await response.json();
       toast.success("Document uploaded successfully.");
-      console.log("Uploaded file:", data);
+      onSuccessfulSubmit();
     } catch (error) {
       toast.error("An error occurred while uploading the document.");
     } finally {

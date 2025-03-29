@@ -33,7 +33,20 @@ const ChaptersForm = ({ initialData, courseId }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [chapters, setChapters] = useState(initialData?.chapters || []);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const fetchChapters = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await apiCall("get", `/training/course/${courseId}`);
+      setChapters(response.course.chapters);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId]);
 
   const toggleCreating = () => setIsCreating((current) => !current);
 
@@ -56,12 +69,12 @@ const ChaptersForm = ({ initialData, courseId }) => {
       );
       if (response) {
         toast.success(`${response.message}`);
-        setChapters([...chapters, { title: values.title }]);
+        fetchChapters();
         toggleCreating();
       }
     } catch (error) {
       toast?.error("Something went wrong!", {
-        description: `${error?.message}`,
+        description: `${error?.response?.data?.message}`,
       });
     }
   };
@@ -77,6 +90,7 @@ const ChaptersForm = ({ initialData, courseId }) => {
         }
       );
       toast.success(`${response.message}`);
+      await fetchChapters();
     } catch (error) {
       toast.error(`${error?.message}` || "Something went wrong");
     } finally {
@@ -87,6 +101,10 @@ const ChaptersForm = ({ initialData, courseId }) => {
   const onEdit = async (chapterId) => {
     router.push(`/dashboard/training/course/${courseId}/chapter/${chapterId}`);
   };
+
+  useEffect(() => {
+    fetchChapters();
+  }, [fetchChapters, router]);
 
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4 transition-all relative">
@@ -160,11 +178,7 @@ const ChaptersForm = ({ initialData, courseId }) => {
           className={cn("text-sm", !chapters.length && "text-slate-500 italic")}
         >
           {!chapters.length && "No chapters added yet"}
-          <ChapterList
-            onEdit={onEdit}
-            onReorder={onReorder}
-            items={initialData?.chapters || []}
-          />
+          <ChapterList onEdit={onEdit} onReorder={onReorder} items={chapters} />
         </div>
       )}
 

@@ -14,44 +14,46 @@ import {
 } from "@/components/ui/form";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
 
-import { Combobox } from "@/components/ui/combobox";
 import { useAuth } from "@/context/authProvider";
+import { redirect } from "next/navigation";
 
 const formSchema = z.object({
-  categoryId: z.string().min(1),
+  title: z.string().min(2, {
+    message: "Title is required",
+  }),
 });
 
-const CategoryForm = ({
+const CourseChapterTitleForm = ({
   initialData,
   courseId,
-  options,
+  chapterId,
   onSuccessfulSubmit,
 }) => {
   const { user } = useAuth();
-  const [isMounted, setIsMounted] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      categoryId: initialData?.categoryId || "",
-    },
+    defaultValues: initialData,
   });
 
   const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values) => {
     try {
-      const response = await apiCall("PATCH", `/training/course/${courseId}`, {
-        categoryId: values.categoryId,
-        userId: user.id,
-      });
-
+      const response = await apiCall(
+        "PATCH",
+        `/training/course/${courseId}/chapter/${chapterId}`,
+        {
+          title: values.title,
+        }
+      );
       if (response) {
-        toast.success(response.message);
+        toast.success(`${response.message}`);
         onSuccessfulSubmit();
       }
     } catch (error) {
@@ -61,33 +63,34 @@ const CategoryForm = ({
     }
   };
 
-  useEffect(() => {
-    form.reset({ categoryId: initialData?.categoryId || "" });
-  }, [initialData, form, options]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  if (!isMounted) return null;
+  if (!user) {
+    redirect(`/auth/login`);
+  }
 
   return (
-    <>
+    <div className="w-full">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <FormField
             control={form.control}
-            name="categoryId"
+            name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>course category</FormLabel>
+                <FormLabel className="text-sm text-slate-700">
+                  Chapter title
+                </FormLabel>
                 <FormControl>
-                  <Combobox options={options} {...field} />
+                  <Input
+                    disabled={isSubmitting}
+                    placeholder="eg: 'Advanced web development"
+                    className="shadow bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <div className="flex items-center gap-x-2">
             <Button
               type="submit"
@@ -96,17 +99,17 @@ const CategoryForm = ({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="animate-spin" /> Please wait...
+                  <Loader2 className=" animate-spin" /> please wait...
                 </>
               ) : (
-                "Save"
+                "Update"
               )}
             </Button>
           </div>
         </form>
       </Form>
-    </>
+    </div>
   );
 };
 
-export default CategoryForm;
+export default CourseChapterTitleForm;

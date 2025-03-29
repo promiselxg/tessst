@@ -4,8 +4,8 @@ import ChapterTabsComponent from "@/app/(admin)/dashboard/_components/dashboard/
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/authProvider";
 import { apiCall } from "@/lib/utils/api";
-import { Loader2 } from "lucide-react";
-import { redirect } from "next/navigation";
+import { ChevronLeft, Loader2 } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -13,7 +13,7 @@ const ChapterEditPage = ({ params }) => {
   const { user } = useAuth();
   const [chapter, setChapter] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   if (!user) {
     redirect(`/auth/login`);
   }
@@ -63,9 +63,19 @@ const ChapterEditPage = ({ params }) => {
         </div>
       </div>
       <div className="p-6 bg-[whitesmoke] min-h-screen">
-        <h1>
-          Chapter ID : {params.chapterId}: {params.courseId}
-        </h1>
+        <div className="w-full flex items-center gap-2">
+          <ChevronLeft className="w-7 h-7" />
+          <p
+            onClick={() =>
+              router.replace(
+                `/dashboard/training/course/${params.courseId}?tab=lessons`
+              )
+            }
+            className="italic cursor-pointer transition-all"
+          >
+            Go back
+          </p>
+        </div>
         <ChapterTabsComponent
           initialData={chapter}
           chapterId={params.chapterId}

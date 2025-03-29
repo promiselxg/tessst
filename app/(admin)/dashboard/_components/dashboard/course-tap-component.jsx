@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Lock, Layout, BookOpen } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Lock, Layout, BookOpen, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import CourseTitleForm from "@/components/training/course-title-form";
 import CourseDescriptionForm from "@/components/training/course-description-form";
 import AttachmentForm from "@/components/training/attachment-form";
@@ -35,27 +35,52 @@ const tabs = [
 
 const TabsComponent = ({ initialData, courseId }) => {
   const searchParams = useSearchParams();
-  const [categories, setCategories] = useState([]);
-  const [activeTab, setActiveTab] = useState("course");
-  let activeScreen;
-
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    const fetchCourseCategories = async () => {
-      try {
-        const response = await apiCall("GET", "/training/course/category");
-        if (response) {
-          setCategories(response.categories);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
+  const [categories, setCategories] = useState([]);
+  const [activeTab, setActiveTab] = useState("course");
+  const [courseData, setcourseData] = useState(initialData);
 
+  const [loading, setLoading] = useState(false);
+
+  let activeScreen;
+
+  const fetchCourseInfo = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await apiCall("GET", `/training/course/${courseId}`);
+      setcourseData(response?.course);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId]);
+
+  const fetchCourseCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await apiCall("GET", "/training/course/category");
+      if (response) {
+        setCategories(response.categories);
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCourseCategories();
   }, []);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab") || "course";
+    setActiveTab(tab);
+    fetchCourseInfo();
+  }, [searchParams, fetchCourseInfo]);
 
   const handleTabClick = (key) => {
     const params = new URLSearchParams(searchParams);
@@ -66,19 +91,31 @@ const TabsComponent = ({ initialData, courseId }) => {
   switch (activeTab) {
     case "course":
       activeScreen = (
-        <CourseTitleForm initialData={initialData} courseId={courseId} />
+        <CourseTitleForm
+          initialData={courseData}
+          courseId={courseId}
+          onSuccessfulSubmit={fetchCourseInfo}
+        />
       );
       break;
     case "description":
       activeScreen = (
-        <CourseDescriptionForm initialData={initialData} courseId={courseId} />
+        <CourseDescriptionForm
+          initialData={courseData}
+          courseId={courseId}
+          onSuccessfulSubmit={fetchCourseInfo}
+        />
       );
       break;
     case "attachment":
       activeScreen = (
         <div className="flex gap-2 w-full justify-between flex-col">
-          <ImageFileUploadForm initialData={initialData} courseId={courseId} />
-          <AttachmentForm initialData={initialData} courseId={courseId} />
+          <ImageFileUploadForm initialData={courseData} courseId={courseId} />
+          <AttachmentForm
+            initialData={courseData}
+            courseId={courseId}
+            onSuccessfulSubmit={fetchCourseInfo}
+          />
         </div>
       );
       break;
@@ -86,12 +123,13 @@ const TabsComponent = ({ initialData, courseId }) => {
       activeScreen = (
         <div className="w-full">
           <CategoryForm
-            initialData={initialData}
+            initialData={courseData}
             courseId={initialData.id}
-            options={categories.map((category) => ({
+            options={categories?.map((category) => ({
               label: category.name,
               value: category.id,
             }))}
+            onSuccessfulSubmit={fetchCourseCategories}
           />
           <ChaptersForm initialData={initialData} courseId={courseId} />
         </div>
@@ -99,7 +137,11 @@ const TabsComponent = ({ initialData, courseId }) => {
       break;
     default:
       activeScreen = (
-        <CourseTitleForm initialData={initialData} courseId={courseId} />
+        <CourseTitleForm
+          initialData={courseData}
+          courseId={courseId}
+          onSuccessfulSubmit={fetchCourseInfo}
+        />
       );
       break;
   }
@@ -127,7 +169,9 @@ const TabsComponent = ({ initialData, courseId }) => {
         ))}
       </div>
       <div className="w-full bg-white shadow rounded-bl-lg rounded-br-lg overflow-hidden">
-        <div className="flex w-full p-6">{activeScreen}</div>
+        <div className="flex w-full p-6">
+          {loading ? <Loader2 className=" animate-spin" /> : activeScreen}
+        </div>
       </div>
     </>
   );

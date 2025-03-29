@@ -763,7 +763,7 @@ const getSingleChapter = async (req, params) => {
   const { chapterId, id } = await params;
 
   const userId = req.user.id;
-  console.log(params.id);
+
   if (!chapterId) {
     return customMessage("chapter ID is required", {}, 400);
   }

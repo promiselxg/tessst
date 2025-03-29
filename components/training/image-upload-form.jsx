@@ -56,6 +56,7 @@ const ImageFileUploadForm = ({ initialData, courseId }) => {
             alt="uploaded image"
             width={100}
             height={110}
+            priority
             className={`object-contain ${
               uploadedFile.length > 0 ? "h-[110px]" : "h-[110px]"
             } border-[2px] border-[--primary-btn] p-[2px] rounded-[5px] cursor-pointer`}
