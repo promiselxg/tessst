@@ -102,6 +102,10 @@ const ChaptersForm = ({ initialData, courseId }) => {
     router.push(`/dashboard/training/course/${courseId}/chapter/${chapterId}`);
   };
 
+  const onDelete = async (table, chapterId) => {
+    toast.success(`${table}-${chapterId}`);
+  };
+
   useEffect(() => {
     fetchChapters();
   }, [fetchChapters, router]);
@@ -178,7 +182,12 @@ const ChaptersForm = ({ initialData, courseId }) => {
           className={cn("text-sm", !chapters.length && "text-slate-500 italic")}
         >
           {!chapters.length && "No chapters added yet"}
-          <ChapterList onEdit={onEdit} onReorder={onReorder} items={chapters} />
+          <ChapterList
+            onEdit={onEdit}
+            onReorder={onReorder}
+            items={chapters}
+            onDelete={onDelete}
+          />
         </div>
       )}
 

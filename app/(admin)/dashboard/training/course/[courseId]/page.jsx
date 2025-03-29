@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import TabsComponent from "../../../_components/dashboard/course-tap-component";
+import DashboardHeader from "../../../_components/dashboard/header";
 
 const CourseEditPage = () => {
   const [course, setCourse] = useState({});
@@ -62,6 +63,11 @@ const CourseEditPage = () => {
     }
   };
 
+  const breadcrumbs = [
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Course setup" },
+  ];
+
   useEffect(() => {
     fetchCourseInfo();
     fetchCourseCategories();
@@ -87,20 +93,23 @@ const CourseEditPage = () => {
   }
 
   return (
-    <div className="p-6 bg-[whitesmoke] min-h-screen">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-y-2">
-          <h1 className="text-2xl font-medium">Course setup</h1>
-          <span className="text-sm text-slate-700">
-            Complete all fields {completedText}
-          </span>
+    <>
+      <DashboardHeader breadcrumbs={breadcrumbs} />
+      <div className="p-6 bg-[whitesmoke] min-h-screen">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-y-2">
+            <h1 className="text-2xl font-medium">Course setup</h1>
+            <span className="text-sm text-slate-700">
+              Complete all fields {completedText}
+            </span>
+          </div>
         </div>
+        <div className="flex items-center gap-x-2 mt-3">
+          <h2 className="text-xl">Customize this training course.</h2>
+        </div>
+        <TabsComponent initialData={course} courseId={course.id} />
       </div>
-      <div className="flex items-center gap-x-2 mt-3">
-        <h2 className="text-xl">Customize this training course.</h2>
-      </div>
-      <TabsComponent initialData={course} courseId={course.id} />
-    </div>
+    </>
   );
 };
 

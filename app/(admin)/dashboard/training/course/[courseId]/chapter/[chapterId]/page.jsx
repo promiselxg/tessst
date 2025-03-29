@@ -1,6 +1,7 @@
 "use client";
 
 import ChapterTabsComponent from "@/app/(admin)/dashboard/_components/dashboard/chapter-tab-component";
+import DashboardHeader from "@/app/(admin)/dashboard/_components/dashboard/header";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/authProvider";
 import { apiCall } from "@/lib/utils/api";
@@ -51,9 +52,18 @@ const ChapterEditPage = ({ params }) => {
       </div>
     );
   }
+  const breadcrumbs = [
+    { name: "Dashboard", href: "/dashboard" },
+    {
+      name: "Course setup",
+      href: `/dashboard/training/course/${params.courseId}?tab=lessons`,
+    },
+    { name: "Course chapter setup" },
+  ];
 
   return (
     <>
+      <DashboardHeader breadcrumbs={breadcrumbs} />
       <div className="p-4 w-full bg-red-300 ">
         <div className="flex justify-between items-center">
           <p className="text-sm font-bold">
@@ -63,19 +73,6 @@ const ChapterEditPage = ({ params }) => {
         </div>
       </div>
       <div className="p-6 bg-[whitesmoke] min-h-screen">
-        <div className="w-full flex items-center gap-2">
-          <ChevronLeft className="w-7 h-7" />
-          <p
-            onClick={() =>
-              router.replace(
-                `/dashboard/training/course/${params.courseId}?tab=lessons`
-              )
-            }
-            className="italic cursor-pointer transition-all"
-          >
-            Go back
-          </p>
-        </div>
         <ChapterTabsComponent
           initialData={chapter}
           chapterId={params.chapterId}

@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
-import { Grip, Pencil } from "lucide-react";
+import { Grip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-const ChapterList = ({ onEdit, onReorder, items }) => {
+const ChapterList = ({ onEdit, onReorder, items, onDelete }) => {
   const [mounted, setIsMounted] = useState(false);
   const [chapters, setChapters] = useState(items);
 
@@ -84,6 +84,10 @@ const ChapterList = ({ onEdit, onReorder, items }) => {
                       <Pencil
                         className="w-4 h4 cursor-pointer hover:opacity-75"
                         onClick={() => onEdit(chapter.id)}
+                      />
+                      <Trash2
+                        className="w-4 h4 cursor-pointer hover:opacity-75"
+                        onClick={() => onDelete("chapter", chapter.id)}
                       />
                     </div>
                   </div>
