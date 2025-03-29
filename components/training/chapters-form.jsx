@@ -33,18 +33,17 @@ const ChaptersForm = ({ initialData, courseId }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [chapters, setChapters] = useState(initialData?.chapters || []);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const fetchChapters = React.useCallback(async () => {
-    setLoading(true);
+    setIsUpdating(true);
     try {
       const response = await apiCall("get", `/training/course/${courseId}`);
       setChapters(response.course.chapters);
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setIsUpdating(false);
     }
   }, [courseId]);
 
@@ -92,7 +91,9 @@ const ChaptersForm = ({ initialData, courseId }) => {
       toast.success(`${response.message}`);
       await fetchChapters();
     } catch (error) {
-      toast.error(`${error?.message}` || "Something went wrong");
+      toast?.error("Something went wrong!", {
+        description: `${error?.response?.data?.message}`,
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -100,10 +101,6 @@ const ChaptersForm = ({ initialData, courseId }) => {
 
   const onEdit = async (chapterId) => {
     router.push(`/dashboard/training/course/${courseId}/chapter/${chapterId}`);
-  };
-
-  const onDelete = async (table, chapterId) => {
-    toast.success(`${table}-${chapterId}`);
   };
 
   useEffect(() => {
@@ -186,7 +183,8 @@ const ChaptersForm = ({ initialData, courseId }) => {
             onEdit={onEdit}
             onReorder={onReorder}
             items={chapters}
-            onDelete={onDelete}
+            courseId={courseId}
+            onSuccess={fetchChapters}
           />
         </div>
       )}

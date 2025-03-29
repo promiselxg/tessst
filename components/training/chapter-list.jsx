@@ -5,8 +5,9 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
 import { Grip, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { handleDeleteBtn } from "@/lib/utils/deleteItemFromDb";
 
-const ChapterList = ({ onEdit, onReorder, items, onDelete }) => {
+const ChapterList = ({ onEdit, onReorder, items, courseId, onSuccess }) => {
   const [mounted, setIsMounted] = useState(false);
   const [chapters, setChapters] = useState(items);
 
@@ -87,7 +88,12 @@ const ChapterList = ({ onEdit, onReorder, items, onDelete }) => {
                       />
                       <Trash2
                         className="w-4 h4 cursor-pointer hover:opacity-75"
-                        onClick={() => onDelete("chapter", chapter.id)}
+                        onClick={() =>
+                          handleDeleteBtn(
+                            `/training/course/${courseId}/chapter/${chapter.id}`,
+                            onSuccess
+                          )
+                        }
                       />
                     </div>
                   </div>
