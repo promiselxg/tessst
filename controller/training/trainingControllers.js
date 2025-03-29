@@ -566,6 +566,10 @@ const updateCourseChapter = async (req, params) => {
       updates.title = sanitize(updates.title);
     }
 
+    if (updates?.description) {
+      updates.description = sanitize(updates.description);
+    }
+
     if (updates?.isFree) {
       updates.isFree = !!updates.isFree;
     }
@@ -580,6 +584,7 @@ const updateCourseChapter = async (req, params) => {
 
     return customMessage(`Course chapter updated successfully`, {}, 200);
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };

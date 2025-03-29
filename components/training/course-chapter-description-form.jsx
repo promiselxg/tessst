@@ -19,6 +19,7 @@ import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/authProvider";
+import { redirect } from "next/navigation";
 import Editor from "../editor/editor";
 
 const formSchema = z.object({
@@ -27,9 +28,10 @@ const formSchema = z.object({
   }),
 });
 
-const CourseDescriptionForm = ({
+const ChapterDescriptionForm = ({
   initialData,
   courseId,
+  chapterId,
   onSuccessfulSubmit,
 }) => {
   const { user } = useAuth();
@@ -41,16 +43,15 @@ const CourseDescriptionForm = ({
 
   const { isSubmitting, isValid } = form.formState;
 
-  useEffect(() => {
-    form.reset(initialData);
-  }, [initialData, form]);
-
   const onSubmit = async (values) => {
     try {
-      const response = await apiCall("PATCH", `/training/course/${courseId}`, {
-        description: values.description,
-        userId: user.id,
-      });
+      const response = await apiCall(
+        "PATCH",
+        `/training/course/${courseId}/chapter/${chapterId}`,
+        {
+          description: values.description,
+        }
+      );
       if (response) {
         toast.success(`${response.message}`);
         onSuccessfulSubmit();
@@ -62,6 +63,10 @@ const CourseDescriptionForm = ({
     }
   };
 
+  if (!user) {
+    redirect(`/auth/login`);
+  }
+  console.log(initialData);
   return (
     <div className="w-full">
       <Form {...form}>
@@ -72,7 +77,7 @@ const CourseDescriptionForm = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm text-slate-700">
-                  Course description
+                  Chapter description
                 </FormLabel>
                 <FormControl>
                   <Editor {...field} />
@@ -102,4 +107,4 @@ const CourseDescriptionForm = ({
   );
 };
 
-export default CourseDescriptionForm;
+export default ChapterDescriptionForm;

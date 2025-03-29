@@ -1,10 +1,11 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Lock, Layout, BookOpen, Loader2 } from "lucide-react";
+import { Lock, Layout, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import CourseChapterTitleForm from "@/components/training/course-chapter-title-form";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/utils/api";
+import ChapterDescriptionForm from "@/components/training/course-chapter-description-form";
 
 const tabs = [
   {
@@ -74,7 +75,14 @@ const ChapterTabsComponent = ({ initialData, courseId, chapterId }) => {
       );
       break;
     case "description":
-      activeScreen = <div>chapter description</div>;
+      activeScreen = (
+        <ChapterDescriptionForm
+          initialData={chapterData}
+          courseId={courseId}
+          chapterId={chapterId}
+          onSuccessfulSubmit={fetchChapterData}
+        />
+      );
       break;
     case "attachment":
       activeScreen = <div>chapter attachment</div>;

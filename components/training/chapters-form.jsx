@@ -36,14 +36,11 @@ const ChaptersForm = ({ initialData, courseId }) => {
   const router = useRouter();
 
   const fetchChapters = React.useCallback(async () => {
-    setIsUpdating(true);
     try {
       const response = await apiCall("get", `/training/course/${courseId}`);
       setChapters(response.course.chapters);
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsUpdating(false);
     }
   }, [courseId]);
 
