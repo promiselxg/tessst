@@ -3,18 +3,23 @@
 import { apiCall } from "@/lib/utils/api";
 import { isValidUUID } from "@/lib/utils/validateUUID";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TabsComponent from "../../../_components/dashboard/course-tap-component";
 import DashboardHeader from "../../../_components/dashboard/header";
+import Banner from "@/components/banner/banner";
+import { Button } from "@/components/ui/button";
+import { handleDeleteBtn } from "@/lib/utils/deleteItemFromDb";
+import { useCourse } from "@/context/courseContext";
+import { toast } from "sonner";
 
 const CourseEditPage = () => {
-  const [course, setCourse] = useState({});
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { course, loading, fetchCourseInfo } = useCourse();
+  const [isPublishing, setIsPublishing] = useState(false);
   const router = useRouter();
   const params = useParams();
+  if (!params) return null;
 
   const { courseId } = params;
 
@@ -23,57 +28,55 @@ const CourseEditPage = () => {
   }
 
   const requiredFields = [
-    course.title,
-    course.description,
-    course.asset,
-    course.categoryId,
-    course.chapters?.some((chapter) => chapter?.isPublished),
+    course?.title,
+    course?.description,
+    course?.asset,
+    course?.categoryId,
+    course?.chapters?.some((chapter) => chapter?.isPublished),
   ];
 
   const totalFields = requiredFields?.length;
-  const completedFields = requiredFields.filter(Boolean)?.length;
+  const completedFields = requiredFields?.filter(Boolean)?.length;
   const completedText = `(${completedFields}/${totalFields})`;
-
-  const fetchCourseInfo = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await apiCall("GET", `/training/course/${courseId}`);
-
-      if (!response || Object.keys(response).length === 0) {
-        router.replace("/dashboard");
-      }
-
-      setCourse(response?.course);
-    } catch (error) {
-      console.log(error);
-      router.replace("/dashboard");
-    } finally {
-      setLoading(false);
-    }
-  }, [courseId, router]);
-
-  const fetchCourseCategories = async () => {
-    try {
-      const response = await apiCall("GET", "/training/course/category");
-      if (response) {
-        setCategories(response.categories);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const isFieldsCompleted = requiredFields?.filter(Boolean);
 
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Course setup" },
   ];
 
-  useEffect(() => {
-    fetchCourseInfo();
-    fetchCourseCategories();
-  }, [courseId, fetchCourseInfo]);
+  const handlePublishCourse = async (courseId, isPublished) => {
+    if (!courseId) return;
+    try {
+      setIsPublishing(true);
+      const endpoint = isPublished
+        ? `/training/course/${courseId}/unpublish`
+        : `/training/course/${courseId}/publish`;
 
-  if (!params) return null;
+      await apiCall("patch", endpoint);
+      toast.success(
+        `Course/Training successfully ${
+          isPublished ? "unpublished" : "published"
+        }.`
+      );
+
+      fetchCourseInfo(courseId, router);
+    } catch (error) {
+      toast.error(
+        `${error?.response?.data?.message}` || "something went wrong"
+      );
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleDelete = () => {
+    handleDeleteBtn(`/training/course/${courseId}`, "", `/dashboard`, router);
+  };
+
+  useEffect(() => {
+    fetchCourseInfo(courseId, router);
+  }, [courseId, fetchCourseInfo]);
 
   if (loading) {
     return (
@@ -88,26 +91,54 @@ const CourseEditPage = () => {
     );
   }
 
-  if (!course) {
-    router.replace("/dashboard");
-  }
-
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />
+      {!course?.isPublished && (
+        <Banner
+          variant="warning"
+          label={`This course is yet to be published therefore won't be visible to your user's`}
+        />
+      )}
       <div className="p-6 bg-[whitesmoke] min-h-screen">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-y-2">
-            <h1 className="text-2xl font-medium">Course setup</h1>
-            <span className="text-sm text-slate-700">
-              Complete all fields {completedText}
+            <div className="flex items-center gap-x-2 mt-3">
+              <h2 className="text-2xl">Customize this training course.</h2>
+            </div>
+            <span className="text-sm text-slate-700 italic font-bold">
+              Complete all required fields {completedText}
             </span>
           </div>
+          <div className="flex items-center gap-3">
+            <Button
+              disabled={!isFieldsCompleted || isPublishing}
+              onClick={() => handlePublishCourse(courseId, course?.isPublished)}
+            >
+              {isPublishing ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="animate-spin" />
+                  <span className="text-sm italic">
+                    {course?.isPublished ? "Unpublishing..." : "Publishing..."}
+                  </span>
+                </div>
+              ) : course?.isPublished ? (
+                "Unpublish Course"
+              ) : (
+                "Publish Course"
+              )}
+            </Button>
+
+            {!isPublishing && (
+              <Trash2
+                className="w-5 h-5 cursor-pointer hover:opacity-75 text-red-600"
+                onClick={handleDelete}
+              />
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-x-2 mt-3">
-          <h2 className="text-xl">Customize this training course.</h2>
-        </div>
-        <TabsComponent initialData={course} courseId={course.id} />
+
+        <TabsComponent initialData={course} courseId={course?.id} />
       </div>
     </>
   );

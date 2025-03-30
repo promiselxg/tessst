@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { getCookie } from "cookies-next";
-import { useAuthStore } from "@/lib/authStore";
+import { useAuthStore } from "@/store/authStore";
 
 const formSchema = z.object({
   username: z.string().min(2, {

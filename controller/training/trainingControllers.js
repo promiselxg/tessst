@@ -323,19 +323,28 @@ const publishCourse = async (req, params) => {
       return customMessage("course not found", {}, 404);
     }
 
-    const hasPublishedChapter = course.chapters.som(
+    const hasPublishedChapter = course.chapters.some(
       (chapter) => chapter.isPublished
     );
+
     if (
       !course.title ||
       !course.description ||
-      !course.imageUrl ||
       !course.categoryId ||
       !hasPublishedChapter
     ) {
       return customMessage("Missing required fields", {}, 401);
     }
 
+    if (
+      course &&
+      course.mediaType &&
+      course.mediaType.toLowerCase() === "video"
+    ) {
+      if (!course.videoUrl) {
+        return customMessage("Missing required fields", {}, 401);
+      }
+    }
     const publishedCourse = await prisma.course.update({
       where: {
         id: courseId,
@@ -352,6 +361,7 @@ const publishCourse = async (req, params) => {
       200
     );
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -391,6 +401,7 @@ const unpublishCourse = async (req, params) => {
       200
     );
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -421,14 +432,12 @@ const publishCourseChapter = async (req, params) => {
       },
     });
 
-    // Get Mux Data
-
     if (!chapter || !chapter.title || !chapter.description) {
       return customMessage("Missing required fields", {}, 400);
     }
 
-    if (chapter.mediaType.toUppercase() === "video") {
-      if (!muxData || !chapter.videoUrl) {
+    if (chapter.mediaType.toLowerCase() === "video") {
+      if (!chapter.videoUrl) {
         return customMessage("Missing required fields", {}, 400);
       }
     }
@@ -484,7 +493,7 @@ const unpublishCourseChapter = async (req, params) => {
 
     const publishedChaptersInCourse = await prisma.chapter.findMany({
       where: {
-        chapterId,
+        id: chapterId,
         isPublished: true,
       },
     });
@@ -506,6 +515,7 @@ const unpublishCourseChapter = async (req, params) => {
       200
     );
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -892,54 +902,66 @@ const deleteCourse = async (req, params) => {
 };
 
 const deleteCourseChapter = async (req, params) => {
-  const { chapterId, id } = await params;
-  const userId = req.user.id;
+  const { chapterId, id: courseId } = params;
+  const userId = req.user?.id;
 
-  if (!id || !userId || !chapterId) {
+  // Validate required fields
+  if (!courseId || !userId || !chapterId) {
     return customMessage("Missing required fields.", {}, 400);
   }
 
-  if (!isValidUUID(id) || !isValidUUID(userId)) {
-    return customMessage("Invalid Course Chapter ID or User ID", {}, 400);
+  // Validate UUIDs
+  if (
+    !isValidUUID(courseId) ||
+    !isValidUUID(userId) ||
+    !isValidUUID(chapterId)
+  ) {
+    return customMessage("Invalid Course, Chapter, or User ID", {}, 400);
   }
 
   try {
-    const chapterExist = await prisma.course.findUnique({
-      where: { id },
+    // Check if the course exists
+    const courseExists = await prisma.course.findUnique({
+      where: { id: courseId },
     });
-
-    if (!chapterExist) {
-      return customMessage(
-        "Course chapter not found or does not exist.",
-        {},
-        404
-      );
+    if (!courseExists) {
+      return customMessage("Course not found.", {}, 404);
     }
 
-    await prisma.chapter.delete({
-      where: { id: chapterId, courseId: id },
+    // Delete chapter
+    const deletedChapter = await prisma.chapter.delete({
+      where: { id: chapterId, courseId },
     });
 
-    const publishedChaptersInCourse = await prisma.chapter.findMany({
-      where: {
-        courseId: id,
-        isPublished: true,
-      },
+    if (deletedChapter) {
+      const existingMuxData = await prisma.muxData.findUnique({
+        where: { chapterId },
+      });
+
+      // Delete Mux data and video in parallel
+      await Promise.allSettled([
+        existingMuxData && prisma.muxData.delete({ where: { chapterId } }),
+        existingMuxData?.publicId &&
+          removeUploadedImage([existingMuxData.publicId], "video"),
+      ]);
+    }
+
+    // Count remaining published chapters
+    const publishedChapterCount = await prisma.chapter.count({
+      where: { courseId, isPublished: true },
     });
 
-    if (!publishedChaptersInCourse) {
+    // If no published chapters remain, unpublish the course
+    if (publishedChapterCount === 0) {
       await prisma.course.update({
-        where: {
-          courseId: id,
-        },
-        data: {
-          isPublished: false,
-        },
+        where: { id: courseId },
+        data: { isPublished: false },
       });
     }
 
     return customMessage("Course chapter deleted successfully", {}, 200);
   } catch (error) {
+    console.error("Error deleting chapter:", error);
     return ServerError(error, {}, 500);
   }
 };

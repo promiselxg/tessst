@@ -79,7 +79,7 @@ const CategoryForm = ({
             name="categoryId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>course category</FormLabel>
+                <FormLabel>Course category</FormLabel>
                 <FormControl>
                   <Combobox options={options} {...field} />
                 </FormControl>

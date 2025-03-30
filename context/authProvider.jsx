@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 import Cookies from "js-cookie";
-import { useAuthStore } from "@/lib/authStore";
+import { useAuthStore } from "@/store/authStore";
 
 const AuthContext = createContext(null);
 
@@ -33,5 +33,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook for authentication
 export const useAuth = () => useContext(AuthContext);

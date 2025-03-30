@@ -3,20 +3,17 @@ import { AlertTriangle, CheckCircleIcon } from "lucide-react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const bannerVariants = cva(
-  "border text-center p-4 text-sm flex w-full items-center",
-  {
-    variants: {
-      variant: {
-        warning: "bg-yellow-200/80 text-primary border-yellow/30",
-        success: "bg-emerald-700 border-emerald-800 text-secondary",
-      },
+const bannerVariants = cva("text-center p-4 text-sm flex w-full items-center", {
+  variants: {
+    variant: {
+      warning: "bg-yellow-200/80 text-primary border-yellow/30",
+      success: "bg-emerald-700 border-emerald-800 text-secondary",
     },
-    defaultVariants: {
-      variant: "warning",
-    },
-  }
-);
+  },
+  defaultVariants: {
+    variant: "warning",
+  },
+});
 
 const iconMap = {
   warning: AlertTriangle,
