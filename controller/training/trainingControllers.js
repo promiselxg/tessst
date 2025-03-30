@@ -436,7 +436,7 @@ const publishCourseChapter = async (req, params) => {
       return customMessage("Missing required fields", {}, 400);
     }
 
-    if (chapter.mediaType.toLowerCase() === "video") {
+    if (chapter.mediaType === "VIDEO") {
       if (!chapter.videoUrl) {
         return customMessage("Missing required fields", {}, 400);
       }
@@ -857,8 +857,8 @@ const deleteCategory = async (req, params) => {
 };
 
 const deleteCourse = async (req, params) => {
-  const { id } = await params;
-  const userId = req.user.id;
+  const { id } = params;
+  const userId = req.user?.id;
 
   if (!id || !userId) {
     return customMessage("Missing required fields.", {}, 400);
@@ -869,31 +869,55 @@ const deleteCourse = async (req, params) => {
   }
 
   try {
-    const courseExist = await prisma.course.findUnique({
+    // Fetch course with related chapters, Mux data, and attachments
+    const course = await prisma.course.findUnique({
       where: { id, userId },
       include: {
-        chapters: {
-          include: {
-            muxData: true,
-          },
-        },
+        chapters: { include: { muxData: true } },
+        attachments: true,
       },
     });
 
-    if (!courseExist) {
+    if (!course) {
       return customMessage("Course not found or does not exist.", {}, 404);
     }
 
-    for (const chapter of courseExist.chapters) {
-      if (chapter.muxData?.assetId) {
-        await Video.Assets.del(chapter.muxData.assetId);
-      }
+    const chapterIds = course.chapters.map((chapter) => chapter.id);
+    const muxPublicIds = course.chapters
+      .map((chapter) => chapter.muxData?.publicId)
+      .filter(Boolean);
+
+    const attachmentPublicIds = course.attachments
+      .map((attachment) => attachment.asset?.publicId)
+      .filter(Boolean);
+
+    // Delete chapters, Mux data, and attachments in parallel
+    await Promise.allSettled([
+      chapterIds.length > 0 &&
+        prisma.chapter.deleteMany({ where: { id: { in: chapterIds } } }),
+
+      chapterIds.length > 0 &&
+        prisma.muxData.deleteMany({ where: { chapterId: { in: chapterIds } } }),
+
+      muxPublicIds.length > 0 && removeUploadedImage(muxPublicIds, "video"),
+
+      attachmentPublicIds.length > 0 &&
+        removeUploadedImage(attachmentPublicIds, "raw"),
+
+      course.attachments.length > 0 &&
+        prisma.attachment.deleteMany({ where: { courseId: id } }),
+    ]);
+
+    // Remove course image if it exists
+    if (course.asset?.publicId) {
+      await removeUploadedImage(
+        [course.asset.publicId],
+        course.asset.resourceType
+      );
     }
 
-    // delete the category
-    await prisma.course.delete({
-      where: { id, userId },
-    });
+    // Delete course
+    await prisma.course.delete({ where: { id, userId } });
 
     return customMessage("Course deleted successfully", {}, 200);
   } catch (error) {
@@ -966,6 +990,52 @@ const deleteCourseChapter = async (req, params) => {
   }
 };
 
+const deleteCourseAttachment = async (req, params) => {
+  const { id: courseId, attachmentId } = params;
+
+  const userId = req.user?.id;
+
+  if (!courseId || !attachmentId || !userId) {
+    return customMessage("Missing required fields.", {}, 400);
+  }
+
+  if (
+    !isValidUUID(courseId) ||
+    !isValidUUID(attachmentId) ||
+    !isValidUUID(userId)
+  ) {
+    return customMessage(
+      "Invalid Course ID, Attachment ID, or User ID",
+      {},
+      400
+    );
+  }
+
+  try {
+    // Fetch the attachment to get its publicId
+    const attachment = await prisma.attachment.findUnique({
+      where: { id: attachmentId, courseId },
+    });
+
+    if (!attachment) {
+      return customMessage("Attachment not found.", {}, 404);
+    }
+
+    // Extract publicId for deletion from Cloudinary
+    const publicId = attachment.asset?.publicId;
+
+    await Promise.allSettled([
+      publicId && removeUploadedImage([publicId], "raw"),
+      prisma.attachment.delete({ where: { id: attachmentId } }),
+    ]);
+
+    return customMessage("Attachment deleted successfully", {}, 200);
+  } catch (error) {
+    console.error(error);
+    return ServerError(error, {}, 500);
+  }
+};
+
 export const trainingControllers = {
   createNewCourse,
   createCourseCategory,
@@ -985,4 +1055,5 @@ export const trainingControllers = {
   deleteCategory,
   deleteCourse,
   deleteCourseChapter,
+  deleteCourseAttachment,
 };

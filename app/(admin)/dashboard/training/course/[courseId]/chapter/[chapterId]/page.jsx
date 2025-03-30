@@ -29,7 +29,7 @@ const ChapterEditPage = ({ params }) => {
   const completedFields = requiredFields.filter(Boolean)?.length;
   const completedText = `(${completedFields}/${totalFields})`;
 
-  const isFieldsCompleted = requiredFields.filter(Boolean);
+  const isFieldsCompleted = completedFields === totalFields;
 
   const fetchChapterInfo = React.useCallback(async () => {
     setLoading(true);
@@ -63,7 +63,7 @@ const ChapterEditPage = ({ params }) => {
     handleDeleteBtn(
       `/training/course/${params.courseId}/chapter/${params.chapterId}`,
       "",
-      `/training/course/${params.courseId}`,
+      `/dashboard/training/course/${params.courseId}`,
       router
     );
   };
@@ -83,7 +83,9 @@ const ChapterEditPage = ({ params }) => {
 
       fetchChapterInfo();
     } catch (error) {
-      toast.error(`${error.message}` || "something went wrong");
+      toast.error(
+        `${error?.response?.data?.message}` || "something went wrong"
+      );
     } finally {
       setIsPublishing(false);
     }

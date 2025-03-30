@@ -48,7 +48,9 @@ const ChaptersForm = ({ initialData, courseId }) => {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: "" },
+    defaultValues: {
+      title: "",
+    },
   });
 
   const { isSubmitting, isValid } = form.formState;
@@ -67,6 +69,7 @@ const ChaptersForm = ({ initialData, courseId }) => {
         toast.success(`${response.message}`);
         fetchChapters();
         toggleCreating();
+        form.reset();
       }
     } catch (error) {
       toast?.error("Something went wrong!", {
@@ -175,7 +178,8 @@ const ChaptersForm = ({ initialData, courseId }) => {
         <div
           className={cn("text-sm", !chapters.length && "text-slate-500 italic")}
         >
-          {!chapters.length && "No chapters added yet"}
+          {!chapters.length &&
+            "you have not added a chapter to this course yet."}
           <ChapterList
             onEdit={onEdit}
             onReorder={onReorder}
@@ -186,7 +190,7 @@ const ChaptersForm = ({ initialData, courseId }) => {
         </div>
       )}
 
-      {!isCreating && (
+      {!isCreating && chapters.length > 1 && (
         <p className="text-xs text-muted-foreground">
           Drag and drop to reorder the course chapters
         </p>

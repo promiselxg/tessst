@@ -85,8 +85,6 @@ export async function middleware(req) {
     console.log("Access token expired, attempting refresh...");
     return await generateRefreshToken();
   }
-
-  console.log("No valid tokens, redirecting to login...");
   return redirectToLogin(req);
 }
 

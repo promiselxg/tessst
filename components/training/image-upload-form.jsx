@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useImageContext } from "@/context/imageUpload.context";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 import FileUpload from "@/components/image/file-upload";
 
@@ -47,22 +48,24 @@ const ImageFileUploadForm = ({ initialData, courseId }) => {
 
         {isEditing && <FileUpload courseId={courseId} />}
         {!isEditing && initialData.asset && (
-          <>
-            <Image
-              src={
-                uploadedFile.length > 0 && uploadedFile[0]?.secure_url
-                  ? uploadedFile[0].secure_url
-                  : initialData.asset.publicUrl
-              }
-              alt="uploaded image"
-              width={200}
-              height={200}
-              priority
-              className={`w-[200px] object-contain my-3 ${
-                uploadedFile.length > 0 ? "h-[110px]" : "h-[110px]"
-              } rounded-[5px]`}
-            />
-          </>
+          <div className="w-[300px] overflow-hidden rounded-md shadow-[0_2px_10px] my-3">
+            <AspectRatio ratio={16 / 9}>
+              <Image
+                src={
+                  uploadedFile.length > 0 && uploadedFile[0]?.secure_url
+                    ? uploadedFile[0].secure_url
+                    : initialData.asset.publicUrl
+                }
+                alt="uploaded image"
+                width={300}
+                height={300}
+                priority
+                className={`h-full w-full rounded-md object-cover ${
+                  uploadedFile.length > 0 ? "h-[110px]" : "h-[110px]"
+                } rounded-[5px]`}
+              />
+            </AspectRatio>
+          </div>
         )}
       </div>
     </>

@@ -72,7 +72,7 @@ const ChapterList = ({ onEdit, onReorder, items, courseId, onSuccess }) => {
                     >
                       <Grip className="h-5 w-5" />
                     </div>
-                    {chapter.title},
+                    {chapter.title}
                     <div className="ml-auto pr-2 flex items-center gap-x-2">
                       {chapter.isFree && <Badge>Free</Badge>}
                       <Badge

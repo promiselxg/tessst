@@ -11,14 +11,18 @@ import DashboardHeader from "../../../_components/dashboard/header";
 import Banner from "@/components/banner/banner";
 import { Button } from "@/components/ui/button";
 import { handleDeleteBtn } from "@/lib/utils/deleteItemFromDb";
-import { useCourse } from "@/context/courseContext";
 import { toast } from "sonner";
+import useConfettiStore from "@/store/confettiStore";
 
 const CourseEditPage = () => {
-  const { course, loading, fetchCourseInfo } = useCourse();
+  const [course, setCourse] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+
+  const confetti = useConfettiStore();
   const router = useRouter();
   const params = useParams();
+
   if (!params) return null;
 
   const { courseId } = params;
@@ -35,10 +39,10 @@ const CourseEditPage = () => {
     course?.chapters?.some((chapter) => chapter?.isPublished),
   ];
 
-  const totalFields = requiredFields?.length;
-  const completedFields = requiredFields?.filter(Boolean)?.length;
+  const totalFields = requiredFields.length;
+  const completedFields = requiredFields.filter(Boolean).length;
   const completedText = `(${completedFields}/${totalFields})`;
-  const isFieldsCompleted = requiredFields?.filter(Boolean);
+  const isFieldsCompleted = completedFields === totalFields;
 
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
@@ -59,8 +63,8 @@ const CourseEditPage = () => {
           isPublished ? "unpublished" : "published"
         }.`
       );
-
-      fetchCourseInfo(courseId, router);
+      confetti.showConfetti();
+      fetchCourseInfo();
     } catch (error) {
       toast.error(
         `${error?.response?.data?.message}` || "something went wrong"
@@ -71,12 +75,31 @@ const CourseEditPage = () => {
   };
 
   const handleDelete = () => {
-    handleDeleteBtn(`/training/course/${courseId}`, "", `/dashboard`, router);
+    handleDeleteBtn(
+      `/training/course/${courseId}`,
+      "",
+      `/dashboard/courses`,
+      router
+    );
+  };
+
+  const fetchCourseInfo = async () => {
+    try {
+      const response = await apiCall("GET", `/training/course/${courseId}`);
+      if (!response || Object.keys(response).length === 0) {
+        router.replace("/dashboard/courses");
+      }
+      setCourse(response.course);
+    } catch (error) {
+      router.replace("/dashboard/courses");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchCourseInfo(courseId, router);
-  }, [courseId, fetchCourseInfo]);
+    fetchCourseInfo();
+  }, [courseId]);
 
   if (loading) {
     return (
@@ -91,6 +114,7 @@ const CourseEditPage = () => {
     );
   }
 
+  console.log(course);
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />

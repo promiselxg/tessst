@@ -2,12 +2,15 @@
 import React, { useEffect, useState } from "react";
 import { useImageContext } from "@/context/imageUpload.context";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
 
 import DocumentFileUpload from "@/components/document/file-upload";
+import { handleDeleteBtn } from "@/lib/utils/deleteItemFromDb";
+import { useRouter } from "next/navigation";
 
 const AttachmentForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter();
   const { uploadStatus, setUploadStatus, setSelectedImages } =
     useImageContext();
 
@@ -15,6 +18,15 @@ const AttachmentForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
     setIsEditing((prev) => !prev);
     setUploadStatus("pending");
     setSelectedImages([]);
+  };
+
+  const handleDelete = (attachmentId) => {
+    handleDeleteBtn(
+      `/training/course/${courseId}/attachment/${attachmentId}`,
+      "",
+      `/dashboard/training/course/${courseId}`,
+      router
+    );
   };
 
   useEffect(() => {
@@ -70,8 +82,12 @@ const AttachmentForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
                 >
                   {attachment.name}
                 </a>
-                <Button variant="ghost" className="text-red-500 cursor-pointer">
-                  Delete
+                <Button
+                  variant="ghost"
+                  className="text-red-500 cursor-pointer"
+                  onClick={() => handleDelete(attachment.id)}
+                >
+                  <Trash2 />
                 </Button>
               </div>
             ))}
