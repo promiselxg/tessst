@@ -114,7 +114,6 @@ const CourseEditPage = () => {
     );
   }
 
-  console.log(course);
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />

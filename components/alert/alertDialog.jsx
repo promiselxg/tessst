@@ -1,7 +1,6 @@
 "use client";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,6 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
+import { Button } from "../ui/button";
 
 const ConfirmModal = ({ children, onConfirm, isPublishing }) => {
   return (
@@ -26,7 +26,7 @@ const ConfirmModal = ({ children, onConfirm, isPublishing }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm}>
+            <Button onClick={onConfirm}>
               {isPublishing ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className=" animate-spin" />
@@ -35,7 +35,7 @@ const ConfirmModal = ({ children, onConfirm, isPublishing }) => {
               ) : (
                 "Continue"
               )}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
