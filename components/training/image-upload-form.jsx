@@ -47,20 +47,22 @@ const ImageFileUploadForm = ({ initialData, courseId }) => {
 
         {isEditing && <FileUpload courseId={courseId} />}
         {!isEditing && initialData.asset && (
-          <Image
-            src={
-              uploadedFile.length > 0 && uploadedFile[0]?.secure_url
-                ? uploadedFile[0].secure_url
-                : initialData.asset.publicUrl
-            }
-            alt="uploaded image"
-            width={100}
-            height={110}
-            priority
-            className={`object-contain ${
-              uploadedFile.length > 0 ? "h-[110px]" : "h-[110px]"
-            } border-[2px] border-[--primary-btn] p-[2px] rounded-[5px] cursor-pointer`}
-          />
+          <>
+            <Image
+              src={
+                uploadedFile.length > 0 && uploadedFile[0]?.secure_url
+                  ? uploadedFile[0].secure_url
+                  : initialData.asset.publicUrl
+              }
+              alt="uploaded image"
+              width={200}
+              height={200}
+              priority
+              className={`w-[200px] object-contain my-3 ${
+                uploadedFile.length > 0 ? "h-[110px]" : "h-[110px]"
+              } rounded-[5px]`}
+            />
+          </>
         )}
       </div>
     </>

@@ -10,7 +10,7 @@ import { useImageContext } from "@/context/imageUpload.context";
 const SelectedImagesDisplay = ({ source, onRemoveImage }) => {
   return source?.map((image, i) => (
     <div
-      className="w-full h-[60px] rounded-md relative mb-5   bg-contain"
+      className="w-[200px] h-[60px] rounded-md relative mb-5   bg-contain"
       key={i}
     >
       {type === "file" && (
@@ -34,7 +34,7 @@ const ImageCard = ({ image, type, onRemoveImage, index }) => {
   const { uploadStatus, loading } = useImageContext();
   return (
     <div
-      className="w-full h-[110px] rounded-md relative mb-5 bg-contain imageWrapper link-transition overflow-hidden"
+      className="w-[200px] h-[110px] rounded-md relative mb-5 bg-contain imageWrapper link-transition overflow-hidden"
       key={index}
     >
       {type === "file" && uploadStatus !== "completed" && !loading && (
@@ -70,7 +70,7 @@ export const RenderImages = ({
   uploadStatus,
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-5 gap-3">
       {source?.map((image, index) => (
         <ImageCard
           key={index}
@@ -82,7 +82,7 @@ export const RenderImages = ({
         />
       ))}
       {!loading && uploadStatus !== "completed" && (
-        <div className="h-[110px] border border-dashed p-2 rounded-[8px] border-[rgba(0,0,0,0.2)] w-full cursor-pointer items-center flex justify-center">
+        <div className="h-[110px] border border-dashed p-2 rounded-[8px] border-[rgba(0,0,0,0.2)] w-[200px] cursor-pointer items-center flex justify-center">
           <div className="flex flex-col cursor-pointer justify-center items-center">
             <label
               htmlFor="files"

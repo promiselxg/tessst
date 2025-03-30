@@ -1,11 +1,13 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Lock, Layout, Loader2 } from "lucide-react";
+import { Lock, Layout, Loader2, Video } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import CourseChapterTitleForm from "@/components/training/course-chapter-title-form";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/utils/api";
 import ChapterDescriptionForm from "@/components/training/course-chapter-description-form";
+import ChapterAccessForm from "@/components/training/course-chapter-access-form";
+import ChapterVideoUploadForm from "@/components/training/chapter-video-form";
 
 const tabs = [
   {
@@ -19,8 +21,13 @@ const tabs = [
     key: "description",
   },
   {
+    name: "Access setting",
+    icon: <Lock className="h-4 w-4 mr-1" />,
+    key: "access",
+  },
+  {
     name: "Media documents",
-    icon: <Layout className="h-4 w-4 mr-1" />,
+    icon: <Video className="h-4 w-4 mr-1" />,
     key: "attachment",
   },
 ];
@@ -84,14 +91,36 @@ const ChapterTabsComponent = ({ initialData, courseId, chapterId }) => {
         />
       );
       break;
-    case "attachment":
-      activeScreen = <div>chapter attachment</div>;
+    case "access":
+      activeScreen = (
+        <ChapterAccessForm
+          initialData={chapterData}
+          courseId={courseId}
+          chapterId={chapterId}
+          onSuccessfulSubmit={fetchChapterData}
+        />
+      );
+
       break;
-    case "lessons":
-      activeScreen = <div>chapter title</div>;
+    case "attachment":
+      activeScreen = (
+        <ChapterVideoUploadForm
+          initialData={chapterData}
+          courseId={courseId}
+          chapterId={chapterId}
+          onSuccessfulSubmit={fetchChapterData}
+        />
+      );
       break;
     default:
-      activeScreen = <div>chapter title</div>;
+      activeScreen = (
+        <CourseChapterTitleForm
+          initialData={chapterData}
+          courseId={courseId}
+          chapterId={chapterId}
+          onSuccessfulSubmit={fetchChapterData}
+        />
+      );
       break;
   }
 

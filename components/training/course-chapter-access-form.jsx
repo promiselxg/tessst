@@ -10,7 +10,7 @@ import {
   FormMessage,
   FormField,
   FormItem,
-  FormLabel,
+  FormDescription,
 } from "@/components/ui/form";
 
 import { Button } from "@/components/ui/button";
@@ -20,15 +20,13 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/context/authProvider";
 import { redirect } from "next/navigation";
-import Editor from "../editor/editor";
+import { Checkbox } from "../ui/checkbox";
 
 const formSchema = z.object({
-  description: z.string().min(2, {
-    message: "course description is required",
-  }),
+  isFree: z.boolean().default(false),
 });
 
-const ChapterDescriptionForm = ({
+const ChapterAccessForm = ({
   initialData,
   courseId,
   chapterId,
@@ -38,7 +36,9 @@ const ChapterDescriptionForm = ({
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      isFree: !!initialData.isFree,
+    },
   });
 
   const { isSubmitting, isValid } = form.formState;
@@ -49,7 +49,7 @@ const ChapterDescriptionForm = ({
         "PATCH",
         `/training/course/${courseId}/chapter/${chapterId}`,
         {
-          description: values.description,
+          isFree: values.isFree,
         }
       );
       if (response) {
@@ -73,15 +73,21 @@ const ChapterDescriptionForm = ({
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <FormField
             control={form.control}
-            name="description"
+            name="isFree"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm text-slate-700">
-                  Chapter description
-                </FormLabel>
+              <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
                 <FormControl>
-                  <Editor {...field} />
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                 </FormControl>
+                <div className="leading-none flex font-bold">
+                  <FormDescription className="text-sm italic text-slate-500">
+                    Check this box if you want this chapter to be free for
+                    preview to all user&apos;s
+                  </FormDescription>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -107,4 +113,4 @@ const ChapterDescriptionForm = ({
   );
 };
 
-export default ChapterDescriptionForm;
+export default ChapterAccessForm;

@@ -742,14 +742,23 @@ const getSingleCourse = async (req, params) => {
       where: { id, userId },
       include: {
         chapters: {
-          orderBy: {
-            position: "asc",
+          select: {
+            id: true,
+            courseId: true,
+            title: true,
+            description: true,
+            videoUrl: true,
+            position: true,
+            isFree: true,
+            isPublished: true,
+            mediaType: true,
+            muxData: true,
+            createdAt: true,
           },
+          orderBy: { position: "asc" },
         },
         attachments: {
-          orderBy: {
-            createdAt: "desc",
-          },
+          orderBy: { createdAt: "desc" },
         },
       },
     });
@@ -760,6 +769,7 @@ const getSingleCourse = async (req, params) => {
 
     return customMessage("Course found", { course }, 200);
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };

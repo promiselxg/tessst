@@ -240,13 +240,13 @@ model Chapter {
 }
 
 model MuxData {
-  id         String   @id @default(uuid())
-  playbackId String?
-  assetId   String
-  chapterId String  @unique
-  chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(uuid())
+  assetId     String
+  publicId    String
+  chapterId   String    @unique
+  chapter     Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([chapterId])
 }

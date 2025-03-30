@@ -2,11 +2,13 @@
 
 import ChapterTabsComponent from "@/app/(admin)/dashboard/_components/dashboard/chapter-tab-component";
 import DashboardHeader from "@/app/(admin)/dashboard/_components/dashboard/header";
+import Banner from "@/components/banner/banner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/authProvider";
 import { apiCall } from "@/lib/utils/api";
-import { Loader2 } from "lucide-react";
-import { redirect } from "next/navigation";
+import { handleDeleteBtn } from "@/lib/utils/deleteItemFromDb";
+import { Loader2, Trash2 } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -14,16 +16,19 @@ const ChapterEditPage = ({ params }) => {
   const { user } = useAuth();
   const [chapter, setChapter] = useState([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   if (!user) {
     redirect(`/auth/login`);
   }
 
-  const requiredFields = [chapter.title, chapter.description, chapter.videoUrl];
+  const requiredFields = [chapter.title, chapter.description];
 
   const totalFields = requiredFields?.length;
   const completedFields = requiredFields.filter(Boolean)?.length;
   const completedText = `(${completedFields}/${totalFields})`;
+
+  const isFieldsCompleted = requiredFields.filter(Boolean);
 
   const fetchChapterInfo = React.useCallback(async () => {
     setLoading(true);
@@ -61,16 +66,35 @@ const ChapterEditPage = ({ params }) => {
     },
     { name: "Course chapter setup" },
   ];
-
+  const handleDelete = () => {
+    handleDeleteBtn(
+      `/training/course/${params.courseId}/chapter/${params.chapterId}`,
+      "",
+      `/training/course/${params.courseId}`,
+      router
+    );
+  };
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />
-      <div className="p-4 w-full bg-red-300 ">
+      {!chapter.isPublished && (
+        <Banner
+          variant="warning"
+          label={`This chapter is yet to be published therefore won't be visible in the course page.`}
+        />
+      )}
+      <div className="p-4 w-full bg-red-200 ">
         <div className="flex justify-between items-center">
           <p className="text-sm font-bold">
             Completed Fields : {completedText}
           </p>
-          <Button disabled={!completedFields}>Publish Chapter</Button>
+          <div className="flex items-center gap-3">
+            <Button disabled={!isFieldsCompleted}>Publish Chapter</Button>
+            <Trash2
+              className="w-5 h-5 cursor-pointer hover:opacity-75"
+              onClick={() => handleDelete()}
+            />
+          </div>
         </div>
       </div>
       <div className="p-6 bg-[whitesmoke] min-h-screen">
