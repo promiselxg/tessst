@@ -5,7 +5,7 @@ import { isValidUUID } from "@/lib/utils/validateUUID";
 
 import { Loader2, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import TabsComponent from "../../../_components/dashboard/course-tap-component";
 import DashboardHeader from "../../../_components/dashboard/header";
 import Banner from "@/components/banner/banner";
@@ -15,22 +15,76 @@ import { toast } from "sonner";
 import useConfettiStore from "@/store/confettiStore";
 
 const CourseEditPage = () => {
-  const [course, setCourse] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
 
   const confetti = useConfettiStore();
   const router = useRouter();
   const params = useParams();
 
-  if (!params) return null;
+  // Ensure params exist before accessing courseId
+  const courseId = params?.courseId;
 
-  const { courseId } = params;
+  useEffect(() => {
+    if (!courseId || !isValidUUID(courseId)) {
+      router.replace("/dashboard");
+    }
+  }, [courseId, router]);
 
-  if (!isValidUUID(courseId)) {
-    router.replace("/dashboard");
-  }
+  // Fetch course info with useCallback to prevent re-renders
+  const fetchCourseInfo = useCallback(async () => {
+    if (!courseId) return;
+    try {
+      setLoading(true);
+      const response = await apiCall("GET", `/training/course/${courseId}`);
+      if (!response || Object.keys(response).length === 0) {
+        router.replace("/dashboard/courses");
+      } else {
+        setCourse(response.course);
+      }
+    } catch (error) {
+      router.replace("/dashboard/courses");
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId, router]);
 
+  useEffect(() => {
+    fetchCourseInfo();
+  }, [fetchCourseInfo]);
+
+  const handlePublishCourse = async (isPublished) => {
+    if (!courseId) return;
+    try {
+      setIsPublishing(true);
+      const endpoint = isPublished
+        ? `/training/course/${courseId}/unpublish`
+        : `/training/course/${courseId}/publish`;
+
+      await apiCall("patch", endpoint);
+      toast.success(
+        `Course successfully ${isPublished ? "unpublished" : "published"}.`
+      );
+      confetti.showConfetti();
+      fetchCourseInfo();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleDelete = () => {
+    handleDeleteBtn(
+      `/training/course/${courseId}`,
+      "",
+      `/dashboard/courses`,
+      router
+    );
+  };
+
+  // Ensure required fields are present for publishing
   const requiredFields = [
     course?.title,
     course?.description,
@@ -49,65 +103,13 @@ const CourseEditPage = () => {
     { name: "Course setup" },
   ];
 
-  const handlePublishCourse = async (courseId, isPublished) => {
-    if (!courseId) return;
-    try {
-      setIsPublishing(true);
-      const endpoint = isPublished
-        ? `/training/course/${courseId}/unpublish`
-        : `/training/course/${courseId}/publish`;
-
-      await apiCall("patch", endpoint);
-      toast.success(
-        `Course/Training successfully ${
-          isPublished ? "unpublished" : "published"
-        }.`
-      );
-      confetti.showConfetti();
-      fetchCourseInfo();
-    } catch (error) {
-      toast.error(
-        `${error?.response?.data?.message}` || "something went wrong"
-      );
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-
-  const handleDelete = () => {
-    handleDeleteBtn(
-      `/training/course/${courseId}`,
-      "",
-      `/dashboard/courses`,
-      router
-    );
-  };
-
-  const fetchCourseInfo = async () => {
-    try {
-      const response = await apiCall("GET", `/training/course/${courseId}`);
-      if (!response || Object.keys(response).length === 0) {
-        router.replace("/dashboard/courses");
-      }
-      setCourse(response.course);
-    } catch (error) {
-      router.replace("/dashboard/courses");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCourseInfo();
-  }, [courseId, fetchCourseInfo]);
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-[rgba(0,0,0,0.2)]">
         <div className="flex flex-col justify-center items-center mt-20">
           <Loader2 className=" animate-spin" />
           <p className="text-sm text-slate-500 italic">
-            loading course information...
+            Loading course information...
           </p>
         </div>
       </div>
@@ -120,7 +122,7 @@ const CourseEditPage = () => {
       {!course?.isPublished && (
         <Banner
           variant="warning"
-          label={`This course is yet to be published therefore won't be visible to your user's`}
+          label="This course is yet to be published and won't be visible to users."
         />
       )}
       <div className="p-6 bg-[whitesmoke] min-h-screen">
@@ -136,7 +138,7 @@ const CourseEditPage = () => {
           <div className="flex items-center gap-3">
             <Button
               disabled={!isFieldsCompleted || isPublishing}
-              onClick={() => handlePublishCourse(courseId, course?.isPublished)}
+              onClick={() => handlePublishCourse(course?.isPublished)}
             >
               {isPublishing ? (
                 <div className="flex items-center gap-2">
