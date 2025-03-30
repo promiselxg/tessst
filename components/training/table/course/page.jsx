@@ -33,7 +33,7 @@ const CourseDataTable = () => {
     if (!user.id) {
       router.replace(`/auth/login`);
     }
-  }, []);
+  }, [user.id, router]);
 
   return (
     <div className="container mx-auto  bg-white shadow p-4 rounded-[8px]">

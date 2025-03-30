@@ -99,7 +99,7 @@ const CourseEditPage = () => {
 
   useEffect(() => {
     fetchCourseInfo();
-  }, [courseId]);
+  }, [courseId, fetchCourseInfo]);
 
   if (loading) {
     return (
