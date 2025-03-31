@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -23,6 +23,7 @@ import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { getCookie } from "cookies-next";
 import { useAuthStore } from "@/store/authStore";
+import { useAuth } from "@/context/authProvider";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -36,6 +37,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const { loginUser } = useAuthStore();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
 
   const [isMounted, setIsMounted] = useState(false);
@@ -69,7 +71,11 @@ export function LoginForm() {
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+
+    if (user) {
+      router.replace("/dashboard/training");
+    }
+  }, [user, router]);
 
   if (!isMounted) return null;
 

@@ -24,7 +24,6 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/authProvider";
-import DashboardHeader from "@/app/(admin)/dashboard/_components/dashboard/header";
 
 const formSchema = z.object({
   title: z.string().min(2, {

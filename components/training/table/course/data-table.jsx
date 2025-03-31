@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 export function CourseTable({ columns, data, loading }) {
   const [sorting, setSorting] = React.useState([]);
@@ -34,6 +35,7 @@ export function CourseTable({ columns, data, loading }) {
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [selectedCourse, setselectedCourse] = React.useState({});
+  const router = useRouter();
 
   const handleGetSelectedIds = () => {
     const selectedIds = table
@@ -64,39 +66,49 @@ export function CourseTable({ columns, data, loading }) {
   return (
     <div>
       <div className="rounded-md p-2">
-        <div className="flex items-center py-4 gap-3">
-          <Input
-            placeholder="Filter course title"
-            value={table.getColumn("title")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Filter columns</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex justify-between py-4 gap-3">
+          <div className="flex w-1/2 gap-4">
+            <Input
+              placeholder="Filter course title"
+              value={table.getColumn("title")?.getFilterValue() ?? ""}
+              onChange={(event) =>
+                table.getColumn("title")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">Filter columns</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div>
+            <Button
+              className="bg-sky-700 transition-all hover:bg-sky-600"
+              onClick={() => router.replace(`/dashboard/training/create`)}
+            >
+              Create new course
+            </Button>
+          </div>
         </div>
         <div className="text-sm text-muted-foreground px-2 py-2 flex items-center gap-3">
           <div>
@@ -105,6 +117,7 @@ export function CourseTable({ columns, data, loading }) {
           </div>
           <Button
             onClick={handleGetSelectedIds}
+            size="icon"
             className=" bg-red-500 hover:bg-red-600 text-black disabled:cursor-not-allowed"
             disabled={table.getSelectedRowModel().rows.length === 0}
           >
@@ -137,9 +150,9 @@ export function CourseTable({ columns, data, loading }) {
                 <tr>
                   <td colSpan="7">
                     <div className="p-5 w-full space-y-2">
-                      <Skeleton className="h-2 w-full bg-[#171726] rounded-full" />
-                      <Skeleton className="h-2 w-2/3 bg-[#212136] rounded-full" />
-                      <Skeleton className="h-2 w-1/3 bg-[#0d0d16] rounded-full" />
+                      <Skeleton className="h-2 w-full bg-sky-700 rounded-full" />
+                      <Skeleton className="h-2 w-2/3 bg-sky-500 rounded-full" />
+                      <Skeleton className="h-2 w-1/3 bg-sky-300 rounded-full" />
                     </div>
                   </td>
                 </tr>
