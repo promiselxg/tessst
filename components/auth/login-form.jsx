@@ -61,7 +61,7 @@ export function LoginForm() {
     try {
       await loginUser(values.username, values.password);
       toast.success("Login successful");
-      router.replace(callbackUrl);
+      redirect(callbackUrl);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "An unknown error occurred"
@@ -73,7 +73,7 @@ export function LoginForm() {
     setIsMounted(true);
 
     if (user) {
-      router.replace("/dashboard/training");
+      router.replace("/dashboard");
     }
   }, [user, router]);
 
