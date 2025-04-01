@@ -5,17 +5,12 @@ import sanitizeHtml from "sanitize-html";
 
 const createNewProduct = async (req) => {
   try {
-    const { name, description, price, categoryid, stock, images } =
-      await req.json();
+    // const { name, description, price, categoryid, stock, images } =
+    //   await req.json();
 
-    if (
-      !name ||
-      !description ||
-      !price ||
-      !categoryid.trim() ||
-      !Array.isArray(images) ||
-      images.length === 0
-    ) {
+    console.log(await req.json());
+    return;
+    if (!name || !description || !price || !categoryid.trim()) {
       return customMessage("All fields are required", {}, 400);
     }
 
@@ -63,6 +58,7 @@ const createNewProduct = async (req) => {
 
     return customMessage("Product created successfully", { product }, 201);
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };

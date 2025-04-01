@@ -55,10 +55,22 @@ const ProductPriceForm = () => {
                       {...field}
                       id="product_price"
                       onChange={(e) => {
-                        const sanitizedValue = e.target.value.replace(
-                          /[^0-9]/g,
-                          ""
-                        );
+                        let value = e.target.value;
+                        let sanitizedValue = value.replace(/[^0-9.]/g, "");
+                        const parts = sanitizedValue.split(".");
+                        if (parts.length > 2) {
+                          sanitizedValue =
+                            parts[0] + "." + parts.slice(1).join("");
+                        }
+                        if (sanitizedValue.includes(".")) {
+                          const decimalParts = sanitizedValue.split(".");
+                          if (decimalParts[1].length > 2) {
+                            sanitizedValue =
+                              decimalParts[0] +
+                              "." +
+                              decimalParts[1].substring(0, 2);
+                          }
+                        }
                         field.onChange(sanitizedValue);
                         updateFormData({ product_price: sanitizedValue });
                       }}

@@ -36,6 +36,7 @@ const ProductTitleForm = () => {
   }, [form, formData, form.reset]);
 
   console.log(formData);
+
   return (
     <>
       <FormWrapper
