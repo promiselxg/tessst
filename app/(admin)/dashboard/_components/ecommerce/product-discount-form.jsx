@@ -12,21 +12,14 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormData } from "@/context/form.context";
 import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
-  product_discount_percent: z
-    .number()
-    .positive({ message: "Discount must be greater than zero." })
-    .optional(),
-  product_discount_order_qty: z
-    .number()
-    .positive({ message: "Orders must be greater than zero." })
-    .optional(),
+  product_discount_percent: z.number().optional(),
+  product_discount_order_qty: z.number().optional(),
 });
 
 const ProductDiscountForm = () => {
@@ -35,19 +28,15 @@ const ProductDiscountForm = () => {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      product_discount_percent:
-        formData?.variants?.product_discount_percent || undefined,
-      product_discount_order_qty:
-        formData?.variants?.product_discount_order_qty || undefined,
+      product_discount_percent: formData?.product_discount_percent || "",
+      product_discount_order_qty: formData?.product_discount_order_qty || "",
     },
   });
 
   useEffect(() => {
     form.reset({
-      product_discount_percent:
-        formData?.variants?.product_discount_percent || undefined,
-      product_discount_order_qty:
-        formData?.variants?.product_discount_order_qty || undefined,
+      product_discount_percent: formData?.product_discount_percent || "",
+      product_discount_order_qty: formData?.product_discount_order_qty || "",
     });
   }, [form, formData, form.reset]);
 
@@ -72,28 +61,28 @@ const ProductDiscountForm = () => {
                           placeholder="Discount"
                           className="border-0 focus:shadow-none pl-2"
                           {...field}
+                          id="product_discount_percent"
+                          maxLength={2}
                           onChange={(e) => {
-                            const value = e.target.value.trim();
-                            const numValue = value ? Number(value) : undefined; // Convert to number or undefined
-
+                            let sanitizedValue = e.target.value.replace(
+                              /[^0-9]/g,
+                              ""
+                            );
                             if (
-                              numValue === undefined ||
-                              (numValue >= 1 && numValue <= 100)
+                              sanitizedValue.startsWith("0") &&
+                              sanitizedValue.length > 1
                             ) {
-                              field.onChange(numValue);
-                              updateFormData({
-                                variants: {
-                                  ...formData.variants, // Preserve other variant data
-                                  product_discount_percent: numValue,
-                                },
-                              });
+                              sanitizedValue = sanitizedValue.slice(1);
                             }
+                            field.onChange(sanitizedValue);
+                            updateFormData({
+                              product_discount_percent: sanitizedValue,
+                            });
                           }}
                         />
                       </FormControl>
                     </div>
                     <FormDescription>This field is optional</FormDescription>
-                    <FormMessage />
                   </FormItem>
                 );
               }}
@@ -110,25 +99,28 @@ const ProductDiscountForm = () => {
                     <FormControl>
                       <Input
                         placeholder="Orders"
+                        id="product_discount_order_qty"
                         {...field}
+                        maxLength={2}
                         onChange={(e) => {
-                          const value = e.target.value.trim();
-                          const numValue = value ? Number(value) : undefined; // Convert to number or undefined
-
-                          if (numValue === undefined || numValue >= 1) {
-                            field.onChange(numValue);
-                            updateFormData({
-                              variants: {
-                                ...formData.variants, // Preserve other variant data
-                                product_discount_order_qty: numValue,
-                              },
-                            });
+                          let sanitizedValue = e.target.value.replace(
+                            /[^0-9]/g,
+                            ""
+                          );
+                          if (
+                            sanitizedValue.startsWith("0") &&
+                            sanitizedValue.length > 1
+                          ) {
+                            sanitizedValue = sanitizedValue.slice(1);
                           }
+                          field.onChange(sanitizedValue);
+                          updateFormData({
+                            product_discount_order_qty: sanitizedValue,
+                          });
                         }}
                       />
                     </FormControl>
                     <FormDescription>This field is optional</FormDescription>
-                    <FormMessage />
                   </FormItem>
                 );
               }}

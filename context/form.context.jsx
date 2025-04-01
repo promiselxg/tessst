@@ -18,25 +18,71 @@ export const FormProvider = ({ children }) => {
     return {};
   });
 
+  const [formErrors, setErrors] = useState(() => {
+    // Remove errors from localStorage on page refresh
+    return [];
+  });
+
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Store form data and errors in localStorage
       localStorage.setItem("formData", JSON.stringify(formData));
+      localStorage.setItem("formErrors", JSON.stringify(formErrors));
     }
-  }, [formData]);
+  }, [formData, formErrors]);
+
+  const validateField = (fieldName, value) => {
+    // Example validation logic
+    const newErrors = [...formErrors];
+    const existingErrorIndex = newErrors.findIndex(
+      (error) => error.path === fieldName
+    );
+
+    // Remove the existing error for the field if any
+    if (existingErrorIndex > -1) {
+      newErrors.splice(existingErrorIndex, 1);
+    }
+
+    if (!value) {
+      newErrors?.push({ message: "This field is required", path: fieldName });
+    }
+
+    setErrors(newErrors);
+  };
 
   const updateFormData = (newData) => {
-    setFormData((prevData) => ({ ...prevData, ...newData }));
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, ...newData };
+      Object.keys(newData).forEach((key) => {
+        validateField(key, updatedData[key]);
+      });
+      return updatedData;
+    });
+  };
+
+  const updateFormErrors = (newErrors) => {
+    setErrors(newErrors);
   };
 
   const clearFormData = () => {
     setFormData({});
+    setErrors([]);
     if (typeof window !== "undefined") {
       localStorage.removeItem("formData");
+      localStorage.removeItem("formErrors");
     }
   };
 
   return (
-    <FormContext.Provider value={{ formData, updateFormData, clearFormData }}>
+    <FormContext.Provider
+      value={{
+        formData,
+        formErrors,
+        updateFormData,
+        updateFormErrors,
+        clearFormData,
+      }}
+    >
       {children}
     </FormContext.Provider>
   );

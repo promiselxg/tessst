@@ -28,7 +28,7 @@ const formSchema = z.object({
 });
 
 const ProductCategoryForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -47,7 +47,7 @@ const ProductCategoryForm = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [form.watch, updateFormData]);
+  }, [form, form.watch, updateFormData]);
 
   return (
     <>
@@ -75,7 +75,13 @@ const ProductCategoryForm = () => {
                     <SelectItem value="track_suit">Track suits</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
+                <FormMessage>
+                  {formErrors
+                    .filter((error) => error.path === "product_category")
+                    .map((error, index) => (
+                      <span key={index}>{error.message}</span>
+                    ))}
+                </FormMessage>
               </FormItem>
             )}
           />

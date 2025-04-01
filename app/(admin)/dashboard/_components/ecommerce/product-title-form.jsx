@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 const ProductTitleForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -35,6 +35,7 @@ const ProductTitleForm = () => {
     form.reset({ product_title: formData.product_title || "" });
   }, [form, formData, form.reset]);
 
+  console.log(formData);
   return (
     <>
       <FormWrapper
@@ -58,7 +59,13 @@ const ProductTitleForm = () => {
                       }}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {formErrors
+                      .filter((error) => error.path === "product_title")
+                      .map((error, index) => (
+                        <span key={index}>{error.message}</span>
+                      ))}
+                  </FormMessage>
                 </FormItem>
               );
             }}

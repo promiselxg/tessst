@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 const ProductStockForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -52,13 +52,25 @@ const ProductStockForm = () => {
                     <Input
                       placeholder="Product quantity"
                       {...field}
+                      id="product_stock_qty"
+                      maxLength={3}
                       onChange={(e) => {
-                        field.onChange(e.target.value);
-                        updateFormData({ product_stock_qty: e.target.value });
+                        const sanitizedValue = e.target.value.replace(
+                          /[^0-9]/g,
+                          ""
+                        );
+                        field.onChange(sanitizedValue);
+                        updateFormData({ product_stock_qty: sanitizedValue });
                       }}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {formErrors
+                      .filter((error) => error.path === "product_stock_qty")
+                      .map((error, index) => (
+                        <span key={index}>{error.message}</span>
+                      ))}
+                  </FormMessage>
                 </FormItem>
               );
             }}

@@ -13,7 +13,6 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useFormData } from "@/context/form.context";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -24,7 +23,7 @@ const formSchema = z.object({
 });
 
 const ProductBriefDescriptionForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -67,7 +66,15 @@ const ProductBriefDescriptionForm = () => {
                     ></Textarea>
                   </FormControl>
                   <FormDescription>Maximum of 100 characters.</FormDescription>
-                  <FormMessage />
+                  <FormMessage>
+                    {formErrors
+                      .filter(
+                        (error) => error.path === "product_brief_description"
+                      )
+                      .map((error, index) => (
+                        <span key={index}>{error.message}</span>
+                      ))}
+                  </FormMessage>
                 </FormItem>
               );
             }}

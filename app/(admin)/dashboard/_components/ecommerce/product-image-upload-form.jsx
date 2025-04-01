@@ -5,7 +5,7 @@ import FormWrapper from "./form-wrapper";
 import { useFormData } from "@/context/form.context";
 
 const ProductImageUploadForm = () => {
-  const { updateFormData } = useFormData();
+  const { updateFormData, formErrors } = useFormData();
 
   const handleFileChange = (newFiles, field) => {
     updateFormData({ [field]: newFiles });
@@ -18,6 +18,13 @@ const ProductImageUploadForm = () => {
           onChange={(files) => handleFileChange(files, "product_main_image")}
           total={1}
         />
+        <p className=" text-[0.8rem] font-medium text-destructive py-2">
+          {formErrors
+            .filter((error) => error.path === "product_main_image")
+            .map((error, index) => (
+              <span key={index}>{error.message}</span>
+            ))}
+        </p>
       </FormWrapper>
 
       <FormWrapper
@@ -28,6 +35,13 @@ const ProductImageUploadForm = () => {
           onChange={(files) => handleFileChange(files, "product_images")}
           total={6}
         />
+        <p className=" text-[0.8rem] font-medium text-destructive py-2">
+          {formErrors
+            .filter((error) => error.path === "product_images")
+            .map((error, index) => (
+              <span key={index}>{error.message}</span>
+            ))}
+        </p>
       </FormWrapper>
     </>
   );

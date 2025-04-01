@@ -22,18 +22,18 @@ const formSchema = z.object({
 });
 
 const ProductManufacturerForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      product_manufacturer: formData?.variant?.product_manufacturer || "",
+      product_manufacturer: formData?.product_manufacturer || "",
     },
   });
 
   useEffect(() => {
     form.reset({
-      product_manufacturer: formData?.variant?.product_manufacturer || "",
+      product_manufacturer: formData?.product_manufacturer || "",
     });
   }, [form, formData, form.reset]);
 
@@ -52,19 +52,20 @@ const ProductManufacturerForm = () => {
                       placeholder="product manufacturer"
                       {...field}
                       onChange={(e) => {
-                        const value = e.target.value;
-                        field.onChange(value);
+                        field.onChange(e.target.value);
                         updateFormData({
-                          variant: {
-                            ...formData.variant,
-                            product_manufacturer: value,
-                          },
+                          product_manufacturer: e.target.value,
                         });
                       }}
                     />
                   </FormControl>
-
-                  <FormMessage />
+                  <FormMessage>
+                    {formErrors
+                      .filter((error) => error.path === "product_manufacturer")
+                      .map((error, index) => (
+                        <span key={index}>{error.message}</span>
+                      ))}
+                  </FormMessage>
                 </FormItem>
               );
             }}

@@ -23,7 +23,7 @@ const formSchema = z.object({
 });
 
 const ProductDescriptionForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -60,7 +60,13 @@ const ProductDescriptionForm = () => {
                       }}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {formErrors
+                      .filter((error) => error.path === "product_description")
+                      .map((error, index) => (
+                        <span key={index}>{error.message}</span>
+                      ))}
+                  </FormMessage>
                 </FormItem>
               );
             }}

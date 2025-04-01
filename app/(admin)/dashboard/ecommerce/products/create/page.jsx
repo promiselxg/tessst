@@ -10,6 +10,8 @@ import ProductBriefDescriptionForm from "../../../_components/ecommerce/product-
 import ProductManufacturerForm from "../../../_components/ecommerce/product-manufacture-form";
 import ProductStockForm from "../../../_components/ecommerce/product-stock-form";
 import ProductDiscountForm from "../../../_components/ecommerce/product-discount-form";
+import ProductVarientForm from "../../../_components/ecommerce/product-variant-form";
+import ProductSubmitButton from "../../../_components/ecommerce/product-submit-button";
 
 const AddProduct = () => {
   const breadcrumbs = [
@@ -24,13 +26,17 @@ const AddProduct = () => {
       <DashboardHeader breadcrumbs={breadcrumbs} />
       <div className="p-6 bg-[whitesmoke] space-y-4">
         <h1 className="font-bold text-[20px]">Add Product</h1>
-        <div className="w-full flex gap-5 justify-between">
-          <div className="w-2/3 space-y-5  h-fit ">
+        <div className="w-full flex md:flex-row flex-col gap-5 justify-between">
+          <div className="w-full md:w-2/3 space-y-5  h-fit ">
             <ProductTitleForm />
             <ProductDescriptionForm />
             <ProductImageUploadForm />
+            <ProductVarientForm />
+            <div className="hidden md:flex justify-end pb-7">
+              <ProductSubmitButton />
+            </div>
           </div>
-          <div className="w-2/6 h-fit space-y-5">
+          <div className="w-full md:w-2/6 h-fit space-y-5">
             <ProductPriceForm />
             <ProductStockForm />
             <ProductCategoryForm />
@@ -38,6 +44,9 @@ const AddProduct = () => {
             <ProductBriefDescriptionForm />
             <ProductManufacturerForm />
             <ProductDiscountForm />
+            <div className="flex md:hidden justify-end pb-7">
+              <ProductSubmitButton />
+            </div>
           </div>
         </div>
       </div>

@@ -62,9 +62,6 @@ const ProductTagForm = () => {
   useEffect(() => {
     form.reset({ product_tag: formData.product_tag || "" });
   }, [form, formData, form.reset]);
-
-  console.log(formData);
-
   return (
     <>
       <FormWrapper

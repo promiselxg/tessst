@@ -8,7 +8,6 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -24,7 +23,7 @@ const formSchema = z.object({
 });
 
 const ProductPriceForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -54,13 +53,24 @@ const ProductPriceForm = () => {
                     <Input
                       placeholder="price"
                       {...field}
+                      id="product_price"
                       onChange={(e) => {
-                        field.onChange(e.target.value);
-                        updateFormData({ product_price: e.target.value });
+                        const sanitizedValue = e.target.value.replace(
+                          /[^0-9]/g,
+                          ""
+                        );
+                        field.onChange(sanitizedValue);
+                        updateFormData({ product_price: sanitizedValue });
                       }}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {formErrors
+                      .filter((error) => error.path === "product_price")
+                      .map((error, index) => (
+                        <span key={index}>{error.message}</span>
+                      ))}
+                  </FormMessage>
                 </FormItem>
               );
             }}
