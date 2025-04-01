@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const FileUpload = ({ total = 1, onChange }) => {
+const FileUpload = ({ total, onChange }) => {
   const [files, setFiles] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
 
