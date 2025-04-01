@@ -4,7 +4,7 @@ import "react-quill/dist/quill.snow.css";
 
 import { useMemo } from "react";
 
-const Editor = ({ onChange, value }) => {
+const Editor = ({ onChange, value, height, ...props }) => {
   const ReactQuill = useMemo(
     () => dynamic(() => import("react-quill"), { ssr: false }),
     []
@@ -12,8 +12,8 @@ const Editor = ({ onChange, value }) => {
 
   return (
     <>
-      <div className="bg-white">
-        <ReactQuill theme="snow" value={value} onChange={onChange} />
+      <div className={`bg-white ${height && `${height}`}`}>
+        <ReactQuill theme="snow" value={value} onChange={onChange} {...props} />
       </div>
     </>
   );

@@ -30,7 +30,7 @@ const DashboardHeader = ({ breadcrumbs = [] }) => {
                       {item.name}
                     </BreadcrumbLink>
                   ) : (
-                    <BreadcrumbPage className="text-sm text-slate-600 italic -mt-1">
+                    <BreadcrumbPage className="text-sm text-slate-600 italic -mt-[1px]">
                       {item.name}
                     </BreadcrumbPage>
                   )}
