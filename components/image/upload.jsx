@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { Button } from "../ui/button";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const FileUpload = ({ total = 5, onChange }) => {
+const FileUpload = ({ total = 1, onChange }) => {
   const [files, setFiles] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
 
@@ -52,7 +53,6 @@ const FileUpload = ({ total = 5, onChange }) => {
 
   return (
     <div className="w-full flex mt-2">
-      {/* No images selected */}
       {selectedImages.length < 1 && (
         <div className="border border-dashed p-[30px] rounded-[8px] border-[rgba(0,0,0,0.1)] w-full cursor-pointer">
           <div className="flex flex-col cursor-pointer justify-center">
@@ -86,25 +86,29 @@ const FileUpload = ({ total = 5, onChange }) => {
         </div>
       )}
 
-      {/* Images selected */}
       {selectedImages.length > 0 && (
         <div className="flex flex-col w-full">
-          <div className="w-full gap-3">
+          <div className="w-full gap-3 ">
             {selectedImages.map((src, index) => (
-              <div key={index} className="relative">
-                <Image
-                  src={src}
-                  width={200}
-                  height={200}
-                  alt="Selected"
-                  className="w-20 h-20 rounded-lg"
-                />
-                <button
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+              <div
+                key={index}
+                className="relative flex w-full justify-between items-center my-2 border border-dashed p-2 rounded-[8px] border-[rgba(0,0,0,0.1)]"
+              >
+                <div className="flex gap-3">
+                  <Image
+                    src={src}
+                    width={200}
+                    height={200}
+                    alt="Selected"
+                    className="w-14 h-14"
+                  />
+                </div>
+                <Button
+                  className=" bg-red-700 hover:bg-red-600 text-white px-[15px] -mt-6 text-[12px] h-[27px] rounded-[3px]"
                   onClick={() => removeSelectedImage(index)}
                 >
-                  X
-                </button>
+                  Delete
+                </Button>
               </div>
             ))}
           </div>

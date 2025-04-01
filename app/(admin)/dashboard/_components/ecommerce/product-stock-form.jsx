@@ -16,45 +16,45 @@ import { Input } from "@/components/ui/input";
 import { useFormData } from "@/context/form.context";
 
 const formSchema = z.object({
-  product_title: z.string().min(10, {
-    message: "Product title must be at least 10 characters.",
-  }),
+  product_stock_qty: z
+    .number()
+    .positive({ message: "Stock must be greater than zero." }),
 });
 
-const ProductTitleForm = () => {
+const ProductStockForm = () => {
   const { formData, updateFormData } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      product_title: formData.product_title || "",
+      product_stock_qty: formData.product_stock_qty || "",
     },
   });
 
   useEffect(() => {
-    form.reset({ product_title: formData.product_title || "" });
+    form.reset({ product_stock_qty: formData.product_stock_qty || "" });
   }, [form, formData, form.reset]);
 
   return (
     <>
       <FormWrapper
-        title="Product title"
-        label="Enter a descriptive and unique title for your product. This will help customers identify your product easily."
+        title="Product quantity"
+        label="How many of this product is in stock?"
       >
         <Form {...form}>
           <FormField
             control={form.control}
-            name="product_title"
+            name="product_stock_qty"
             render={({ field }) => {
               return (
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="product title"
+                      placeholder="Product quantity"
                       {...field}
                       onChange={(e) => {
                         field.onChange(e.target.value);
-                        updateFormData({ product_title: e.target.value });
+                        updateFormData({ product_stock_qty: e.target.value });
                       }}
                     />
                   </FormControl>
@@ -69,4 +69,4 @@ const ProductTitleForm = () => {
   );
 };
 
-export default ProductTitleForm;
+export default ProductStockForm;

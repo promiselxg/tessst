@@ -8,6 +8,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -16,45 +17,46 @@ import { Input } from "@/components/ui/input";
 import { useFormData } from "@/context/form.context";
 
 const formSchema = z.object({
-  product_title: z.string().min(10, {
-    message: "Product title must be at least 10 characters.",
-  }),
+  product_price: z
+    .number()
+    .positive({ message: "Price must be greater than zero." })
+    .multipleOf(0.01, { message: "Price must be a valid amount." }),
 });
 
-const ProductTitleForm = () => {
+const ProductPriceForm = () => {
   const { formData, updateFormData } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      product_title: formData.product_title || "",
+      product_price: formData.product_price || "",
     },
   });
 
   useEffect(() => {
-    form.reset({ product_title: formData.product_title || "" });
+    form.reset({ product_price: formData.product_price || "" });
   }, [form, formData, form.reset]);
 
   return (
     <>
       <FormWrapper
-        title="Product title"
-        label="Enter a descriptive and unique title for your product. This will help customers identify your product easily."
+        title="Product price"
+        label="Enter the price of the product."
       >
         <Form {...form}>
           <FormField
             control={form.control}
-            name="product_title"
+            name="product_price"
             render={({ field }) => {
               return (
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="product title"
+                      placeholder="price"
                       {...field}
                       onChange={(e) => {
                         field.onChange(e.target.value);
-                        updateFormData({ product_title: e.target.value });
+                        updateFormData({ product_price: e.target.value });
                       }}
                     />
                   </FormControl>
@@ -69,4 +71,4 @@ const ProductTitleForm = () => {
   );
 };
 
-export default ProductTitleForm;
+export default ProductPriceForm;

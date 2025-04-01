@@ -16,48 +16,54 @@ import { Input } from "@/components/ui/input";
 import { useFormData } from "@/context/form.context";
 
 const formSchema = z.object({
-  product_title: z.string().min(10, {
+  product_manufacturer: z.string().min(10, {
     message: "Product title must be at least 10 characters.",
   }),
 });
 
-const ProductTitleForm = () => {
+const ProductManufacturerForm = () => {
   const { formData, updateFormData } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      product_title: formData.product_title || "",
+      product_manufacturer: formData?.variant?.product_manufacturer || "",
     },
   });
 
   useEffect(() => {
-    form.reset({ product_title: formData.product_title || "" });
+    form.reset({
+      product_manufacturer: formData?.variant?.product_manufacturer || "",
+    });
   }, [form, formData, form.reset]);
 
   return (
     <>
-      <FormWrapper
-        title="Product title"
-        label="Enter a descriptive and unique title for your product. This will help customers identify your product easily."
-      >
+      <FormWrapper title="Product manufacturer" label="this field is optional">
         <Form {...form}>
           <FormField
             control={form.control}
-            name="product_title"
+            name="product_manufacturer"
             render={({ field }) => {
               return (
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="product title"
+                      placeholder="product manufacturer"
                       {...field}
                       onChange={(e) => {
-                        field.onChange(e.target.value);
-                        updateFormData({ product_title: e.target.value });
+                        const value = e.target.value;
+                        field.onChange(value);
+                        updateFormData({
+                          variant: {
+                            ...formData.variant,
+                            product_manufacturer: value,
+                          },
+                        });
                       }}
                     />
                   </FormControl>
+
                   <FormMessage />
                 </FormItem>
               );
@@ -69,4 +75,4 @@ const ProductTitleForm = () => {
   );
 };
 
-export default ProductTitleForm;
+export default ProductManufacturerForm;

@@ -5,38 +5,29 @@ import FormWrapper from "./form-wrapper";
 import { useFormData } from "@/context/form.context";
 
 const ProductImageUploadForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { updateFormData } = useFormData();
 
   const handleFileChange = (newFiles, field) => {
     updateFormData({ [field]: newFiles });
   };
 
-  console.log(formData);
-
   return (
     <>
-      <FormWrapper title="Product Gallery">
-        <div className="space-y-3">
-          <h1 className="text-[14px] font-bold">Product Image</h1>
-          <p className="text-sm italic text-slate-600">
-            Add Product main Image.
-          </p>
-          <FileUpload
-            onChange={(files) => handleFileChange(files, "product_main_image")}
-            total={1}
-          />
-        </div>
+      <FormWrapper title="Product Gallery" label="Add Product main Image.">
+        <FileUpload
+          onChange={(files) => handleFileChange(files, "product_main_image")}
+          total={1}
+        />
       </FormWrapper>
 
-      <FormWrapper title="Product Images">
-        <div className="space-y-3">
-          <h1 className="text-[14px] font-bold">Product Image</h1>
-          <p className="text-sm italic text-slate-600">Add Product images.</p>
-          <FileUpload
-            onChange={(files) => handleFileChange(files, "product_images")}
-            total={5}
-          />
-        </div>
+      <FormWrapper
+        title="Product Gallery"
+        label="Add Product Gallery Images, Maximum files (6)"
+      >
+        <FileUpload
+          onChange={(files) => handleFileChange(files, "product_images")}
+          total={6}
+        />
       </FormWrapper>
     </>
   );

@@ -8,56 +8,65 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormData } from "@/context/form.context";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
-  product_title: z.string().min(10, {
-    message: "Product title must be at least 10 characters.",
+  product_brief_description: z.string().max(100, {
+    message: "Description must be less than 100 characters.",
   }),
 });
 
-const ProductTitleForm = () => {
+const ProductBriefDescriptionForm = () => {
   const { formData, updateFormData } = useFormData();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      product_title: formData.product_title || "",
+      product_brief_description: formData.product_brief_description || "",
     },
   });
 
   useEffect(() => {
-    form.reset({ product_title: formData.product_title || "" });
+    form.reset({
+      product_brief_description: formData.product_brief_description || "",
+    });
   }, [form, formData, form.reset]);
 
   return (
     <>
       <FormWrapper
-        title="Product title"
-        label="Enter a descriptive and unique title for your product. This will help customers identify your product easily."
+        title="Brief Description"
+        label="Add short description for product"
       >
         <Form {...form}>
           <FormField
             control={form.control}
-            name="product_title"
+            name="product_brief_description"
             render={({ field }) => {
               return (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      placeholder="product title"
+                    <Textarea
+                      placeholder="Enter a brief description"
+                      className="resize-none"
+                      maxLength={100}
                       {...field}
                       onChange={(e) => {
                         field.onChange(e.target.value);
-                        updateFormData({ product_title: e.target.value });
+                        updateFormData({
+                          product_brief_description: e.target.value,
+                        });
                       }}
-                    />
+                    ></Textarea>
                   </FormControl>
+                  <FormDescription>Maximum of 100 characters.</FormDescription>
                   <FormMessage />
                 </FormItem>
               );
@@ -69,4 +78,4 @@ const ProductTitleForm = () => {
   );
 };
 
-export default ProductTitleForm;
+export default ProductBriefDescriptionForm;

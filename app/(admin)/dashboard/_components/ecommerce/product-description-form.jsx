@@ -10,7 +10,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 
@@ -50,7 +49,6 @@ const ProductDescriptionForm = () => {
             render={({ field }) => {
               return (
                 <FormItem>
-                  <FormLabel>Product Description</FormLabel>
                   <FormControl>
                     <Editor
                       className="h-full md:h-[300px]"
