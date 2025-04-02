@@ -196,6 +196,7 @@ const getAllProducts = async (req) => {
       include: {
         tags: true,
         product_variants: true,
+        category: true,
       },
     });
 
