@@ -44,19 +44,45 @@ model UserRole {
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  price       Float    @db.Float
-  stock       Int
-  images      Json     @db.Json
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  orderItems  OrderItem[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String   @id @default(uuid())
+  name                  String   @unique
+  description           String
+  full_description      String
+  price                 Decimal   @db.Decimal(10,2) 
+  stock                 Int
+  discount_order_qty    Int       @default(0) 
+  discount_percent      Int       @default(0)
+  manufacturer          String?  
+  product_main_image    Json      @db.Json
+  product_images        Json      @db.Json
+  categoryId            String
+  category              Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderItems            OrderItem[]
+  tags                  ProductTag[]
+  product_variants      ProductVariant[]  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@index([categoryId])
+}
+
+model ProductTag {
+  id        String  @id @default(uuid())
+  name      String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  color     String?
+  size      String?
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
 }
 
 model Category {

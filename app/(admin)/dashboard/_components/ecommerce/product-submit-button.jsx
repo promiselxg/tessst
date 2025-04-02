@@ -56,8 +56,6 @@ const ProductSubmitButton = () => {
         product_images: productImages.photos,
       });
 
-      console.log("Final Product Data:", JSON.stringify(preparedData, null, 2));
-      // TODO: Append Cloudinary response to formData and send to backend
       const response = await addNewProduct(preparedData);
       console.log(response);
     } catch (error) {
@@ -67,7 +65,7 @@ const ProductSubmitButton = () => {
     }
   };
 
-  const handleFormErrors = (error) => {
+  const handleFormErrors = async (error) => {
     if (error instanceof z.ZodError) {
       const errorsArray = extractValidationErrors(error.errors);
       updateFormErrors(errorsArray);
@@ -94,7 +92,7 @@ const ProductSubmitButton = () => {
       description: productData.product_brief_description,
       full_description: productData.product_description,
       price: parseFloat(productData.product_price),
-      categoryid: productData.product_category,
+      categoryId: productData.product_category,
       stock: Number(productData.product_stock_qty),
       discount_order_qty: Number(productData.product_discount_order_qty),
       discount_percent: Number(productData.product_discount_percent),
@@ -105,12 +103,20 @@ const ProductSubmitButton = () => {
         size: productData.variants?.product_variant_size || "",
       },
       product_main_image: product_main_photo.map((img) => ({
+        assetId: img.asset_id,
         publicId: img.public_id,
         public_url: img.secure_url,
+        format: img.format,
+        resource_type: img.resource_type,
+        original_filename: img.original_filename,
       })),
       product_images: product_images.map((img) => ({
+        assetId: img.asset_id,
         publicId: img.public_id,
         public_url: img.secure_url,
+        format: img.format,
+        resource_type: img.resource_type,
+        original_filename: img.original_filename,
       })),
     };
   };

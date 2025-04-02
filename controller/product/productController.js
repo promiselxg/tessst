@@ -1,63 +1,143 @@
+import { removeUploadedImage } from "@/lib/utils/cloudinary";
 import { customMessage, ServerError } from "@/lib/utils/customMessage";
 import prisma from "@/lib/utils/dbConnect";
 import { isValidUUID } from "@/lib/utils/validateUUID";
+import { Prisma } from "@prisma/client";
 import sanitizeHtml from "sanitize-html";
 
 const createNewProduct = async (req) => {
   try {
-    // const { name, description, price, categoryid, stock, images } =
-    //   await req.json();
+    const { formData } = await req.json();
 
-    console.log(await req.json());
-    return;
-    if (!name || !description || !price || !categoryid.trim()) {
+    const {
+      name,
+      description,
+      full_description,
+      price,
+      categoryId,
+      stock,
+      discount_order_qty,
+      discount_percent,
+      manufacturer,
+      tags,
+      product_variants,
+      product_main_image,
+      product_images,
+    } = formData;
+
+    // Helper function to clean up images
+    const cleanupImages = () => {
+      removeUploadedImage(formData.product_main_image);
+      removeUploadedImage(formData.product_images);
+    };
+
+    // Validate required fields
+    if (
+      !name ||
+      !description ||
+      !full_description ||
+      !price ||
+      !categoryId ||
+      !product_main_image ||
+      !product_images
+    ) {
+      cleanupImages();
       return customMessage("All fields are required", {}, 400);
+    }
+
+    // Validate image structure
+    if (!Array.isArray(product_main_image) || !Array.isArray(product_images)) {
+      cleanupImages();
+      return customMessage("Images must be an array of objects", {}, 400);
     }
 
     const cleanName = sanitizeHtml(name);
     const cleanDescription = sanitizeHtml(description);
+    const cleanFullDescription = sanitizeHtml(full_description);
 
-    const numericPrice = Number(price);
-    if (isNaN(numericPrice) || numericPrice <= 0) {
+    const numericPrice = parseFloat(price);
+
+    if (!numericPrice || isNaN(numericPrice) || numericPrice <= 0) {
+      cleanupImages();
       return customMessage("Invalid price value", {}, 400);
     }
 
-    if (
-      !(await prisma.category.findUnique({
-        where: { id: categoryid },
-      }))
-    ) {
+    const numericStock = Number(stock);
+    if (!Number.isInteger(numericStock) || numericStock < 0) {
+      cleanupImages();
+      return customMessage("Stock must be a non-negative integer", {}, 400);
+    }
+
+    // Function to format images
+    const formatImages = (images) => {
+      return images.map(({ publicId, public_url, assetId }) => {
+        if (!publicId || !public_url) {
+          cleanupImages();
+          throw new Error("Each image must have a publicId and public_url.");
+        }
+        return { publicId, public_url, assetId };
+      });
+    };
+
+    const formattedProductMainImage = formatImages(product_main_image);
+    const formattedProductImages = formatImages(product_images);
+
+    // Check if category exists
+    const categoryExists = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { id: true },
+    });
+
+    if (!categoryExists) {
+      cleanupImages();
       return customMessage("Category does not exist", {}, 400);
     }
 
-    if (stock && typeof stock !== "number") {
-      return customMessage("Stock must be a number", {}, 400);
+    // Check if product already exists
+    if (
+      await prisma.product.findUnique({
+        where: { name: cleanName, categoryId },
+      })
+    ) {
+      cleanupImages();
+      return customMessage(
+        `A product with this name "${cleanName}" already exists`,
+        {},
+        409
+      );
     }
 
-    if (await prisma.product.findFirst({ where: { name: cleanName } })) {
-      return customMessage("Product with this name already exists", {}, 409);
-    }
-
-    const formattedImages = images.map((img) => {
-      if (!img.publicId || !img.public_url) {
-        throw new Error("Each image must have a public_id and public_url.");
-      }
-      return { publicId: img.publicId, public_url: img.public_url };
-    });
-
+    // Create new product
     const product = await prisma.product.create({
       data: {
         name: cleanName,
         description: cleanDescription,
-        price: numericPrice,
-        category: { connect: { id: categoryid } },
+        full_description: cleanFullDescription,
+        price: new Prisma.Decimal(numericPrice),
         stock: stock || 0,
-        images: formattedImages,
+        discount_order_qty: discount_order_qty || 0,
+        discount_percent: discount_percent || 0,
+        manufacturer: manufacturer || null,
+        category: { connect: { id: categoryId } },
+        product_main_image: formattedProductMainImage,
+        product_images: formattedProductImages,
+        tags: {
+          create: tags.map((tag) => ({ name: tag })),
+        },
+        product_variants: {
+          create: [
+            {
+              color: product_variants.color || null,
+              size: product_variants.size || null,
+            },
+          ],
+        },
       },
     });
 
     return customMessage("Product created successfully", { product }, 201);
   } catch (error) {
+    cleanupImages(); // Ensure cleanup on error
     console.log(error);
     return ServerError(error, {}, 500);
   }
