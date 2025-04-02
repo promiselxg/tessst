@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FormWrapper from "./form-wrapper";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 
 import { useFormData } from "@/context/form.context";
+import { getProductCategories } from "@/service/ecommerce/productService";
+import { capitalizeFirstLetter } from "@/lib/utils/regExpression";
 
 const formSchema = z.object({
   product_category: z.string(),
@@ -29,6 +31,8 @@ const formSchema = z.object({
 
 const ProductCategoryForm = () => {
   const { formData, updateFormData, formErrors } = useFormData();
+  const [productCategories, setProductCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -49,6 +53,20 @@ const ProductCategoryForm = () => {
     return () => subscription.unsubscribe();
   }, [form, form.watch, updateFormData]);
 
+  const fetchProductCategories = async () => {
+    try {
+      const response = await getProductCategories();
+      setProductCategories(response.categories);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductCategories();
+  }, []);
   return (
     <>
       <FormWrapper title="Product Category" label="Select product category">
@@ -63,16 +81,16 @@ const ProductCategoryForm = () => {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger disabled={loading}>
                       <SelectValue placeholder="Select product category" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="sports_ware">Sports wares</SelectItem>
-                    <SelectItem value="football_boot">
-                      Football boats
-                    </SelectItem>
-                    <SelectItem value="track_suit">Track suits</SelectItem>
+                    {productCategories?.map((category) => (
+                      <SelectItem value={category?.id} key={category?.id}>
+                        {capitalizeFirstLetter(category?.name)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage>

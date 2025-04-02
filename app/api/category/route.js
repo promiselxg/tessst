@@ -9,9 +9,4 @@ export const POST = async (req) =>
     req,
     () => categoryControllers.createNewCategory(req)
   );
-
-export const GET = async (req) =>
-  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin, ROLES.moderator))(
-    req,
-    () => categoryControllers.getAllCategories()
-  );
+export const GET = async (req) => categoryControllers.getAllCategories();

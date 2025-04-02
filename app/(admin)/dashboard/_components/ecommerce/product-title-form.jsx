@@ -35,8 +35,6 @@ const ProductTitleForm = () => {
     form.reset({ product_title: formData.product_title || "" });
   }, [form, formData, form.reset]);
 
-  console.log(formData);
-
   return (
     <>
       <FormWrapper

@@ -44,10 +44,10 @@ model UserRole {
 }
 
 model Product {
-  id                    String   @id @default(uuid())
-  name                  String   @unique
+  id                    String    @id @default(uuid())
+  name                  String    @unique
   description           String
-  full_description      String
+  full_description      String    @db.Text
   price                 Decimal   @db.Decimal(10,2) 
   stock                 Int
   discount_order_qty    Int       @default(0) 

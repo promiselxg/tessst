@@ -3,7 +3,7 @@ import { customMessage, ServerError } from "@/lib/utils/customMessage";
 import prisma from "@/lib/utils/dbConnect";
 import { isValidUUID } from "@/lib/utils/validateUUID";
 import { Prisma } from "@prisma/client";
-import sanitizeHtml from "sanitize-html";
+import sanitizeInput from "sanitize-html";
 
 const createNewProduct = async (req) => {
   try {
@@ -25,7 +25,7 @@ const createNewProduct = async (req) => {
       product_images,
     } = formData;
 
-    // Helper function to clean up images
+    // Helper function to clean up uploaded images
     const cleanupImages = () => {
       removeUploadedImage(formData.product_main_image);
       removeUploadedImage(formData.product_images);
@@ -45,15 +45,19 @@ const createNewProduct = async (req) => {
       return customMessage("All fields are required", {}, 400);
     }
 
+    if (!isValidUUID(categoryId)) {
+      return customMessage("Invalid product ID", {}, 400);
+    }
+
     // Validate image structure
     if (!Array.isArray(product_main_image) || !Array.isArray(product_images)) {
       cleanupImages();
       return customMessage("Images must be an array of objects", {}, 400);
     }
 
-    const cleanName = sanitizeHtml(name);
-    const cleanDescription = sanitizeHtml(description);
-    const cleanFullDescription = sanitizeHtml(full_description);
+    const cleanName = sanitizeInput(name);
+    const cleanDescription = sanitizeInput(description);
+    const cleanFullDescription = sanitizeInput(full_description);
 
     const numericPrice = parseFloat(price);
 
@@ -108,36 +112,38 @@ const createNewProduct = async (req) => {
     }
 
     // Create new product
-    const product = await prisma.product.create({
-      data: {
-        name: cleanName,
-        description: cleanDescription,
-        full_description: cleanFullDescription,
-        price: new Prisma.Decimal(numericPrice),
-        stock: stock || 0,
-        discount_order_qty: discount_order_qty || 0,
-        discount_percent: discount_percent || 0,
-        manufacturer: manufacturer || null,
-        category: { connect: { id: categoryId } },
-        product_main_image: formattedProductMainImage,
-        product_images: formattedProductImages,
-        tags: {
-          create: tags.map((tag) => ({ name: tag })),
-        },
-        product_variants: {
-          create: [
-            {
-              color: product_variants.color || null,
-              size: product_variants.size || null,
-            },
-          ],
-        },
+    const productData = {
+      name: cleanName,
+      description: cleanDescription,
+      full_description: cleanFullDescription,
+      price: new Prisma.Decimal(numericPrice),
+      stock: stock || 0,
+      discount_order_qty: discount_order_qty || 0,
+      discount_percent: discount_percent || 0,
+      manufacturer: manufacturer || null,
+      category: { connect: { id: categoryId } },
+      product_main_image: formattedProductMainImage,
+      product_images: formattedProductImages,
+      tags: {
+        create: tags?.map((tag) => ({ name: tag })),
       },
-    });
+    };
+
+    // Check if product_variants is valid before adding it
+    if (product_variants?.color || product_variants?.size) {
+      productData.product_variants = {
+        create: [
+          {
+            color: product_variants.color || null,
+            size: product_variants.size || null,
+          },
+        ],
+      };
+    }
+    const product = await prisma.product.create({ data: productData });
 
     return customMessage("Product created successfully", { product }, 201);
   } catch (error) {
-    cleanupImages(); // Ensure cleanup on error
     console.log(error);
     return ServerError(error, {}, 500);
   }
@@ -187,14 +193,9 @@ const getAllProducts = async (req) => {
       skip: offset,
       take: limit,
       orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        stock: true,
-        createdAt: true,
-        images: true,
-        category: { select: { id: true, name: true } },
+      include: {
+        tags: true,
+        product_variants: true,
       },
     });
 
@@ -206,6 +207,7 @@ const getAllProducts = async (req) => {
       200
     );
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };

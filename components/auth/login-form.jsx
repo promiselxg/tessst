@@ -60,9 +60,10 @@ export function LoginForm() {
   const onSubmit = async (values) => {
     try {
       await loginUser(values.username, values.password);
+      window.location.replace(callbackUrl);
       toast.success("Login successful");
-      redirect(callbackUrl);
     } catch (error) {
+      console.log(error);
       toast.error(
         error instanceof Error ? error.message : "An unknown error occurred"
       );
