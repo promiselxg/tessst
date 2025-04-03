@@ -39,14 +39,14 @@ const EditProductPage = async ({ params }) => {
         <h1 className="font-bold text-[20px]">Edit Product</h1>
         <div className="w-full flex md:flex-row flex-col gap-5 justify-between">
           <div className="w-full md:w-2/3 space-y-5  h-fit ">
-            {/* <EditProductTitleForm
+            <EditProductTitleForm
               name={response?.product?.name}
               id={response?.product?.id}
             />
             <EditProductDescriptionForm
               product_description={response?.product?.full_description}
               id={response?.product?.id}
-            /> */}
+            />
             <EditProductImageUploadForm
               product_main_image={response.product.product_main_image}
               product_images={response.product.product_images}

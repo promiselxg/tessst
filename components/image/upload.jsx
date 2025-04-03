@@ -4,8 +4,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const FileUpload = ({ total, onChange }) => {
-  const [files, setFiles] = useState([]);
+const FileUpload = ({ total, onChange, field }) => {
   const [selectedImages, setSelectedImages] = useState([]);
 
   // Handle Image Change
@@ -31,24 +30,15 @@ const FileUpload = ({ total, onChange }) => {
       }
     });
 
-    setFiles(selectedFiles);
-    const fileArray = selectedFiles.map((file) => URL.createObjectURL(file));
-    setSelectedImages((prevImages) => prevImages.concat(fileArray));
+    setSelectedImages((prevImages) => prevImages.concat(fileURLs));
 
-    if (onChange) onChange(selectedFiles);
-
-    fileURLs.forEach(URL.revokeObjectURL);
+    if (onChange) onChange(selectedFiles, field);
   };
 
   // Remove selected image
   const removeSelectedImage = (index) => {
-    const updatedFiles = files.filter((_, i) => i !== index);
     const updatedImages = selectedImages.filter((_, i) => i !== index);
-
-    setFiles(updatedFiles);
     setSelectedImages(updatedImages);
-
-    if (onChange) onChange(updatedFiles);
   };
 
   return (
@@ -57,7 +47,7 @@ const FileUpload = ({ total, onChange }) => {
         <div className="border border-dashed p-[30px] rounded-[8px] border-[rgba(0,0,0,0.1)] w-full cursor-pointer">
           <div className="flex flex-col cursor-pointer justify-center">
             <label
-              htmlFor="files"
+              htmlFor={`file-upload-${field}`}
               className="w-full cursor-pointer flex justify-center flex-col items-center"
             >
               <Image
@@ -76,8 +66,7 @@ const FileUpload = ({ total, onChange }) => {
           </div>
           <input
             type="file"
-            name="files"
-            id="files"
+            id={`file-upload-${field}`}
             accept="image/png, image/gif, image/jpeg"
             multiple
             onChange={handleImageChange}
@@ -88,7 +77,7 @@ const FileUpload = ({ total, onChange }) => {
 
       {selectedImages.length > 0 && (
         <div className="flex flex-col w-full">
-          <div className="w-full gap-3 ">
+          <div className="w-full gap-3">
             {selectedImages.map((src, index) => (
               <div
                 key={index}
