@@ -68,7 +68,7 @@ model Product {
 
 model ProductTag {
   id        String  @id @default(uuid())
-  name      String
+  name      String  @unique
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 

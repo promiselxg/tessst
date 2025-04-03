@@ -25,7 +25,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Trash2 } from "lucide-react";
+import { MenuSquare, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ProductTable({ columns, data, loading }) {
@@ -76,7 +76,13 @@ export function ProductTable({ columns, data, loading }) {
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">Filter columns</Button>
+                <Button
+                  variant="outline"
+                  className="text-sm font-normal italic"
+                >
+                  <MenuSquare />
+                  Filter columns
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {table

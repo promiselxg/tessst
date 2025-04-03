@@ -63,11 +63,11 @@ export const columns = [
             </AspectRatio>
           </div>
           <div>
-            <h1 className="font-bold">
+            <h1 className="font-bold text-sm">
               <Link
-                href={`/product/${id}`}
+                href={`/ecommerce/product/${id}`}
                 target="_blank"
-                className="hover:underline hover:text-[#e97688] transition-all delay-75 capitalize"
+                className="hover:underline hover:text-[#e97688] transition-all delay-75"
               >
                 {name}
               </Link>
@@ -106,7 +106,7 @@ export const columns = [
 
   {
     accessorKey: "stock",
-    header: "Stock QTY",
+    header: "Stock qty",
     cell: ({ row }) => {
       const { stock } = row.original;
       return (
@@ -136,17 +136,17 @@ export const columns = [
       return (
         <div className="ml-auto pr-2 flex items-center gap-2">
           <CustomToolTip label="View course">
-            <Link href={`/training/course/${id}`} target="_blank">
+            <Link href={`/ecommerce/product/${id}`} target="_blank">
               <EyeIcon className="w-5 h-5 cursor-pointer hover:opacity-75" />
             </Link>
           </CustomToolTip>
           <CustomToolTip label="Edit course">
-            <Link href={`/dashboard/training/course/${id}`} target="_blank">
+            <Link href={`/dashboard/ecommerce/products/${id}/edit`}>
               <Pencil className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </Link>
           </CustomToolTip>
           <CustomToolTip label="Delete course">
-            <DeleteDialog id={id}>
+            <DeleteDialog id={id} endpoint={`/product`}>
               <Trash2 className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </DeleteDialog>
           </CustomToolTip>

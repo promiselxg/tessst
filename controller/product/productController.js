@@ -226,32 +226,15 @@ const getSingleProduct = async (req, params) => {
   try {
     const product = await prisma.product.findUnique({
       where: { id },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        stock: true,
-        description: true,
-        category: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        images: true,
-        createdAt: true,
+      include: {
+        tags: true,
+        product_variants: true,
+        category: true,
       },
     });
 
     if (!product) {
       return customMessage("Product not found", {}, 404);
-    }
-
-    if (product && Array.isArray(product.images)) {
-      product.images = product.images.map((img) => ({
-        public_url: img.public_url,
-      }));
     }
 
     return customMessage("Product found", { product }, 200);
@@ -292,6 +275,16 @@ const updateProduct = async (req, params) => {
       if (isNaN(numericPrice) || numericPrice <= 0) {
         return customMessage("Invalid price value", {}, 400);
       }
+
+      if (!Number.isInteger(numericPrice * 100)) {
+        // Allows 2 decimal places
+        return customMessage(
+          "Price can only have up to 2 decimal places",
+          {},
+          400
+        );
+      }
+
       updates.price = numericPrice;
     }
 
@@ -315,13 +308,16 @@ const updateProduct = async (req, params) => {
 
     // Sanitize name and description if provided
     if (updates.name) {
-      updates.name = sanitizeHtml(updates.name);
-    }
-    if (updates.description) {
-      updates.description = sanitizeHtml(updates.description);
+      updates.name = sanitizeInput(updates.name);
     }
 
-    // Handle images update (expects an array of image objects)
+    if (updates.full_description) {
+      updates.full_description = sanitizeInput(updates.full_description);
+    }
+
+    if (updates.description) {
+      updates.description = sanitizeInput(updates.description);
+    }
 
     if (updates.images) {
       if (!Array.isArray(updates.images)) {
@@ -341,6 +337,52 @@ const updateProduct = async (req, params) => {
       }
     }
 
+    if (updates.tags) {
+      if (!Array.isArray(updates.tags)) {
+        return customMessage("Tags must be an array of objects", {}, 400);
+      }
+
+      const validTags = updates.tags.every(
+        (tag) => typeof tag.name === "string"
+      );
+
+      if (!validTags) {
+        return customMessage("Each tag must have a name property", {}, 400);
+      }
+
+      // Get existing tags linked to the product
+      const existingTags = await prisma.productTag.findMany({
+        where: { productId: id },
+        select: { id: true, name: true },
+      });
+
+      // Identify tags to disconnect
+      const tagsToDisconnect = existingTags
+        .filter(
+          (existingTag) =>
+            !updates.tags.some((tag) => tag.name === existingTag.name)
+        )
+        .map((tag) => ({ id: tag.id }));
+
+      // Disconnect removed tags
+      await prisma.productTag.deleteMany({
+        where: { id: { in: tagsToDisconnect.map((tag) => tag.id) } },
+      });
+
+      // Upsert tags (Create if they don't exist)
+      await Promise.all(
+        updates.tags.map(async (tag) => {
+          await prisma.productTag.upsert({
+            where: { name: tag.name },
+            update: {},
+            create: { name: tag.name, productId: id },
+          });
+        })
+      );
+
+      delete updates.tags;
+    }
+
     await prisma.product.update({
       where: { id },
       data: updates,
@@ -348,6 +390,7 @@ const updateProduct = async (req, params) => {
 
     return customMessage("Product updated successfully", {}, 200);
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -355,7 +398,6 @@ const updateProduct = async (req, params) => {
 const deleteProduct = async (req, params) => {
   try {
     const { id } = await params;
-
     if (!id) {
       return customMessage("Product ID is required", {}, 400);
     }
