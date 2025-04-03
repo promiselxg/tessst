@@ -144,7 +144,6 @@ const createNewProduct = async (req) => {
 
     return customMessage("Product created successfully", { product }, 201);
   } catch (error) {
-    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -208,7 +207,6 @@ const getAllProducts = async (req) => {
       200
     );
   } catch (error) {
-    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -306,19 +304,22 @@ const updateProduct = async (req, params) => {
       }
     }
 
-    // Sanitize name and description if provided
+    // Sanitize name
     if (updates.name) {
       updates.name = sanitizeInput(updates.name);
     }
 
+    // full description
     if (updates.full_description) {
       updates.full_description = sanitizeInput(updates.full_description);
     }
 
+    // brief description
     if (updates.description) {
       updates.description = sanitizeInput(updates.description);
     }
 
+    // update images
     if (updates.images) {
       if (!Array.isArray(updates.images)) {
         return customMessage("Images must be an array of objects", {}, 400);
@@ -335,8 +336,31 @@ const updateProduct = async (req, params) => {
           400
         );
       }
+
+      const formatImages = (images) => {
+        return images.map(({ publicId, public_url, assetId }) => {
+          if (!publicId || !public_url) {
+            removeUploadedImage(updates.oldImage);
+            throw new Error("Each image must have a publicId and public_url.");
+          }
+          return { publicId, public_url, assetId };
+        });
+      };
+      const formattedProductMainImage = formatImages(updates.images);
+      removeUploadedImage(updates.oldImage);
+
+      if (updates.type === "product_main_image") {
+        updates.product_main_image = formattedProductMainImage;
+      } else {
+        updates.product_images = formattedProductMainImage;
+      }
+
+      delete updates.images;
+      delete updates.oldImage;
+      delete updates.type;
     }
 
+    // tags
     if (updates.tags) {
       if (!Array.isArray(updates.tags)) {
         return customMessage("Tags must be an array of objects", {}, 400);

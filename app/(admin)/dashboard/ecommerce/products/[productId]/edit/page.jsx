@@ -3,6 +3,7 @@ import EditProductBriefDescriptionForm from "@/app/(admin)/dashboard/_components
 import EditProductCategoryForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-category-form";
 import EditProductDescriptionForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-description-form";
 import EditProductDiscountForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-discount-form";
+import EditProductImageUploadForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-image-upload-form";
 import EditProductManufacturerForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-manufacture-form";
 import EditProductPriceForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-price-form";
 import EditProductStockForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-stock-form";
@@ -38,16 +39,20 @@ const EditProductPage = async ({ params }) => {
         <h1 className="font-bold text-[20px]">Edit Product</h1>
         <div className="w-full flex md:flex-row flex-col gap-5 justify-between">
           <div className="w-full md:w-2/3 space-y-5  h-fit ">
-            <EditProductTitleForm
+            {/* <EditProductTitleForm
               name={response?.product?.name}
               id={response?.product?.id}
             />
             <EditProductDescriptionForm
               product_description={response?.product?.full_description}
               id={response?.product?.id}
+            /> */}
+            <EditProductImageUploadForm
+              product_main_image={response.product.product_main_image}
+              product_images={response.product.product_images}
+              id={response?.product?.id}
             />
-            {/* <ProductImageUploadForm />
-            <ProductVarientForm /> */}
+            {/* <ProductVarientForm /> */}
           </div>
           <div className="w-full md:w-2/6 h-fit space-y-5">
             <EditProductPriceForm

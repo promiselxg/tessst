@@ -31,6 +31,10 @@ export const getSingleProduct = async (productId) => {
 };
 
 export const getAllCategories = async () => {
-  const response = await apiClient("/category");
-  return response.data;
+  try {
+    const response = await apiClient("/category");
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };

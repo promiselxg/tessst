@@ -59,11 +59,14 @@ export function LoginForm() {
 
   const onSubmit = async (values) => {
     try {
-      await loginUser(values.username, values.password);
-      window.location.replace(callbackUrl);
-      toast.success("Login successful");
+      const response = await loginUser(values.username, values.password);
+      if (response.success === true) {
+        router.replace(callbackUrl);
+        toast.success("Login successful");
+      } else {
+        toast.error(response.message);
+      }
     } catch (error) {
-      console.log(error);
       toast.error(
         error instanceof Error ? error.message : "An unknown error occurred"
       );
