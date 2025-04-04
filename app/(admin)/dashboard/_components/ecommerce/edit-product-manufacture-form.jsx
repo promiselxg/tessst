@@ -52,7 +52,7 @@ const EditProductManufacturerForm = ({ manufacturer, id }) => {
     form.reset({
       product_manufacturer: manufacturer || "",
     });
-  }, [form, form.reset]);
+  }, [form, form.reset, manufacturer]);
 
   return (
     <>

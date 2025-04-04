@@ -55,7 +55,7 @@ const EditProductStockForm = ({ stock, id }) => {
 
   useEffect(() => {
     form.reset({ product_stock_qty: stock || "" });
-  }, [form, form.reset]);
+  }, [form, form.reset, stock]);
 
   return (
     <>

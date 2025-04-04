@@ -82,7 +82,12 @@ const EditProductDiscountForm = ({ initialData, id }) => {
       product_discount_percent: initialData?.discount_percent || "",
       product_discount_order_qty: initialData?.discount_order_qty || "",
     });
-  }, [form, form.reset]);
+  }, [
+    form,
+    form.reset,
+    initialData?.discount_order_qty,
+    initialData?.discount_percent,
+  ]);
 
   return (
     <>

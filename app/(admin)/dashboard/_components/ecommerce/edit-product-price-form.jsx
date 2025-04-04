@@ -55,7 +55,7 @@ const EditProductPriceForm = ({ product_price, id }) => {
 
   useEffect(() => {
     form.reset({ product_price: product_price || "" });
-  }, [form, form.reset]);
+  }, [form, form.reset, product_price]);
 
   return (
     <>

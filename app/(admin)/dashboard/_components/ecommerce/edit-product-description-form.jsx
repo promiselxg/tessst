@@ -55,7 +55,7 @@ const EditProductDescriptionForm = ({ product_description, id }) => {
 
   useEffect(() => {
     form.reset({ product_description: product_description || "" });
-  }, [form, form.reset]);
+  }, [form, form.reset, product_description]);
 
   return (
     <>

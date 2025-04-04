@@ -60,7 +60,7 @@ const EditProductBriefDescriptionForm = ({ brief_description, id }) => {
     form.reset({
       product_brief_description: brief_description || "",
     });
-  }, [form, form.reset]);
+  }, [form, form.reset, brief_description]);
 
   return (
     <>

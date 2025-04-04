@@ -55,7 +55,7 @@ const EditProductCategoryForm = ({ options = [], id }) => {
 
   useEffect(() => {
     form.reset({ product_category: options.id || "" });
-  }, [form, form.reset]);
+  }, [form, form.reset, options.id]);
 
   return (
     <>

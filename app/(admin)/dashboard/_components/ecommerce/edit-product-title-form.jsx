@@ -54,7 +54,7 @@ const EditProductTitleForm = ({ name, id }) => {
 
   useEffect(() => {
     form.reset({ product_title: name || "" });
-  }, [form, form.reset]);
+  }, [form, form.reset, name]);
 
   return (
     <>
