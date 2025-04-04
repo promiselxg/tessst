@@ -11,3 +11,8 @@ export const POST = async (req) =>
   );
 
 export const GET = async (req) => productControllers.getAllProducts(req);
+
+export const DELETE = async (req) =>
+  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin))(req, () =>
+    productControllers.deleteMultipleProducts(req)
+  );

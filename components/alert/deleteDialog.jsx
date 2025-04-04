@@ -13,6 +13,7 @@ import { Button } from "../ui/button";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { apiCall } from "@/lib/utils/api";
+import { toast } from "sonner";
 
 const LottieAnimation = dynamic(() => import("../animation/lottieAnimation"), {
   ssr: false,
@@ -25,21 +26,32 @@ const DeleteDialog = ({
   id,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleItemDelete = async (itemID, endpoint) => {
     try {
       setLoading(true);
       const response = await apiCall("delete", `${endpoint}/${itemID}`);
-      console.log(response);
+
+      toast.success(response.message || "Item deleted successfully", {
+        description: "We'll refresh the page for you",
+      });
+      setOpen(false);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
-      console.log("ERROR FROM DELETE DIALOG", error);
+      toast.error(error.response.data.message || error.message, {
+        description: "Please try again",
+      });
     } finally {
       setLoading(false);
     }
   };
   return (
     <>
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="w-[90%] md:w-2/6 flex flex-col justify-center items-center">
           <LottieAnimation

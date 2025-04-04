@@ -1,6 +1,6 @@
 import React from "react";
 import DashboardHeader from "../_components/dashboard/header";
-import CourseDataTable from "@/components/training/table/course/page";
+import CourseDataTable from "@/components/training/table/course/course-table";
 
 const TrainingPage = () => {
   const breadcrumbs = [

@@ -1036,6 +1036,87 @@ const deleteCourseAttachment = async (req, params) => {
   }
 };
 
+const deleteMultipleCourses = async (req) => {
+  try {
+    const idsObj = await req.json();
+
+    if (!idsObj || typeof idsObj !== "object") {
+      return customMessage("No course IDs provided", {}, 400);
+    }
+
+    const ids = Object.values(idsObj);
+
+    const invalidIds = ids.filter((id) => !isValidUUID(id));
+    if (invalidIds.length > 0) {
+      return customMessage("One or more invalid course IDs", {}, 400);
+    }
+
+    const courses = await prisma.course.findMany({
+      where: { id: { in: ids } },
+      include: {
+        chapters: { include: { muxData: true } },
+        attachments: true,
+      },
+    });
+
+    if (courses.length === 0) {
+      return customMessage("No course found for the provided IDs", {}, 404);
+    }
+
+    for (const course of courses) {
+      const chapterIds = course.chapters.map((chapter) => chapter.id);
+      const muxPublicIds = course.chapters
+        .map((chapter) => chapter.muxData?.publicId)
+        .filter(Boolean);
+
+      const attachmentPublicIds = course.attachments
+        .map((attachment) => attachment.asset?.publicId)
+        .filter(Boolean);
+
+      const assetPublicId = course.asset?.publicId;
+
+      await Promise.allSettled(
+        [
+          // Delete Course Chapters
+          chapterIds.length > 0 &&
+            prisma.chapter.deleteMany({ where: { id: { in: chapterIds } } }),
+
+          // Delete Mux Data
+          chapterIds.length > 0 &&
+            prisma.muxData.deleteMany({
+              where: { chapterId: { in: chapterIds } },
+            }),
+
+          // Remove the corresponding muxData videos
+          muxPublicIds.length > 0 && removeUploadedImage(muxPublicIds, "video"),
+
+          // Remove the corresponding attachments from Cloudinary
+          attachmentPublicIds.length > 0 &&
+            removeUploadedImage(attachmentPublicIds, "raw"),
+
+          // Delete the attachments from the database
+          course.attachments.length > 0 &&
+            prisma.attachment.deleteMany({ where: { courseId: course.id } }),
+
+          // Remove the course image from Cloudinary
+          assetPublicId &&
+            removeUploadedImage([assetPublicId], course.asset.resourceType),
+        ].filter(Boolean)
+      );
+    }
+
+    await prisma.course.deleteMany({
+      where: {
+        id: { in: ids },
+      },
+    });
+
+    return customMessage("Courses deleted successfully", {}, 200);
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
 export const trainingControllers = {
   createNewCourse,
   createCourseCategory,
@@ -1056,4 +1137,5 @@ export const trainingControllers = {
   deleteCourse,
   deleteCourseChapter,
   deleteCourseAttachment,
+  deleteMultipleCourses,
 };

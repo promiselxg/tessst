@@ -4,7 +4,7 @@ import DashboardHeader from "../../_components/dashboard/header";
 
 const TrainingPage = () => {
   const breadcrumbs = [
-    { name: "Dashboard", href: "/dashboard" },
+    { name: "Dashboard", href: "/dashboard/training" },
     { name: "Course creation" },
   ];
 

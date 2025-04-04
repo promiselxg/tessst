@@ -9,7 +9,7 @@ export const metadata = {
 
 const EcommercePage = () => {
   const breadcrumbs = [
-    { name: "Dashboard", href: "/dashboard/ecommerce" },
+    { name: "Dashboard", href: "/dashboard" },
     { name: "Ecommerce" },
   ];
 

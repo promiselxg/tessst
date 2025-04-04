@@ -498,11 +498,59 @@ const deleteProduct = async (req, params) => {
       return customMessage("Product not found", {}, 404);
     }
 
+    removeUploadedImage(product.product_main_image);
+    removeUploadedImage(product.product_images);
+
     await prisma.product.delete({
       where: { id },
     });
 
     return customMessage("Product deleted successfully", {}, 200);
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
+const deleteMultipleProducts = async (req) => {
+  try {
+    const idsObj = await req.json();
+
+    if (!idsObj || typeof idsObj !== "object") {
+      return customMessage("No product IDs provided", {}, 400);
+    }
+
+    const ids = Object.values(idsObj);
+
+    const products = await prisma.product.findMany({
+      where: { id: { in: ids } },
+    });
+
+    const invalidIds = ids.filter((id) => !isValidUUID(id));
+    if (invalidIds.length > 0) {
+      return customMessage("One or more invalid product IDs", {}, 400);
+    }
+
+    if (products.length === 0) {
+      return customMessage("No products found for the provided IDs", {}, 404);
+    }
+
+    for (const product of products) {
+      if (!product) {
+        return customMessage("Product not found", {}, 404);
+      }
+      removeUploadedImage(product.product_main_image);
+      removeUploadedImage(product.product_images);
+    }
+
+    await prisma.product.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return customMessage("Products deleted successfully", {}, 200);
   } catch (error) {
     return ServerError(error, {}, 500);
   }
@@ -514,4 +562,5 @@ export const productControllers = {
   getSingleProduct,
   updateProduct,
   deleteProduct,
+  deleteMultipleProducts,
 };

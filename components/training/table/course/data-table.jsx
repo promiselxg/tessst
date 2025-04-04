@@ -25,23 +25,46 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
+import { apiCall } from "@/lib/utils/api";
+import { toast } from "sonner";
 
 export function CourseTable({ columns, data, loading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [selectedCourse, setselectedCourse] = React.useState({});
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const router = useRouter();
 
-  const handleGetSelectedIds = () => {
+  const handleGetSelectedIds = async () => {
     const selectedIds = table
       .getSelectedRowModel()
       .rows.map((row) => row.original.id);
-    setselectedCourse(selectedIds);
+
+    if (selectedIds.length < 2) {
+      toast.error("Please select at least 2 course to delete.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const response = await apiCall("delete", "/training/course", {
+        ...selectedIds,
+      });
+      toast.success(response?.message || "Courses deleted successfully!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to delete courses."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const table = useReactTable({
@@ -71,6 +94,7 @@ export function CourseTable({ columns, data, loading }) {
             <Input
               placeholder="Filter course title"
               value={table.getColumn("title")?.getFilterValue() ?? ""}
+              disabled={isLoading}
               onChange={(event) =>
                 table.getColumn("title")?.setFilterValue(event.target.value)
               }
@@ -78,7 +102,9 @@ export function CourseTable({ columns, data, loading }) {
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">Filter columns</Button>
+                <Button variant="outline" disabled={isLoading}>
+                  Filter columns
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {table
@@ -105,6 +131,7 @@ export function CourseTable({ columns, data, loading }) {
             <Button
               className="bg-sky-700 transition-all hover:bg-sky-600"
               onClick={() => router.replace(`/dashboard/training/create`)}
+              disabled={isLoading}
             >
               Create new course
             </Button>
@@ -116,12 +143,19 @@ export function CourseTable({ columns, data, loading }) {
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
           <Button
-            onClick={handleGetSelectedIds}
-            size="icon"
+            onClick={() => handleGetSelectedIds()}
             className=" bg-red-500 hover:bg-red-600 text-black disabled:cursor-not-allowed"
-            disabled={table.getSelectedRowModel().rows.length === 0}
+            disabled={
+              table.getSelectedRowModel().rows.length === 0 || isLoading
+            }
           >
-            <Trash2 />
+            {isLoading ? (
+              <>
+                <Loader2 className=" animate-spin" /> please wait...
+              </>
+            ) : (
+              <Trash2 />
+            )}
           </Button>
         </div>
 
@@ -159,7 +193,10 @@ export function CourseTable({ columns, data, loading }) {
               </tbody>
             </>
           ) : (
-            <TableBody>
+            <TableBody className="relative">
+              {isLoading && (
+                <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-[rgba(0,0,0,0.1)] z-30 flex justify-center items-center"></div>
+              )}
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow

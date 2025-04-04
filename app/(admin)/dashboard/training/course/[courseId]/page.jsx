@@ -38,13 +38,13 @@ const CourseEditPage = () => {
     try {
       setLoading(true);
       const response = await apiCall("GET", `/training/course/${courseId}`);
-      if (!response || Object.keys(response).length === 0) {
-        router.replace("/dashboard/courses");
+      if (response.message === "Course not found") {
+        router.replace("/dashboard/training");
       } else {
         setCourse(response.course);
       }
     } catch (error) {
-      router.replace("/dashboard/courses");
+      router.replace("/dashboard/training");
     } finally {
       setLoading(false);
     }
@@ -93,13 +93,14 @@ const CourseEditPage = () => {
     course?.chapters?.some((chapter) => chapter?.isPublished),
   ];
 
-  const totalFields = requiredFields.length;
+  const totalFields = requiredFields?.length;
   const completedFields = requiredFields.filter(Boolean).length;
   const completedText = `(${completedFields}/${totalFields})`;
   const isFieldsCompleted = completedFields === totalFields;
 
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
+    { name: "Courses", href: "/dashboard/training" },
     { name: "Course setup" },
   ];
 
