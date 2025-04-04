@@ -25,20 +25,16 @@ export const FormProvider = ({ children }) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Store form data and errors in localStorage
       localStorage.setItem("formData", JSON.stringify(formData));
       localStorage.setItem("formErrors", JSON.stringify(formErrors));
     }
   }, [formData, formErrors]);
 
   const validateField = (fieldName, value) => {
-    // Example validation logic
     const newErrors = [...formErrors];
     const existingErrorIndex = newErrors.findIndex(
       (error) => error.path === fieldName
     );
-
-    // Remove the existing error for the field if any
     if (existingErrorIndex > -1) {
       newErrors.splice(existingErrorIndex, 1);
     }

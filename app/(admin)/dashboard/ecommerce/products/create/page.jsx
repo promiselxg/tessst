@@ -1,6 +1,5 @@
 import React from "react";
 import DashboardHeader from "../../../_components/dashboard/header";
-import ProductTitleForm from "../../../_components/ecommerce/product-title-form";
 import ProductDescriptionForm from "../../../_components/ecommerce/product-description-form";
 import ProductImageUploadForm from "../../../_components/ecommerce/product-image-upload-form";
 import ProductPriceForm from "../../../_components/ecommerce/product-price-form";
@@ -12,6 +11,7 @@ import ProductStockForm from "../../../_components/ecommerce/product-stock-form"
 import ProductDiscountForm from "../../../_components/ecommerce/product-discount-form";
 import ProductVarientForm from "../../../_components/ecommerce/product-variant-form";
 import ProductSubmitButton from "../../../_components/ecommerce/product-submit-button";
+import ProductTitleForm from "../../../_components/ecommerce/product-title-form";
 
 export const metadata = {
   title: "Admin Dashboard | Add new Product",

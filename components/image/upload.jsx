@@ -2,11 +2,12 @@ import { useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
+import { useFormData } from "@/context/form.context";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const FileUpload = ({ total, onChange, field }) => {
   const [selectedImages, setSelectedImages] = useState([]);
-
+  const { updateFormData } = useFormData();
   // Handle Image Change
   const handleImageChange = (e) => {
     if (!e?.target?.files) return;
@@ -36,9 +37,10 @@ const FileUpload = ({ total, onChange, field }) => {
   };
 
   // Remove selected image
-  const removeSelectedImage = (index) => {
+  const removeSelectedImage = (index, field) => {
     const updatedImages = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(updatedImages);
+    updateFormData({ [field]: updatedImages });
   };
 
   return (
@@ -94,7 +96,7 @@ const FileUpload = ({ total, onChange, field }) => {
                 </div>
                 <Button
                   className=" bg-red-700 hover:bg-red-600 text-white px-[15px] -mt-6 text-[12px] h-[27px] rounded-[3px]"
-                  onClick={() => removeSelectedImage(index)}
+                  onClick={() => removeSelectedImage(index, field)}
                 >
                   Delete
                 </Button>
