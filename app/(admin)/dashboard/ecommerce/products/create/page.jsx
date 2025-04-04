@@ -21,8 +21,7 @@ export const metadata = {
 const AddProduct = () => {
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
-    { name: "Ecommerce", href: "/dashboard/ecommerce" },
-    { name: "Products", href: "/dashboard/ecommerce/products" },
+    { name: "Products", href: "/dashboard/ecommerce" },
     { name: "Add new product" },
   ];
 

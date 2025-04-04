@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { PlusIcon, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AVAILABLE_VARIANT_OPTIONS } from "@/lib/contansts/productVariant";
 
 const variantSchema = z.object({
   product_variant_name: z.string().min(1, "Required"),
@@ -33,17 +34,15 @@ const variantSchema = z.object({
 });
 
 const ProductVarientForm = () => {
-  const { formData, updateFormData } = useFormData();
+  const { formData, updateFormData, formErrors } = useFormData();
+
   const [variants, setVariants] = useState(() => {
-    if (Object.keys(formData.variants || {}).length > 0) {
-      return Object.entries(formData.variants).map(([name, value]) => ({
-        id: Date.now() + Math.random(),
-        name,
-        value,
-      }));
-    } else {
-      return [{ id: Date.now() + Math.random(), name: "", value: "" }];
-    }
+    return Array.isArray(formData.variants) && formData.variants.length > 0
+      ? formData.variants.map((variant) => ({
+          ...variant,
+          id: Date.now() + Math.random(),
+        }))
+      : [{ id: Date.now() + Math.random(), name: "", value: "" }];
   });
 
   const handleAddVariant = () => {
@@ -54,18 +53,14 @@ const ProductVarientForm = () => {
   };
 
   const handleRemoveVariant = (id) => {
-    const updatedVariants = variants.filter((variant) => variant.id !== id);
+    const updatedVariants = variants.filter((v) => v.id !== id);
     setVariants(updatedVariants);
-
-    const updatedVariantData = { ...formData.variants };
-    const removedVariant = variants.find((variant) => variant.id === id);
-    if (removedVariant) delete updatedVariantData[removedVariant.name];
-
-    updateFormData({ ...formData, variants: updatedVariantData });
+    updateFormData({
+      variants: updatedVariants.map(({ id, ...rest }) => rest),
+    });
   };
 
   const handleUpdateVariant = (id, key, value) => {
-    // Prevent selecting the same variant again
     if (
       key === "name" &&
       variants.some((v) => v.name === value && v.id !== id)
@@ -74,50 +69,41 @@ const ProductVarientForm = () => {
       return;
     }
 
-    const updatedVariants = variants.map((variant) =>
-      variant.id === id ? { ...variant, [key]: value } : variant
+    const updatedVariants = variants.map((v) =>
+      v.id === id ? { ...v, [key]: value } : v
     );
     setVariants(updatedVariants);
 
-    // Ensure variant name exists before updating formData.variants
-    const updatedVariantsData = { ...formData.variants };
-    const updatedVariant = updatedVariants.find((v) => v.id === id);
-
-    if (updatedVariant?.name) {
-      updatedVariantsData[updatedVariant.name] = updatedVariant.value;
-    }
-
-    updateFormData({ ...formData, variants: updatedVariantsData });
+    const variantsObject = updatedVariants.reduce((acc, curr) => {
+      if (curr.name) {
+        acc[curr.name] = curr.value;
+      }
+      return acc;
+    }, {});
+    updateFormData({ variants: variantsObject });
   };
 
   const form = useForm({
     resolver: zodResolver(variantSchema),
-    defaultValues: {
-      product_variant_size: formData?.variants?.product_variant_size || "",
-      product_variant_color: formData?.variants?.product_variant_color || "",
-    },
+    defaultValues: {},
   });
 
-  useEffect(() => {
-    form.reset({
-      product_variant_name: formData?.variants?.product_variant_color || "",
-      product_variant_size: formData?.variants?.product_variant_size || "",
-    });
-  }, [
-    form,
-    formData?.variants?.product_variant_color,
-    formData?.variants?.product_variant_size,
-  ]);
-
   return (
-    <>
-      <Form {...form}>
-        <FormWrapper
-          title="Product Variants (optional)"
-          label="This helps in organizing and filtering products effectively."
-        >
-          <div className="flex flex-col gap-4">
-            {variants.map((variant) => (
+    <Form {...form}>
+      <FormWrapper
+        title="Product Variants (optional)"
+        label="This helps in organizing and filtering products effectively."
+      >
+        <div className="flex flex-col gap-4">
+          {variants.map((variant) => {
+            const usedNames = variants
+              .filter((v) => v.id !== variant.id)
+              .map((v) => v.name);
+
+            const variantOptions = AVAILABLE_VARIANT_OPTIONS.filter(
+              (name) => !usedNames.includes(name) || name === variant.name
+            );
+            return (
               <div key={variant.id} className="flex gap-4 items-center">
                 <FormField
                   control={form.control}
@@ -137,12 +123,11 @@ const ProductVarientForm = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="product_variant_size">
-                            Size
-                          </SelectItem>
-                          <SelectItem value="product_variant_color">
-                            Color
-                          </SelectItem>
+                          {variantOptions.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option.charAt(0).toUpperCase() + option.slice(1)}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -150,7 +135,6 @@ const ProductVarientForm = () => {
                   )}
                 />
 
-                {/* Input for Variant Value */}
                 <FormField
                   control={form.control}
                   name={`variant_value_${variant.id}`}
@@ -161,16 +145,12 @@ const ProductVarientForm = () => {
                           placeholder="Enter value"
                           value={variant.value}
                           onChange={(e) => {
-                            const sanitizedValue = e.target.value.replace(
+                            const sanitized = e.target.value.replace(
                               /[^0-9a-zA-Z,]/g,
                               ""
                             );
-                            field.onChange(sanitizedValue);
-                            handleUpdateVariant(
-                              variant.id,
-                              "value",
-                              sanitizedValue
-                            );
+                            field.onChange(sanitized);
+                            handleUpdateVariant(variant.id, "value", sanitized);
                           }}
                         />
                       </FormControl>
@@ -179,7 +159,6 @@ const ProductVarientForm = () => {
                   )}
                 />
 
-                {/* Remove Button */}
                 {variants.length > 1 && (
                   <Button
                     variant="destructive"
@@ -191,20 +170,25 @@ const ProductVarientForm = () => {
                   </Button>
                 )}
               </div>
-            ))}
-
-            {/* Add Another Variant Button */}
-            <Button
-              onClick={handleAddVariant}
-              className="flex gap-2 items-center text-sm font-bold text-sky-600 w-fit bg-transparent shadow-none hover:bg-transparent"
-            >
-              <PlusIcon className="h-4 w-4" />
-              <span className="text-sm text-sky-600">Add another option</span>
-            </Button>
-          </div>
-        </FormWrapper>
-      </Form>
-    </>
+            );
+          })}
+          <span className="text-sm text-red-500">
+            {formErrors
+              .filter((error) => error.path === "variants")
+              .map((error, index) => (
+                <span key={index}>{error.message}</span>
+              ))}
+          </span>
+          <Button
+            onClick={handleAddVariant}
+            className="flex gap-2 items-center text-sm font-bold text-sky-600 w-fit bg-transparent shadow-none hover:bg-transparent"
+          >
+            <PlusIcon className="h-4 w-4" />
+            <span className="text-sm text-sky-600">Add another option</span>
+          </Button>
+        </div>
+      </FormWrapper>
+    </Form>
   );
 };
 

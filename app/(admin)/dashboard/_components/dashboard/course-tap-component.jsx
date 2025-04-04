@@ -85,7 +85,7 @@ const TabsComponent = ({ initialData, courseId }) => {
   const handleTabClick = (key) => {
     const params = new URLSearchParams(searchParams);
     params.set("tab", key);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   switch (activeTab) {

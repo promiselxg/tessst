@@ -135,17 +135,17 @@ export const columns = [
       const { id } = row.original;
       return (
         <div className="ml-auto pr-2 flex items-center gap-2">
-          <CustomToolTip label="View course">
+          <CustomToolTip label="View product">
             <Link href={`/ecommerce/product/${id}`} target="_blank">
               <EyeIcon className="w-5 h-5 cursor-pointer hover:opacity-75" />
             </Link>
           </CustomToolTip>
-          <CustomToolTip label="Edit course">
+          <CustomToolTip label="Edit product">
             <Link href={`/dashboard/ecommerce/products/${id}/edit`}>
               <Pencil className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </Link>
           </CustomToolTip>
-          <CustomToolTip label="Delete course">
+          <CustomToolTip label="Delete product">
             <DeleteDialog id={id} endpoint={`/product`}>
               <Trash2 className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </DeleteDialog>

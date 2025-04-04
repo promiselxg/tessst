@@ -9,6 +9,7 @@ import EditProductPriceForm from "@/app/(admin)/dashboard/_components/ecommerce/
 import EditProductStockForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-stock-form";
 import EditProductTagForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-tag-form";
 import EditProductTitleForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-title-form";
+import EditProductVarientForm from "@/app/(admin)/dashboard/_components/ecommerce/edit-product-variant-form";
 
 import {
   getAllCategories,
@@ -23,8 +24,7 @@ export const metadata = {
 
 const breadcrumbs = [
   { name: "Dashboard", href: "/dashboard" },
-  { name: "Ecommerce", href: "/dashboard/ecommerce" },
-  { name: "Products", href: "/dashboard/ecommerce/products" },
+  { name: "Products", href: "/dashboard/ecommerce" },
   { name: "Edit product" },
 ];
 
@@ -52,7 +52,10 @@ const EditProductPage = async ({ params }) => {
               product_images={response.product.product_images}
               id={response?.product?.id}
             />
-            {/* <ProductVarientForm /> */}
+            <EditProductVarientForm
+              product_variants={response?.product?.product_variants}
+              id={response?.product?.id}
+            />
           </div>
           <div className="w-full md:w-2/6 h-fit space-y-5">
             <EditProductPriceForm

@@ -77,8 +77,8 @@ model ProductTag {
 
 model ProductVariant {
   id        String  @id @default(uuid())
-  color     String?
-  size      String?
+  name      String?
+  value     String?
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 

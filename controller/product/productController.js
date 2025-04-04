@@ -129,16 +129,19 @@ const createNewProduct = async (req) => {
       },
     };
 
-    // Check if product_variants is valid before adding it
-    if (product_variants?.color || product_variants?.size) {
-      productData.product_variants = {
-        create: [
-          {
-            color: product_variants.color || null,
-            size: product_variants.size || null,
-          },
-        ],
-      };
+    if (product_variants && typeof product_variants === "object") {
+      const variantEntries = Object.entries(product_variants).filter(
+        ([_, value]) => value !== ""
+      );
+
+      if (variantEntries.length > 0) {
+        productData.product_variants = {
+          create: variantEntries.map(([name, value]) => ({
+            name,
+            value,
+          })),
+        };
+      }
     }
     const product = await prisma.product.create({ data: productData });
 
@@ -405,6 +408,63 @@ const updateProduct = async (req, params) => {
       );
 
       delete updates.tags;
+    }
+
+    // Product variants
+
+    if (updates.variants) {
+      if (!Array.isArray(updates.variants)) {
+        return customMessage("Variants must be an array of objects", {}, 400);
+      }
+
+      // Ensure each variant has both 'name' and 'value'
+      const validVariants = updates.variants.every(
+        (variant) => variant.name && variant.value
+      );
+
+      if (!validVariants) {
+        return customMessage(
+          "Each variant must have a name and value",
+          {},
+          400
+        );
+      }
+
+      // Delete existing variants that are not in the new update
+      await prisma.productVariant.deleteMany({
+        where: {
+          productId: id,
+          NOT: {
+            id: {
+              in: updates.variants.map((variant) => id).filter(Boolean),
+            },
+          },
+        },
+      });
+
+      // Upsert new or updated product variants
+      await Promise.all(
+        updates.variants.map(async (variant) => {
+          let variantName = variant.name;
+          if (variantName === "product_variant_color") {
+            variantName = "color";
+          } else if (variantName === "product_variant_size") {
+            variantName = "size";
+          }
+
+          await prisma.productVariant.upsert({
+            where: { id },
+            update: { name: variantName, value: variant.value },
+            create: {
+              name: variantName,
+              value: variant.value,
+              productId: id,
+            },
+          });
+        })
+      );
+
+      delete updates.variants;
     }
 
     await prisma.product.update({
