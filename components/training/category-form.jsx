@@ -20,9 +20,10 @@ import { toast } from "sonner";
 
 import { Combobox } from "@/components/ui/combobox";
 import { useAuth } from "@/context/authProvider";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  categoryId: z.string().min(1),
+  categoryId: z.string(),
 });
 
 const CategoryForm = ({
@@ -33,11 +34,12 @@ const CategoryForm = ({
 }) => {
   const { user } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      categoryId: initialData?.categoryId || "",
+      categoryId: "",
     },
   });
 
@@ -52,7 +54,7 @@ const CategoryForm = ({
 
       if (response) {
         toast.success(response.message);
-        onSuccessfulSubmit();
+        window.location.reload();
       }
     } catch (error) {
       toast?.error("Something went wrong!", {

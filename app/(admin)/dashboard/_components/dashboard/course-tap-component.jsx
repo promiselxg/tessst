@@ -91,11 +91,7 @@ const TabsComponent = ({ initialData, courseId }) => {
   switch (activeTab) {
     case "course":
       activeScreen = (
-        <CourseTitleForm
-          initialData={courseData}
-          courseId={courseId}
-          onSuccessfulSubmit={fetchCourseInfo}
-        />
+        <CourseTitleForm initialData={courseData} courseId={courseId} />
       );
       break;
     case "description":

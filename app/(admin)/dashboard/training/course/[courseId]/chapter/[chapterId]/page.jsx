@@ -1,26 +1,44 @@
-"use client";
-
 import ChapterTabsComponent from "@/app/(admin)/dashboard/_components/dashboard/chapter-tab-component";
 import DashboardHeader from "@/app/(admin)/dashboard/_components/dashboard/header";
 import Banner from "@/components/banner/banner";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/authProvider";
-import { apiCall } from "@/lib/utils/api";
-import { handleDeleteBtn } from "@/lib/utils/deleteItemFromDb";
-import { Loader2, Trash2 } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/utils/dbConnect";
+import ChapterCompletedCount from "../_components/chapter-completed-count-form";
 
-const ChapterEditPage = ({ params }) => {
-  const { user } = useAuth();
-  const [chapter, setChapter] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const router = useRouter();
+const ChapterEditPage = async ({ params }) => {
+  const cookieStore = cookies();
+  const courseId = params.courseId;
+  const chapterId = params.chapterId;
 
-  if (!user) {
-    redirect(`/auth/login`);
+  let userId = null;
+  const token = cookieStore.get("accessToken")?.value;
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+
+      if (!userId) {
+        redirect("/auth/login?callbackUrl=/dashboard/training");
+      }
+    } catch (error) {
+      redirect("/auth/login?callbackUrl=/dashboard/training");
+    }
+  } else {
+    redirect("/auth/login?callbackUrl=/dashboard/training");
+  }
+
+  const chapter = await prisma.chapter.findUnique({
+    where: { id: chapterId, courseId },
+    include: {
+      muxData: true,
+    },
+  });
+
+  if (!chapter) {
+    redirect("/dashboard/training");
   }
 
   const requiredFields = [chapter.title, chapter.description];
@@ -31,25 +49,7 @@ const ChapterEditPage = ({ params }) => {
 
   const isFieldsCompleted = completedFields === totalFields;
 
-  const fetchChapterInfo = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await apiCall(
-        "get",
-        `/training/course/${params.courseId}/chapter/${params.chapterId}`
-      );
-      setChapter(response.chapter);
-    } catch (error) {
-      toast.error(`${error.message}` || "something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  }, [params.courseId, params.chapterId]);
-
-  useEffect(() => {
-    fetchChapterInfo();
-  }, [fetchChapterInfo]);
-
+  console.log(chapter);
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
     {
@@ -59,47 +59,6 @@ const ChapterEditPage = ({ params }) => {
     { name: "Course chapter setup" },
   ];
 
-  const handleDelete = () => {
-    handleDeleteBtn(
-      `/training/course/${params.courseId}/chapter/${params.chapterId}`,
-      "",
-      `/dashboard/training/course/${params.courseId}`,
-      router
-    );
-  };
-
-  const handlePublishChapter = async (courseId, chapterId, isPublished) => {
-    if (!courseId || !chapterId) return;
-    try {
-      setIsPublishing(true);
-      const endpoint = isPublished
-        ? `/training/course/${courseId}/chapter/${chapterId}/unpublish`
-        : `/training/course/${courseId}/chapter/${chapterId}/publish`;
-
-      await apiCall("patch", endpoint);
-      toast.success(
-        `Chapter successfully ${isPublished ? "unpublished" : "published"}.`
-      );
-
-      fetchChapterInfo();
-    } catch (error) {
-      toast.error(
-        `${error?.response?.data?.message}` || "something went wrong"
-      );
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-[rgba(0,0,0,0.2)]">
-        <div className="flex flex-col justify-center items-center mt-20">
-          <Loader2 className=" animate-spin" />
-        </div>
-      </div>
-    );
-  }
   return (
     <>
       <DashboardHeader breadcrumbs={breadcrumbs} />
@@ -109,51 +68,18 @@ const ChapterEditPage = ({ params }) => {
           label={`This chapter is yet to be published therefore won't be visible in the course page.`}
         />
       )}
-      <div className="p-4 w-full">
-        <div className="flex justify-between items-center">
-          <p className="text-sm font-bold">
-            Completed Fields : {completedText}
-          </p>
-          <div className="flex items-center gap-3">
-            <Button
-              disabled={!isFieldsCompleted || isPublishing}
-              onClick={() =>
-                handlePublishChapter(
-                  params.courseId,
-                  params.chapterId,
-                  chapter.isPublished
-                )
-              }
-            >
-              {isPublishing ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="animate-spin" />
-                  <span className="text-sm italic">
-                    {chapter.isPublished ? "Unpublishing..." : "Publishing..."}
-                  </span>
-                </div>
-              ) : chapter.isPublished ? (
-                "Unpublish Chapter"
-              ) : (
-                "Publish Chapter"
-              )}
-            </Button>
-
-            {!isPublishing && (
-              <Trash2
-                className="w-5 h-5 cursor-pointer hover:opacity-75 text-red-600"
-                onClick={handleDelete}
-              />
-            )}
-          </div>
-        </div>
-      </div>
 
       <div className="p-6 bg-[whitesmoke] min-h-screen relative">
+        <ChapterCompletedCount
+          chapter={chapter}
+          completedText={completedText}
+          isFieldsCompleted={isFieldsCompleted}
+        />
+
         <ChapterTabsComponent
           initialData={chapter}
-          chapterId={params.chapterId}
-          courseId={params.courseId}
+          chapterId={chapterId}
+          courseId={courseId}
         />
       </div>
     </>

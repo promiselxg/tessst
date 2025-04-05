@@ -20,6 +20,7 @@ import { toast } from "sonner";
 
 import { useAuth } from "@/context/authProvider";
 import Editor from "../editor/editor";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   description: z.string().min(2, {
@@ -33,6 +34,7 @@ const CourseDescriptionForm = ({
   onSuccessfulSubmit,
 }) => {
   const { user } = useAuth();
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -53,6 +55,7 @@ const CourseDescriptionForm = ({
       });
       if (response) {
         toast.success(`${response.message}`);
+        router.push(`/dashboard/training/course/${courseId}?tab=attachment`);
         onSuccessfulSubmit();
       }
     } catch (error) {

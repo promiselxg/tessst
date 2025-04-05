@@ -19,7 +19,7 @@ import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/authProvider";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Editor from "../editor/editor";
 
 const formSchema = z.object({
@@ -28,20 +28,19 @@ const formSchema = z.object({
   }),
 });
 
-const ChapterDescriptionForm = ({
-  initialData,
-  courseId,
-  chapterId,
-  onSuccessfulSubmit,
-}) => {
+const ChapterDescriptionForm = ({ initialData, courseId, chapterId }) => {
   const { user } = useAuth();
-
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
   });
 
   const { isSubmitting, isValid } = form.formState;
+
+  useEffect(() => {
+    form.reset(initialData);
+  }, [initialData, form]);
 
   const onSubmit = async (values) => {
     try {
@@ -54,7 +53,9 @@ const ChapterDescriptionForm = ({
       );
       if (response) {
         toast.success(`${response.message}`);
-        onSuccessfulSubmit();
+        router.push(
+          `/dashboard/training/course/${courseId}/chapter/${chapterId}?tab=access`
+        );
       }
     } catch (error) {
       toast?.error("Something went wrong!", {

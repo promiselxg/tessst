@@ -40,7 +40,9 @@ const ChaptersForm = ({ initialData, courseId }) => {
       const response = await apiCall("get", `/training/course/${courseId}`);
       setChapters(response.course.chapters);
     } catch (error) {
-      console.error(error);
+      toast?.error("Something went wrong!", {
+        description: `${error?.response?.data?.message}`,
+      });
     }
   }, [courseId]);
 
@@ -70,6 +72,7 @@ const ChaptersForm = ({ initialData, courseId }) => {
         fetchChapters();
         toggleCreating();
         form.reset();
+        router.replace(`/dashboard/training/course/${courseId}?tab=lessons`);
       }
     } catch (error) {
       toast?.error("Something went wrong!", {

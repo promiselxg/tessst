@@ -61,7 +61,7 @@ export function LoginForm() {
     try {
       const response = await loginUser(values.username, values.password);
       if (response.success === true) {
-        router.replace(callbackUrl);
+        router.push(callbackUrl);
         toast.success("Login successful");
       } else {
         toast.error(response.message);

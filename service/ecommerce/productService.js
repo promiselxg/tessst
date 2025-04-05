@@ -1,13 +1,5 @@
 import { apiCall } from "@/lib/utils/api";
-import axios from "axios";
-
-const apiClient = axios.create({
-  baseURL: "http://localhost:3000/api",
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import { apiClient } from "@/lib/utils/host";
 
 export const addNewProduct = async (formData) => {
   return await apiCall("post", `/product`, { formData });

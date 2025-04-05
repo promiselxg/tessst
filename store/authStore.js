@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { redirect } from "next/navigation";
-import API_BASE_URL from "@/lib/utils/host";
+import { API_BASE_URL } from "@/lib/utils/host";
 
 export const useAuthStore = create(
   persist(

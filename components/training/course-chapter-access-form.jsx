@@ -19,20 +19,16 @@ import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/authProvider";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Checkbox } from "../ui/checkbox";
 
 const formSchema = z.object({
   isFree: z.boolean().default(false),
 });
 
-const ChapterAccessForm = ({
-  initialData,
-  courseId,
-  chapterId,
-  onSuccessfulSubmit,
-}) => {
+const ChapterAccessForm = ({ initialData, courseId, chapterId }) => {
   const { user } = useAuth();
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -42,6 +38,10 @@ const ChapterAccessForm = ({
   });
 
   const { isSubmitting, isValid } = form.formState;
+
+  useEffect(() => {
+    form.reset(initialData);
+  }, [initialData, form]);
 
   const onSubmit = async (values) => {
     try {
@@ -54,7 +54,9 @@ const ChapterAccessForm = ({
       );
       if (response) {
         toast.success(`${response.message}`);
-        onSuccessfulSubmit();
+        router.push(
+          `/dashboard/training/course/${courseId}/chapter/${chapterId}?tab=attachment`
+        );
       }
     } catch (error) {
       toast?.error("Something went wrong!", {

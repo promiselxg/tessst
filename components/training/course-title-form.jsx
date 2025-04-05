@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,6 +20,7 @@ import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
 
 import { useAuth } from "@/context/authProvider";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -27,15 +28,19 @@ const formSchema = z.object({
   }),
 });
 
-const CourseTitleForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
+const CourseTitleForm = ({ initialData, courseId }) => {
   const { user } = useAuth();
-
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: initialData,
   });
 
   const { isSubmitting, isValid } = form.formState;
+
+  useEffect(() => {
+    form.reset(initialData);
+  }, [initialData, form]);
 
   const onSubmit = async (values) => {
     try {
@@ -45,10 +50,10 @@ const CourseTitleForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
       });
       if (response) {
         toast.success(`${response.message}`);
-        onSuccessfulSubmit();
+        router.push(`/dashboard/training/course/${courseId}?tab=description`);
+        //onSuccessfulSubmit();
       }
     } catch (error) {
-      console.log(error);
       toast?.error("Something went wrong!", {
         description: `${error?.response?.data?.message}`,
       });
@@ -65,7 +70,7 @@ const CourseTitleForm = ({ initialData, courseId, onSuccessfulSubmit }) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm text-slate-700">
-                  Training title
+                  Training title {initialData.title}
                 </FormLabel>
                 <FormControl>
                   <Input

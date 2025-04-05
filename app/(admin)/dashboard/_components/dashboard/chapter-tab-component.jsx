@@ -1,10 +1,9 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { Lock, Layout, Loader2, Video } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Lock, Video } from "lucide-react";
+import { useEffect, useState } from "react";
 import CourseChapterTitleForm from "@/components/training/course-chapter-title-form";
-import { toast } from "sonner";
-import { apiCall } from "@/lib/utils/api";
+
 import ChapterDescriptionForm from "@/components/training/course-chapter-description-form";
 import ChapterAccessForm from "@/components/training/course-chapter-access-form";
 import ChapterVideoUploadForm from "@/components/training/chapter-video-form";
@@ -38,25 +37,8 @@ const ChapterTabsComponent = ({ initialData, courseId, chapterId }) => {
   const pathname = usePathname();
 
   const [activeTab, setActiveTab] = useState("chapter");
-  const [chapterData, setChapterData] = useState(initialData);
-  const [loading, setLoading] = useState(false);
 
   let activeScreen;
-
-  const fetchChapterData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await apiCall(
-        "get",
-        `/training/course/${courseId}/chapter/${chapterId}`
-      );
-      setChapterData(response.chapter);
-    } catch (error) {
-      toast.error("Failed to fetch chapter data");
-    } finally {
-      setLoading(false);
-    }
-  }, [courseId, chapterId]);
 
   const handleTabClick = (key) => {
     const params = new URLSearchParams(searchParams);
@@ -67,37 +49,33 @@ const ChapterTabsComponent = ({ initialData, courseId, chapterId }) => {
   useEffect(() => {
     const tab = searchParams.get("tab") || "chapter";
     setActiveTab(tab);
-    fetchChapterData();
-  }, [searchParams, fetchChapterData]);
+  }, [searchParams]);
 
   switch (activeTab) {
     case "chapter":
       activeScreen = (
         <CourseChapterTitleForm
-          initialData={chapterData}
+          initialData={initialData}
           courseId={courseId}
           chapterId={chapterId}
-          onSuccessfulSubmit={fetchChapterData}
         />
       );
       break;
     case "description":
       activeScreen = (
         <ChapterDescriptionForm
-          initialData={chapterData}
+          initialData={initialData}
           courseId={courseId}
           chapterId={chapterId}
-          onSuccessfulSubmit={fetchChapterData}
         />
       );
       break;
     case "access":
       activeScreen = (
         <ChapterAccessForm
-          initialData={chapterData}
+          initialData={initialData}
           courseId={courseId}
           chapterId={chapterId}
-          onSuccessfulSubmit={fetchChapterData}
         />
       );
 
@@ -105,20 +83,18 @@ const ChapterTabsComponent = ({ initialData, courseId, chapterId }) => {
     case "attachment":
       activeScreen = (
         <ChapterVideoUploadForm
-          initialData={chapterData}
+          initialData={initialData}
           courseId={courseId}
           chapterId={chapterId}
-          onSuccessfulSubmit={fetchChapterData}
         />
       );
       break;
     default:
       activeScreen = (
         <CourseChapterTitleForm
-          initialData={chapterData}
+          initialData={initialData}
           courseId={courseId}
           chapterId={chapterId}
-          onSuccessfulSubmit={fetchChapterData}
         />
       );
       break;
@@ -142,9 +118,7 @@ const ChapterTabsComponent = ({ initialData, courseId, chapterId }) => {
         ))}
       </div>
       <div className="w-full bg-white shadow rounded-bl-lg rounded-br-lg overflow-hidden">
-        <div className="flex w-full p-6">
-          {loading ? <Loader2 className=" animate-spin" /> : activeScreen}
-        </div>
+        <div className="flex w-full p-6">{activeScreen}</div>
       </div>
     </>
   );

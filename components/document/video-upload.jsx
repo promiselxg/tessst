@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
-const VideoFileUpload = ({ chapterId, courseId, onSuccessfulSubmit }) => {
+const VideoFileUpload = ({ chapterId, courseId }) => {
   const [files, setFiles] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -51,10 +51,9 @@ const VideoFileUpload = ({ chapterId, courseId, onSuccessfulSubmit }) => {
       await response.json();
       if (response.ok) {
         toast.success("video uploaded successfully.");
-        onSuccessfulSubmit();
+        window.location.reload();
       }
     } catch (error) {
-      console.log(error);
       toast.error("An error occurred while uploading the video.");
     } finally {
       setLoading(false);

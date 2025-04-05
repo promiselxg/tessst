@@ -7,8 +7,10 @@ import { PlusCircle } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 import FileUpload from "@/components/image/file-upload";
+import { useRouter } from "next/navigation";
 
 const ImageFileUploadForm = ({ initialData, courseId }) => {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const { uploadedFile, uploadStatus, setUploadStatus, setSelectedImages } =
     useImageContext();
@@ -22,8 +24,9 @@ const ImageFileUploadForm = ({ initialData, courseId }) => {
   useEffect(() => {
     if (uploadStatus === "completed") {
       setIsEditing(false);
+      router.push(`/dashboard/training/course/${courseId}?tab=lessons`);
     }
-  }, [uploadStatus]);
+  }, [uploadStatus, courseId, router]);
 
   return (
     <>
