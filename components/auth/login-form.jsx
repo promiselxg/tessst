@@ -45,7 +45,7 @@ export function LoginForm() {
   const callbackUrl =
     searchParams.get("callbackUrl")?.toString() ||
     getCookie("redirectUrl")?.toString() ||
-    "/dashboard";
+    "/dashboard/training";
 
   const form = useForm({
     resolver: zodResolver(formSchema),
