@@ -61,7 +61,7 @@ export function LoginForm() {
     try {
       const response = await loginUser(values.username, values.password);
       if (response.success === true) {
-        router.push(callbackUrl);
+        router.push(callbackUrl || "/dashboard/training");
         toast.success("Login successful");
       } else {
         toast.error(response.message);
@@ -77,7 +77,7 @@ export function LoginForm() {
     setIsMounted(true);
 
     if (user) {
-      router.replace("/dashboard");
+      router.replace("/dashboard/training");
     }
   }, [user, router]);
 
