@@ -34,25 +34,15 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "YSFON",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
     },
   ],
   navMain: [
     {
-      title: "Training",
-      url: "/training",
+      title: "Training & Courses",
+      url: "/dashboard/training",
       icon: SquareTerminal,
       isActive: true,
       items: [
@@ -61,73 +51,59 @@ const data = {
           url: "/dashboard/training/create",
         },
         {
-          title: "Training Category",
-          url: "#",
+          title: "All trainings",
+          url: "/dashboard/training",
+        },
+        {
+          title: "Categories",
+          url: "/dashboard/training/categories",
+        },
+        {
+          title: "Tags",
+          url: "/dashboard/training/tags",
+        },
+        {
+          title: "Instructors",
+          url: "/dashboard/training/instructors",
+        },
+        {
+          title: "Students",
+          url: "/dashboard/training/students",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
+      title: "Ecommerce Store",
+      url: "/dashboard/ecommerce",
       icon: Bot,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "All products",
+          url: "/dashboard/ecommerce",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Add product",
+          url: "/dashboard/ecommerce/products/create",
         },
         {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
+          title: "Orders",
+          url: "/dashboard/ecommerce/orders",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Customers",
+          url: "/dashboard/ecommerce/customers",
         },
         {
-          title: "Tutorials",
-          url: "#",
+          title: "Discounts",
+          url: "/dashboard/ecommerce/discounts",
         },
         {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
+          title: "Categories",
+          url: "/dashboard/ecommerce/categories",
         },
         {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Tags",
+          url: "/dashboard/ecommerce/tags",
         },
       ],
     },
