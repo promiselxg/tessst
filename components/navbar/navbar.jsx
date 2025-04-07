@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import HamburgerMenu from "./HamburgerMenu";
-import MobileMenu from "./MobileMenu";
 import Link from "next/link";
 import Image from "next/image";
 import { MdShoppingCart } from "react-icons/md";
 import { Button } from "../ui/button";
+import HamburgerMenu from "./hamburgerMenu";
+import MobileMenu from "./mobileMenu";
 
 const navLinks = [
   { href: "/", label: "Home" },
