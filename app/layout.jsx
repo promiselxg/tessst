@@ -1,15 +1,36 @@
 import localFont from "next/font/local";
 import "./globals.css";
+import PageTransition from "@/components/animation/pageTransition";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+const euclid = localFont({
+  src: [
+    {
+      path: "./fonts/Euclid_Circular_A_Light_Italic.ttf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "./fonts/Euclid_Circular_A_Light.ttf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Euclid_Circular_A_Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Euclid_Circular_A_Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Euclid_Circular_A_SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+  ],
+  variable: "--font-euclid",
 });
 
 export const metadata = {
@@ -19,11 +40,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" className={euclid.variable}>
+      <body className="antialiased font-euclid">
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );
