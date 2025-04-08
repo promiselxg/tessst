@@ -81,9 +81,9 @@ const HomeBlogSection = () => {
 
             {/* Right List */}
             <div className="w-full md:w-[60%] h-full gap-5 flex flex-col">
-              {blogPosts.slice(1).map((post) => (
+              {blogPosts.slice(1).map((post, i) => (
                 <div
-                  key={post.id}
+                  key={i}
                   className="h-fit md:h-[200px] w-full flex gap-4 flex-col md:flex-row"
                 >
                   <Image

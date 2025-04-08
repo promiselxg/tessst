@@ -29,6 +29,7 @@ const HomeProjectSection = () => {
                     height={200}
                     alt="display image"
                     className="bg-cover"
+                    priority
                   />
                 </div>
                 <div className="shadow bg-white p-5 h-[250px]">
@@ -60,6 +61,7 @@ const HomeProjectSection = () => {
                     width={200}
                     height={200}
                     alt="display image"
+                    priority
                     className="bg-cover"
                   />
                 </div>
@@ -93,6 +95,7 @@ const HomeProjectSection = () => {
                     height={200}
                     alt="display image"
                     className="bg-cover"
+                    priority
                   />
                 </div>
                 <div className="shadow bg-white p-5 h-[250px]">

@@ -12,8 +12,8 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/about-us", label: "About Us" },
   { href: "/Projects", label: "Projects" },
-  { href: "/about", label: "Store" },
-  { href: "/about", label: "Blog" },
+  { href: "/store", label: "Store" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -33,6 +33,7 @@ export default function Navbar() {
               width={80}
               height={80}
               className="cursor-pointer"
+              priority
             />
           </Link>
         </div>

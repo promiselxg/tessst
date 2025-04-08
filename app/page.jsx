@@ -6,6 +6,8 @@ import HomeProjectSection from "./(home)/_components/sections/home-projects-sect
 import HomeDonateSection from "./(home)/_components/sections/home-donate-section";
 import HomeTeamSection from "./(home)/_components/sections/home-team-section";
 import HomeBlogSection from "./(home)/_components/sections/home-blog-section";
+import HomeFAQSection from "./(home)/_components/sections/home-faq-section";
+import { Footer } from "@/components/footer/footer";
 
 export default function Home() {
   return (
@@ -28,6 +30,12 @@ export default function Home() {
       </SectionWrapper>
       <SectionWrapper>
         <HomeBlogSection />
+      </SectionWrapper>
+      <SectionWrapper>
+        <HomeFAQSection />
+      </SectionWrapper>
+      <SectionWrapper>
+        <Footer />
       </SectionWrapper>
     </div>
   );
