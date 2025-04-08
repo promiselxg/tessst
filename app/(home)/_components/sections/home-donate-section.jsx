@@ -31,7 +31,7 @@ const FeatureItem = ({ img, text }) => (
 const HomeDonateSection = () => {
   return (
     <Reveal>
-      <div className="w-full flex max-h-screen pt-[40px] md:pt-[85px]">
+      <div className="w-full flex h-full md:max-h-screen pt-[40px] md:pt-[85px]">
         <Container>
           <TextFadeIn
             as="h1"

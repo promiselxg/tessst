@@ -10,7 +10,7 @@ import React from "react";
 
 const HomePartnerSection = () => {
   return (
-    <>
+    <div className="w-[90%] mx-auto md:w-full min-h-[calc(100vh-85px)] py-[80px] md:pt-[85px] relative">
       <div className="w-full flex">
         <div className="md:container mx-auto w-[80%] md:w-[1300px]">
           <div className="flex items-center text-center justify-center">
@@ -104,7 +104,7 @@ const HomePartnerSection = () => {
           </Reveal>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
