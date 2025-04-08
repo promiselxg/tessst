@@ -15,7 +15,7 @@ const HomeHeroSection = () => {
           <div className="flex flex-col text-white space-y-2">
             <h1
               className={cn(
-                `${big_sholders_text.className} text-white text-[50px] md:text-[80px] font-[700] max-w-[20ch] leading-[1em] text`
+                `${big_sholders_text.className} text-white text-[40px] md:text-[80px] font-[700] max-w-[20ch] leading-[1.18em] md:leading-[1em] text`
               )}
             >
               Join a movement that drives real impact.

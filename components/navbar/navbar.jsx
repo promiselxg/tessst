@@ -36,7 +36,7 @@ export default function Navbar() {
             />
           </Link>
         </div>
-        <div className="flex items-center gap-10 md:flex-1 justify-between">
+        <div className="flex items-center gap-5 md:gap-10 md:flex-1 justify-between">
           <div className="hidden md:flex gap-6 ">
             {navLinks.map((link) => (
               <Link
@@ -52,7 +52,7 @@ export default function Navbar() {
             <Link href="/">
               <MdShoppingCart className="h-7 w-7" />
             </Link>
-            <Button className="px-10 h-10 rounded-[8px] bg-[--app-primary-color] text-white transition-all">
+            <Button className="md:px-10 md:h-10 rounded-[8px] bg-[--app-primary-color] text-white transition-all">
               Donate
             </Button>
           </div>

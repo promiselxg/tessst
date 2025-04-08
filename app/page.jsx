@@ -8,7 +8,7 @@ export default function Home() {
     <div className="h-fit bg-[whitesmoke]">
       <Navbar />
       <HomeHeroSection />
-      <SectionWrapper className="w-full h-full md:h-[calc(100vh-85px)] py-[80px] md:pt-[85px] relative bg-[green]">
+      <SectionWrapper className="w-[90%] mx-auto md:w-full min-h-[calc(100vh-85px)] py-[80px] md:pt-[85px] relative">
         <HomePartnerSection />
       </SectionWrapper>
     </div>
