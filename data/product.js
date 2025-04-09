@@ -1,0 +1,42 @@
+export const products = [
+  {
+    id: 2,
+    name: "Laptop Backpack",
+    price: 30000,
+    image: "/img/product/black-bag.png",
+    category: "Accessories",
+    rating: 5,
+  },
+  {
+    id: 3,
+    name: "Wireless Headphones",
+    price: 50000,
+    image: "/img/product/headphone-purple.png",
+    category: "Accessories",
+    rating: 4,
+  },
+  {
+    id: 4,
+    name: "Smart Watch",
+    price: 25000,
+    image: "/img/product/watch.png",
+    category: "Accessories",
+    rating: 5,
+  },
+  {
+    id: 5,
+    name: "Canon Camera",
+    price: 150000,
+    image: "/img/product/camera.png",
+    category: "Accessories",
+    rating: 4,
+  },
+  // {
+  //   id: 6,
+  //   name: "Black Wrist Watch",
+  //   price: 28000,
+  //   image: "/img/product/watch-black.png",
+  //   category: "Accessories",
+  //   rating: 5,
+  // },
+];
