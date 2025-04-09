@@ -30,9 +30,7 @@ const page = () => {
           <Container className="w-[90%] md:w-[1100px] mx-auto mb-8">
             <div className="flex w-full justify-between">
               <div>
-                <p className="tracking-wide">
-                  About 9,620 results (0.62 seconds)
-                </p>
+                <p className="tracking-wide">About 9,620 results.</p>
               </div>
               <div className="flex items-center gap-4">
                 <span>View:</span>
