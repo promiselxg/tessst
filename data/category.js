@@ -1,0 +1,18 @@
+export const courseCategories = [
+  { name: "All Courses", slug: "all" },
+  { name: "Web Development", slug: "web-development" },
+  { name: "UI/UX Design", slug: "ui-ux-design" },
+  { name: "Mobile Development", slug: "mobile-development" },
+  { name: "Data Science", slug: "data-science" },
+  { name: "Cyber Security", slug: "cyber-security" },
+  { name: "DevOps", slug: "devops" },
+  { name: "Product Management", slug: "product-management" },
+  { name: "Digital Marketing", slug: "digital-marketing" },
+  { name: "Artificial Intelligence", slug: "artificial-intelligence" },
+  { name: "Machine Learning", slug: "machine-learning" },
+  { name: "Cloud Computing", slug: "cloud-computing" },
+  { name: "Game Development", slug: "game-development" },
+  { name: "Blockchain", slug: "blockchain" },
+  { name: "Video Editing", slug: "video-editing" },
+  { name: "E-Commerce", slug: "e-commerce" },
+];
