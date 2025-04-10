@@ -14,7 +14,7 @@ export const ProductDetailsCard = ({ product }) => {
     <div className="w-full md:w-[90%] p-5">
       <div>
         <h1 className=" font-euclid text-[18px] md:text-[25px] font-[400] md:leading-tight">
-          XIAOMI Redmi A3 Pro 6.88" 4GB RAM / 128GB ROM Android 14 - Starry Blue
+          XIAOMI Redmi A3 Pro 6.88 4GB RAM / 128GB ROM Android 14 - Starry Blue
         </h1>
         <div className="flex items-center gap-2 text-xs my-2">
           <span>Brand:</span>
@@ -46,7 +46,7 @@ export const ProductDetailsCard = ({ product }) => {
       >
         {loading ? (
           <>
-            <Loader2 className=" animate-spin" />
+            <Loader2 className="animate-spin" />
           </>
         ) : (
           <>
