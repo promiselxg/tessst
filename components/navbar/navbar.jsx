@@ -7,6 +7,8 @@ import { MdShoppingCart } from "react-icons/md";
 import { Button } from "../ui/button";
 import HamburgerMenu from "./hamburgerMenu";
 import MobileMenu from "./mobileMenu";
+import { Badge } from "../ui/badge";
+import { useCartStore } from "@/store/cartStore";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -20,7 +22,7 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { cart } = useCartStore();
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
@@ -51,8 +53,13 @@ export default function Navbar() {
             ))}
           </div>
           <div className="flex items-center gap-5 md:gap-10">
-            <Link href="/">
-              <MdShoppingCart className="h-7 w-7" />
+            <Link href="/" className="flex items-center relative">
+              <MdShoppingCart className="h-7 w-7 text-gray-800" />
+              {cart.length > 0 && (
+                <Badge className="absolute -top-1 -right-1 px-[6px] py-[1px] bg-red-500 hover:bg-red-800 text-white text-xs rounded-full transition-all">
+                  {cart.length}
+                </Badge>
+              )}
             </Link>
             <Button className="md:px-10 md:h-10 rounded-[8px] bg-[--app-primary-color] text-white transition-all">
               Donate

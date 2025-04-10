@@ -1,8 +1,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import PageTransition from "@/components/animation/pageTransition";
-import Navbar from "@/components/navbar/navbar";
-import { Footer } from "@/components/footer/footer";
+import LayoutWrapper from "./layout-wrapper";
+import { Toaster } from "@/components/ui/sonner";
 
 const euclid = localFont({
   src: [
@@ -45,9 +45,8 @@ export default function RootLayout({ children }) {
     <html lang="en" className={euclid.variable}>
       <body className="font-euclid">
         <PageTransition>
-          <Navbar />
-          {children}
-          <Footer />
+          <LayoutWrapper>{children}</LayoutWrapper>
+          <Toaster richColors />
         </PageTransition>
       </body>
     </html>

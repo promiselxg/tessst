@@ -4,15 +4,20 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingCart, Heart, Search } from "lucide-react";
 import IconButton from "../ui/icon-button";
+import { useRouter } from "next/navigation";
 
 export const ProductCard = ({ product }) => {
+  const router = useRouter();
   return (
     <motion.div
       whileHover={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
       className="relative group p-4 rounded-xl bg-green-50"
     >
-      <div className="relative overflow-hidden rounded-xl cursor-pointer">
+      <div
+        className="relative overflow-hidden rounded-xl cursor-pointer"
+        onClick={() => router.push(`/store/${product?.slug}`)}
+      >
         <motion.div
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}

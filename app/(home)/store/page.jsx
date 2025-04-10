@@ -12,7 +12,7 @@ const page = () => {
     <>
       <BreadcrumbBanner
         title="Store"
-        pathname={[{ label: "Store", href: "/" }]}
+        pathname={[{ label: "Store", href: "/store" }]}
         banner="/img/bg.png"
       />
 
