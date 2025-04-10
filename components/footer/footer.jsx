@@ -2,7 +2,7 @@ import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="bg-neutral-900 text-neutral-100 z-[100]">
+    <footer className="bg-[--course-bg] text-neutral-100 z-[100]">
       <div className="w-[90%] md:max-w-7xl mx-auto px-4 md:px-8 py-16 grid grid-cols-1 md:grid-cols-3 gap-10">
         <div>
           <h4 className="font-semibold mb-4">Office Address</h4>
