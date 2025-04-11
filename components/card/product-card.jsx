@@ -29,8 +29,8 @@ export const ProductCard = ({ product }) => {
           onClick={handleNavigate}
         >
           <Image
-            src={product.image}
-            alt={product.name}
+            src={product?.image}
+            alt={product?.name}
             width={114}
             height={114}
             priority
@@ -52,9 +52,9 @@ export const ProductCard = ({ product }) => {
       </div>
 
       <div className="text-center mt-4">
-        <h3 className="font-euclid font-semibold">{product.name}</h3>
+        <h3 className="font-euclid font-semibold">{product?.name}</h3>
         <p className="font-euclid text-gray-500 text-sm font-[600]">
-          ₦{product.price.toLocaleString()}
+          &#8358;{product?.price?.toLocaleString()}
         </p>
       </div>
     </motion.div>

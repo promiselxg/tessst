@@ -9,15 +9,17 @@ export const useCartStore = create(
       loading: false,
       loadingProductId: null,
 
+      // Add to cart or increase quantity
       addToCart: (product) => {
         set({ loading: true, loadingProductId: product.id });
 
         setTimeout(() => {
-          const existing = get().cart.find((item) => item.id === product.id);
+          const { cart } = get();
+          const exists = cart.find((item) => item.id === product.id);
 
-          if (existing) {
+          if (exists) {
             set({
-              cart: get().cart.map((item) =>
+              cart: cart.map((item) =>
                 item.id === product.id
                   ? { ...item, quantity: item.quantity + 1 }
                   : item
@@ -25,40 +27,50 @@ export const useCartStore = create(
               loading: false,
               loadingProductId: null,
             });
-            toast.success(`${product.name} added to cart successfully.`);
           } else {
             set({
-              cart: [...get().cart, { ...product, quantity: 1 }],
+              cart: [...cart, { ...product, quantity: 1 }],
               loading: false,
               loadingProductId: null,
             });
-            toast.success(`${product.name} added to cart successfully.`);
           }
-        }, 3000);
+
+          toast.success(`${product.name} added to cart.`);
+        }, 1000);
+      },
+
+      // Decrease quantity
+      decreaseQuantity: (id) => {
+        const { cart } = get();
+        const item = cart.find((item) => item.id === id);
+
+        if (!item) return;
+
+        if (item.quantity > 1) {
+          set({
+            cart: cart.map((i) =>
+              i.id === id ? { ...i, quantity: i.quantity - 1 } : i
+            ),
+          });
+        } else {
+          set({
+            cart: cart.filter((i) => i.id !== id),
+          });
+        }
+
+        toast.success("Item quantity updated.");
       },
 
       removeFromCart: (id) => {
-        const existing = get().cart.find((item) => item.id === id);
-        if (!existing) return;
-        set({ loading: true });
-        if (existing.quantity > 1) {
-          set({
-            cart: get().cart.map((item) =>
-              item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-            ),
-            loading: false,
-          });
-          toast.success(`Item quantity has been updated`);
-        } else {
-          set({
-            cart: get().cart.filter((item) => item.id !== id),
-            loading: false,
-          });
-          toast.success(`Item quantity has been updated`);
-        }
+        const { cart } = get();
+        set({
+          cart: cart.filter((item) => item.id !== id),
+        });
       },
 
-      clearCart: () => set({ cart: [] }),
+      clearCart: () => {
+        set({ cart: [] });
+      },
     }),
     {
       name: "cart-storage",

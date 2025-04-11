@@ -53,7 +53,7 @@ export default function Navbar() {
             ))}
           </div>
           <div className="flex items-center gap-5 md:gap-10">
-            <Link href="/" className="flex items-center relative">
+            <Link href="/cart" className="flex items-center relative">
               <MdShoppingCart className="h-7 w-7 text-gray-800" />
               {cart.length > 0 && (
                 <Badge className="absolute -top-1 -right-1 px-[6px] py-[1px] bg-red-500 hover:bg-red-800 text-white text-xs rounded-full transition-all">
