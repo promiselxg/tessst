@@ -7,12 +7,11 @@ export const useCartStore = create(
     (set, get) => ({
       cart: [],
       loading: false,
+      loadingProductId: null,
 
-      // Simulate API call to add to cart with a delay of 3 seconds
       addToCart: (product) => {
-        set({ loading: true }); // Set loading to true before simulating the API call
+        set({ loading: true, loadingProductId: product.id });
 
-        // Simulating an API call with a 3-second delay
         setTimeout(() => {
           const existing = get().cart.find((item) => item.id === product.id);
 
@@ -23,35 +22,46 @@ export const useCartStore = create(
                   ? { ...item, quantity: item.quantity + 1 }
                   : item
               ),
-              loading: false, // Set loading to false after processing
+              loading: false,
+              loadingProductId: null,
             });
             toast.success(`${product.name} added to cart successfully.`);
           } else {
             set({
               cart: [...get().cart, { ...product, quantity: 1 }],
-              loading: false, // Set loading to false after processing
+              loading: false,
+              loadingProductId: null,
             });
             toast.success(`${product.name} added to cart successfully.`);
           }
-        }, 3000); // Simulating a 3-second delay
+        }, 3000);
       },
 
-      // Remove item from cart
       removeFromCart: (id) => {
-        set({
-          cart: get().cart.filter((item) => item.id !== id),
-        });
+        const existing = get().cart.find((item) => item.id === id);
+        if (!existing) return;
+        set({ loading: true });
+        if (existing.quantity > 1) {
+          set({
+            cart: get().cart.map((item) =>
+              item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+            ),
+            loading: false,
+          });
+          toast.success(`Item quantity has been updated`);
+        } else {
+          set({
+            cart: get().cart.filter((item) => item.id !== id),
+            loading: false,
+          });
+          toast.success(`Item quantity has been updated`);
+        }
       },
 
-      // Clear all items from the cart
       clearCart: () => set({ cart: [] }),
-
-      // Get the total number of items in the cart
-      getCartItemCount: () =>
-        get().cart.reduce((total, item) => total + item.quantity, 0),
     }),
     {
-      name: "cart-storage", // This will persist your cart state in localStorage
+      name: "cart-storage",
     }
   )
 );

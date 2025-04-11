@@ -1,15 +1,8 @@
 "use client";
-import { ShoppingCart, AlertCircle, Loader2 } from "lucide-react";
-import { Button } from "../ui/button";
-import { useCartStore } from "@/store/cartStore";
+import { AlertCircle } from "lucide-react";
+import { ProductQtyBtnAction } from "@/app/(home)/store/_components/product-button-action";
 
 export const ProductDetailsCard = ({ product }) => {
-  const { addToCart, loading } = useCartStore();
-
-  const handleAddToCart = (item) => {
-    addToCart(item);
-  };
-
   return (
     <div className="w-full md:w-[90%] p-5">
       <div>
@@ -38,23 +31,7 @@ export const ProductDetailsCard = ({ product }) => {
           </span>
         </div> */}
       </div>
-
-      <Button
-        className="w-full h-10 bg-[--app-primary-color]"
-        onClick={() => handleAddToCart(product)}
-        disabled={loading}
-      >
-        {loading ? (
-          <>
-            <Loader2 className="animate-spin" />
-          </>
-        ) : (
-          <>
-            <ShoppingCart />
-            Add to cart
-          </>
-        )}
-      </Button>
+      <ProductQtyBtnAction product={product} />
     </div>
   );
 };
