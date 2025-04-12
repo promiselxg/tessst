@@ -9,16 +9,7 @@ import HamburgerMenu from "./hamburgerMenu";
 import MobileMenu from "./mobileMenu";
 import { Badge } from "../ui/badge";
 import { useCartStore } from "@/store/cartStore";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/about-us", label: "About Us" },
-  { href: "/Projects", label: "Projects" },
-  { href: "/training", label: "Training" },
-  { href: "/store", label: "Store" },
-  { href: "/blog", label: "Blog" },
-  { href: "/contact", label: "Contact" },
-];
+import { navLinks } from "@/data/navbar";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +19,7 @@ export default function Navbar() {
   return (
     <nav className="w-full px-4 py-3 flex items-center justify-between shadow bg-white fixed top-0 left-0 z-50 h-[85px]">
       <div className="container w-[1300px] mx-auto flex items-center justify-between">
-        <div className="md:w-1/3">
+        <div className="md:w-1/4">
           <Link href="/" className="w-fit cursor-default">
             <Image
               src="/img/ysfon-logo.png"
