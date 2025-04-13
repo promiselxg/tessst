@@ -8,9 +8,7 @@ const BlogCard = ({ image, date, title, desc, isLarge = false }) => {
     <div
       className={cn(
         "w-full",
-        isLarge
-          ? "md:w-[40%] bg-[red]"
-          : "md:h-[200px] flex gap-4 flex-col md:flex-row"
+        isLarge ? "md:w-[40%]" : "md:h-[200px] flex gap-4 flex-col md:flex-row"
       )}
     >
       <div
