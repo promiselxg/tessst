@@ -8,7 +8,7 @@ const page = () => {
     <>
       <BreadcrumbBanner
         title="Projects"
-        pathname={[{ label: "Projects", href: "/project" }]}
+        pathname={[{ label: "Projects", href: "/projects" }]}
         banner="/img/bg.png"
       />
       <div className="w-full flex h-fit py-[40px] md:py-[85px]">

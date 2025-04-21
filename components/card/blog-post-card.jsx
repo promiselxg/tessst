@@ -34,17 +34,19 @@ export default function BlogPostCard({
       <div
         className={cn(isRow ? "md:w-1/3 w-full relative" : "w-full relative")}
       >
-        <Image
-          src={image}
-          width={isRow ? 300 : 600}
-          height={250}
-          alt={title}
-          priority
-          className={cn(
-            "object-cover h-[250px] object-center",
-            isRow ? "w-full rounded-md" : "w-full"
-          )}
-        />
+        <Link href={link}>
+          <Image
+            src={image}
+            width={isRow ? 300 : 600}
+            height={250}
+            alt={title}
+            priority
+            className={cn(
+              "object-cover h-[250px] object-center",
+              isRow ? "w-full rounded-md" : "w-full"
+            )}
+          />
+        </Link>
         {badge && isRow && (
           <span className="absolute top-3 left-3 bg-rose-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow">
             {badge}

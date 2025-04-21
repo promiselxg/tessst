@@ -35,13 +35,13 @@ const page = () => {
               title="Youth Empowerment: Why Support Kits Are Crucial"
               description="Many youth lack access to basic tools. This initiative aims to empower them through essential starter kits."
               image="/img/project1.png"
-              link="/projects/empowerment"
+              link="/news/empowerment"
               layout="row"
               badge="Featured"
               buttons={[
                 {
                   label: "Read more",
-                  href: "/share/empowerment",
+                  href: "/news/empowerment",
                   variant: "ghost",
                 },
               ]}
@@ -53,13 +53,13 @@ const page = () => {
                 title="Youth Empowerment: Why Support Kits Are Crucial"
                 description="Many youth lack access to basic tools. This initiative aims to empower them through essential starter kits."
                 image="/img/image1.png"
-                link="/projects/empowerment"
+                link="/news/empowerment"
                 layout="card"
                 badge="Featured"
                 buttons={[
                   {
                     label: "Read more",
-                    href: "/share/empowerment",
+                    href: "/news/empowerment",
                     variant: "ghost",
                   },
                 ]}
@@ -68,13 +68,13 @@ const page = () => {
                 title="Youth Empowerment: Why Support Kits Are Crucial"
                 description="Many youth lack access to basic tools. This initiative aims to empower them through essential starter kits."
                 image="/img/image2.png"
-                link="/projects/empowerment"
+                link="/news/empowerment"
                 layout="card"
                 badge="Featured"
                 buttons={[
                   {
                     label: "Read more",
-                    href: "/share/empowerment",
+                    href: "/news/empowerment",
                     variant: "ghost",
                   },
                 ]}
@@ -83,13 +83,13 @@ const page = () => {
                 title="Youth Empowerment: Why Support Kits Are Crucial"
                 description="Many youth lack access to basic tools. This initiative aims to empower them through essential starter kits."
                 image="/img/project1.png"
-                link="/projects/empowerment"
+                link="/news/empowerment"
                 layout="card"
                 badge="Featured"
                 buttons={[
                   {
                     label: "Read more",
-                    href: "/share/empowerment",
+                    href: "/news/empowerment",
                     variant: "ghost",
                   },
                 ]}

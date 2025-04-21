@@ -36,7 +36,7 @@ const SectionBlock = ({
             width={1000}
             height={600}
             priority={imagePriority}
-            className="w-full h-[250px] md:h-[400px] object-cover rounded-[8px] bg-[red]"
+            className="w-full h-[250px] md:h-[400px] object-cover rounded-[8px]"
           />
         </Link>
       </Reveal>

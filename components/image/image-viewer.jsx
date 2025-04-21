@@ -1,10 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useState } from "react";
 
-export default function ImageViewer({ src, alt, className }) {
+export default function ImageViewer({
+  src,
+  alt,
+  className,
+  defaultClassName = true,
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -16,17 +26,25 @@ export default function ImageViewer({ src, alt, className }) {
           width={500}
           height={500}
           onClick={() => setOpen(true)}
+          priority
           className={`cursor-zoom-in ${className}`}
         />
       </DialogTrigger>
 
-      <DialogContent className="p-0 bg-transparent border-none">
+      <DialogContent
+        className="p-0 bg-transparent border-none"
+        aria-describedby="image preview"
+      >
+        <DialogTitle></DialogTitle>
         <Image
           src={src}
           alt={alt}
           width={1000}
           height={1000}
-          className="w-full md:h-[500px] object-contain"
+          priority
+          className={
+            defaultClassName ? "w-full md:h-[500px] object-contain" : ""
+          }
         />
       </DialogContent>
     </Dialog>
