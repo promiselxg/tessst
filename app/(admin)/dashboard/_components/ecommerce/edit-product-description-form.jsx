@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import Editor from "@/components/editor/editor";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -72,10 +73,18 @@ const EditProductDescriptionForm = ({ product_description, id }) => {
                 return (
                   <FormItem>
                     <FormControl>
-                      <CKEditor
+                      {/* <CKEditor
                         value={field.value}
                         onChange={(val) => {
                           field.onChange(val);
+                        }}
+                      /> */}
+                      <Editor
+                        className="h-full md:h-[300px]"
+                        height="h-full md:h-[350px]"
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value);
                         }}
                       />
                     </FormControl>

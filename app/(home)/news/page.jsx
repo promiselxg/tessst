@@ -1,11 +1,8 @@
 import BreadcrumbBanner from "@/components/breadcrumb/banner-breadcrumb";
 import BlogPostCard from "@/components/card/blog-post-card";
 import Container from "@/components/container/container";
-import { Button } from "@/components/ui/button";
 import { big_sholders_text } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
-import { ChevronRight } from "lucide-react";
-import Image from "next/image";
 import React from "react";
 
 const page = () => {
