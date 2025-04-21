@@ -7,7 +7,7 @@ import { API_BASE_URL } from "@/lib/utils/host";
 
 export const useAuthStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       isAuthenticated: false,
 
@@ -40,8 +40,6 @@ export const useAuthStore = create(
           };
         }
       },
-
-      // ✅ Logout Function (Clears cookies & redirects)
       logoutUser: async () => {
         try {
           await axios.post(`${API_BASE_URL}/auth/logout`, {
@@ -52,8 +50,6 @@ export const useAuthStore = create(
           Cookies.remove("refreshToken");
 
           set({ user: null, isAuthenticated: false });
-
-          redirect("/auth/login");
         } catch (error) {
           console.error("Logout failed", error);
         }

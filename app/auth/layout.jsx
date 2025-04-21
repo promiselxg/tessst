@@ -1,7 +1,13 @@
+import { AuthProvider } from "@/context/authProvider";
+import { Toaster } from "sonner";
+
 export default function AuthLayout({ children }) {
   return (
-    <html lang="en">
-      <body suppressHydrationWarning={true}>{children}</body>
-    </html>
+    <AuthProvider>
+      <main className="min-h-screen flex items-center justify-center">
+        {children}
+      </main>
+      <Toaster richColors />
+    </AuthProvider>
   );
 }

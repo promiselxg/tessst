@@ -1,6 +1,5 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import PageTransition from "@/components/animation/pageTransition";
 import LayoutWrapper from "./layout-wrapper";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -44,10 +43,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={euclid.variable}>
       <body className="font-euclid">
-        <PageTransition>
-          <LayoutWrapper>{children}</LayoutWrapper>
-          <Toaster richColors />
-        </PageTransition>
+        <LayoutWrapper>{children}</LayoutWrapper>
+        <Toaster richColors />
       </body>
     </html>
   );

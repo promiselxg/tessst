@@ -10,7 +10,6 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const { user, isAuthenticated, loginUser, logoutUser } = useAuthStore();
   const [mounted, setIsMounted] = useState();
-  // Auto-login on page refresh
   useEffect(() => {
     const accessToken = Cookies.get("accessToken");
     if (accessToken) {
