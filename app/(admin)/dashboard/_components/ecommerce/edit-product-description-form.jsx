@@ -13,12 +13,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import Editor from "@/components/editor/editor";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/utils/api";
+import CKEditor from "@/components/editor/ckEditor";
 
 const formSchema = z.object({
   product_description: z.string().min(20, {
@@ -72,12 +72,10 @@ const EditProductDescriptionForm = ({ product_description, id }) => {
                 return (
                   <FormItem>
                     <FormControl>
-                      <Editor
-                        className="h-full md:h-[300px]"
-                        height="h-full md:h-[350px]"
+                      <CKEditor
                         value={field.value}
-                        onChange={(value) => {
-                          field.onChange(value);
+                        onChange={(val) => {
+                          field.onChange(val);
                         }}
                       />
                     </FormControl>

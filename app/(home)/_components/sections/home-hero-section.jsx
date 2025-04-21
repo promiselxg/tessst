@@ -12,7 +12,7 @@ const HomeHeroSection = () => {
       <div className="absolute inset-0 bg-black/60" />
       <div className="relative container mx-auto w-[90%] ms:w-[1300px] flex items-center h-full">
         <Reveal>
-          <div className="flex flex-col text-white space-y-2">
+          <div className="flex flex-col text-white space-y-2 md:mt-36">
             <h1
               className={cn(
                 `${big_sholders_text.className} text-white text-[40px] md:text-[80px] font-[700] max-w-[20ch] leading-[1.18em] md:leading-[1em] text`

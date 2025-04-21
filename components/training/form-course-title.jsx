@@ -69,7 +69,7 @@ const CourseTitle = () => {
 
   return (
     <>
-      <div>
+      <div className="w-[90%] mx-auto">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
@@ -107,7 +107,7 @@ const CourseTitle = () => {
               <Button
                 type="submit"
                 disabled={!isValid || isSubmitting}
-                className="cursor-pointer"
+                className="cursor-pointer w-full md:w-fit"
               >
                 {isSubmitting ? (
                   <>

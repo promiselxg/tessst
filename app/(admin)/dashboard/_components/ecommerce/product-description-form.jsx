@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 
 import { useFormData } from "@/context/form.context";
-import Editor from "@/components/editor/editor";
+import CKEditor from "@/components/editor/ckEditor";
 
 const formSchema = z.object({
   product_description: z.string().min(20, {
@@ -46,30 +46,26 @@ const ProductDescriptionForm = () => {
           <FormField
             control={form.control}
             name="product_description"
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormControl>
-                    <Editor
-                      className="h-full md:h-[300px]"
-                      height="h-full md:h-[350px]"
-                      value={field.value}
-                      onChange={(value) => {
-                        field.onChange(value);
-                        updateFormData({ product_description: value });
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage>
-                    {formErrors
-                      .filter((error) => error.path === "product_description")
-                      .map((error, index) => (
-                        <span key={index}>{error.message}</span>
-                      ))}
-                  </FormMessage>
-                </FormItem>
-              );
-            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <CKEditor
+                    value={field.value}
+                    onChange={(val) => {
+                      field.onChange(val);
+                      updateFormData({ product_description: val });
+                    }}
+                  />
+                </FormControl>
+                <FormMessage>
+                  {formErrors
+                    .filter((error) => error.path === "product_description")
+                    .map((error, index) => (
+                      <span key={index}>{error.message}</span>
+                    ))}
+                </FormMessage>
+              </FormItem>
+            )}
           />
         </Form>
       </FormWrapper>
