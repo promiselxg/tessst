@@ -71,7 +71,7 @@ const page = ({ params }) => {
           </Container>
           <Container className="w-[90%] md:w-[1100px] mx-auto flex flex-col mb-10 space-y-5">
             <Reveal>
-              <div className="w-full grid grid-cols-3 gap-8">
+              <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8">
                 <ImageViewer
                   src="/img/image1.png"
                   alt="project image 1"
