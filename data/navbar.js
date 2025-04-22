@@ -4,6 +4,6 @@ export const navLinks = [
   { href: "/projects", label: "Projects" },
   { href: "/store", label: "Store" },
   { href: "/training", label: "Resources" },
-  { href: "/blog", label: "Membership" },
+  { href: "/pro", label: "Membership" },
   { href: "/contact-us", label: "Contact Us" },
 ];

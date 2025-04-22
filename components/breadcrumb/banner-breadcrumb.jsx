@@ -39,7 +39,7 @@ export default function BreadcrumbBanner({
         </div>
         {description && (
           <Reveal>
-            <div className="w-[90%] mx-auto max-w-[80ch] text-sm text-gray-200 font-euclid leading-relaxed pt-3 line-clamp-3 md:line-clamp-none">
+            <div className="w-[90%] mx-auto max-w-[80ch] text-sm text-gray-200 font-euclid leading-relaxed pt-3 line-clamp-2 md:line-clamp-none">
               <p>{description}</p>
             </div>
           </Reveal>
