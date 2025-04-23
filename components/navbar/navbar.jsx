@@ -10,8 +10,10 @@ import MobileMenu from "./mobileMenu";
 import { Badge } from "../ui/badge";
 import { useCartStore } from "@/store/cartStore";
 import { navLinks } from "@/data/navbar";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCartStore();
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -52,7 +54,10 @@ export default function Navbar() {
                 </Badge>
               )}
             </Link>
-            <Button className="md:px-10 md:h-10 rounded-[8px] bg-[--app-primary-color] text-white transition-all">
+            <Button
+              className="md:px-10 md:h-10 rounded-[8px] bg-[--app-primary-color] text-white transition-all"
+              onClick={() => router.push("/donate")}
+            >
               Donate
             </Button>
           </div>

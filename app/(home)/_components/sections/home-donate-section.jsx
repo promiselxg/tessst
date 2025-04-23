@@ -5,6 +5,7 @@ import Container from "@/components/container/container";
 import { Button } from "@/components/ui/button";
 import { big_sholders_text } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 import React from "react";
 
 const features = [
@@ -73,9 +74,11 @@ const HomeDonateSection = () => {
               Integer eget nisi ultrices, hendrerit urna at, pulvinar diam.
               Donecsit amet facilisis dolor nunc eget purus
             </p>
-            <Button className="bg-transparent shadow-none border border-red-900 text-[--app-bg-red] px-10 h-10 transition-all hover:text-red-900 hover:bg-transparent text-sm">
-              Donate
-            </Button>
+            <Link href="/donate">
+              <Button className="bg-transparent shadow-none border border-red-900 text-[--app-bg-red] px-10 h-10 transition-all hover:text-red-900 hover:bg-transparent text-sm">
+                Donate
+              </Button>
+            </Link>
           </div>
         </Container>
       </div>
