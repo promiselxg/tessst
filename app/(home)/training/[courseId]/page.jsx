@@ -41,7 +41,7 @@ const SingleCoursePage = ({ params }) => {
       }
     };
     fetchCourse();
-  }, []);
+  }, [params.courseId]);
 
   return (
     <div className="w-full flex h-fit md:min-h-[500px] py-[40px] md:py-[85px] flex-col">
