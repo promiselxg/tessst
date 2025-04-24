@@ -102,7 +102,6 @@ model Customer {
   payments  Payment[]
   refunds   Refund[]
   invoices  Invoice[]
-  Purchase  Purchase[]
   createdAt DateTime   @default(now())
   
 }
@@ -256,12 +255,11 @@ model Purchase {
   userId      String
   courseId    String
   course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user        Customer @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount      Float    @db.Float
+  //user        Customer @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Float?    @db.Float
   purchasedAt DateTime @default(now())
 
   @@unique([userId, courseId])
-  @@index([userId])
   @@index([courseId])
 }
 

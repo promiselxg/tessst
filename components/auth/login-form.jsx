@@ -44,8 +44,7 @@ export function LoginForm() {
 
   const callbackUrl =
     searchParams.get("callbackUrl")?.toString() ||
-    getCookie("redirectUrl")?.toString() ||
-    "/dashboard";
+    getCookie("redirectUrl")?.toString();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -61,8 +60,8 @@ export function LoginForm() {
     try {
       const response = await loginUser(values.username, values.password);
       if (response.success === true) {
-        router.push(callbackUrl || "/dashboard/training");
         toast.success("Login successful");
+        window.location = callbackUrl;
       } else {
         toast.error(response.message);
       }
@@ -77,12 +76,13 @@ export function LoginForm() {
     setIsMounted(true);
 
     if (user) {
-      router.replace("/dashboard/training");
+      router.replace(callbackUrl || "/");
     }
-  }, [user, router]);
+  }, [callbackUrl, user, router]);
 
   if (!isMounted) return null;
 
+  console.log(callbackUrl);
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card className="overflow-hidden">

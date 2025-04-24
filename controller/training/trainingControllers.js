@@ -819,7 +819,6 @@ const getProgress = async (req, params) => {
       200
     );
   } catch (error) {
-    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
