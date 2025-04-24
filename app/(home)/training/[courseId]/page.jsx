@@ -24,7 +24,7 @@ const SingleCoursePage = ({ params }) => {
       }
     };
     fetchCourseProgress();
-  }, []);
+  }, [params.courseId]);
 
   useEffect(() => {
     const fetchCourse = async () => {
