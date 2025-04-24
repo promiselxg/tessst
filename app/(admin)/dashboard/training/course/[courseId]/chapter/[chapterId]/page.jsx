@@ -49,10 +49,6 @@ const ChapterEditPage = async ({ params }) => {
 
   const isFieldsCompleted = completedFields === totalFields;
 
-<<<<<<< HEAD
-=======
-  console.log(chapter);
->>>>>>> c81a9ca2e0946054da44efaf67fe42ec66e66886
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
     {
