@@ -5,13 +5,16 @@ import Link from "next/link";
 import { ScrollArea } from "../ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { PlayCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function MobileMenu({
   isOpen,
   setIsOpen,
+  courseId,
   navLinks,
   courseLinks,
 }) {
+  const router = useRouter();
   return (
     <AnimatePresence>
       {isOpen && (
@@ -69,6 +72,11 @@ export default function MobileMenu({
                   >
                     {courseLinks ? (
                       <button
+                        onClick={() =>
+                          router.push(
+                            `/training/${courseId}/chapters/${link.id}`
+                          )
+                        }
                         type="button"
                         className={cn(
                           "flex items-center text-slate-500 text-sm font-[400] transition-all cursor-pointer"

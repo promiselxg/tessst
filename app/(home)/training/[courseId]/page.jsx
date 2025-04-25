@@ -76,10 +76,10 @@ const SingleCoursePage = ({ params }) => {
       </div>
     );
   }
-  console.log(course);
+
   return (
     <>
-      <CourseDetailsHeader chapters={course?.chapters} />
+      <CourseDetailsHeader courseId={course.id} links={course?.chapters} />
 
       <div className="w-full">
         {/* Sidebar */}
@@ -156,6 +156,11 @@ const SingleCoursePage = ({ params }) => {
                     Watch from the last completed chapter.
                   </p>
                   <Button
+                    onClick={() =>
+                      router.push(
+                        `/training/${course.id}/chapters/${course?.chapters[0]?.id}`
+                      )
+                    }
                     variant="secondary"
                     className="w-full text-xs font-[400] flex items-center justify-center gap-2"
                   >

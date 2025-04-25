@@ -7,15 +7,17 @@ import { usePathname } from "next/navigation";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
-  const couseDetailPage = pathname.match(/^\/training\/[^/]+$/);
+  const isCourseOrChapterPage = pathname.match(
+    /^\/training\/[^/]+(\/chapters\/[^/]+)?$/
+  );
   const showLayout =
     !pathname.startsWith("/auth") && !pathname.startsWith("/dashboard");
 
   return (
     <AuthProvider>
-      {showLayout && !couseDetailPage && <Navbar />}
+      {showLayout && !isCourseOrChapterPage && <Navbar />}
       {children}
-      {showLayout && !couseDetailPage && <Footer />}
+      {showLayout && !isCourseOrChapterPage && <Footer />}
     </AuthProvider>
   );
 }

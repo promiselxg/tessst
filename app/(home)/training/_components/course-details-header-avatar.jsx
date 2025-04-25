@@ -15,7 +15,7 @@ import React from "react";
 import { FiHome } from "react-icons/fi";
 
 const CourseHeaderUserAvatar = () => {
-  const { user } = useAuth();
+  const { user, logoutUser } = useAuth();
 
   return (
     <DropdownMenu>
@@ -57,7 +57,10 @@ const CourseHeaderUserAvatar = () => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <div className="w-full flex items-center gap-2 text-sm">
+          <div
+            className="w-full flex items-center gap-2 text-sm"
+            onClick={() => logoutUser()}
+          >
             <LogOut className="w-4 h-4" />
             Log out
           </div>

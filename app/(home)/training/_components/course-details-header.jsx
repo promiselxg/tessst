@@ -10,7 +10,7 @@ import CourseHeaderUserAvatar from "./course-details-header-avatar";
 
 import MobileMenu from "@/components/navbar/mobileMenu";
 
-const CourseDetailsHeader = ({ chapters }) => {
+const CourseDetailsHeader = ({ courseId, links }) => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -46,7 +46,8 @@ const CourseDetailsHeader = ({ chapters }) => {
         <MobileMenu
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          navLinks={chapters}
+          navLinks={links}
+          courseId={courseId}
           courseLinks={true}
         />
       </nav>

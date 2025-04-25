@@ -36,6 +36,7 @@
     "ckeditor5-premium-features": "^45.0.0",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.6.0",
+    "cloudinary-video-player": "^2.4.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cookies-next": "^4.3.0",
