@@ -29,16 +29,21 @@ const SingleCoursePage = ({ params }) => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const { course } = await apiCall(
+        const response = await apiCall(
           "get",
           `/training/course/${params.courseId}`
         );
-        if (!course) {
+        if (!response) {
           router.replace("/training");
         } else {
-          const preview = course.chapters.find((ch) => ch.isFree) || null;
+          const preview =
+            response?.course?.chapters.find((ch) => ch.isFree) || null;
           const videoPreview = preview?.videoUrl || null;
-          setCourse({ ...course, videoPreview });
+          setCourse({
+            ...response.course,
+            videoPreview,
+            enrolled: response.enrolled,
+          });
         }
       } catch (error) {
         router.replace("/training");
@@ -150,22 +155,28 @@ const SingleCoursePage = ({ params }) => {
               <div className="md:sticky md:top-[100px] flex flex-col">
                 <div className="w-full p-5 border rounded-md text-secondary bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-sky-900 via-sky-950 to-gray-900 border-gray-200 flex flex-col gap-5">
                   <h1 className="text-base font-[600]">
-                    Continue where you left off.
+                    {course?.enrolled
+                      ? "Continue where you left off."
+                      : "Enroll to start."}
                   </h1>
                   <p className="text-sm text-neutral-200">
-                    Watch from the last completed chapter.
+                    {course?.enrolled
+                      ? "Watch from your last completed chapter."
+                      : "Track your progress, watch with subtitles, change quality & speed, and more."}
                   </p>
                   <Button
                     onClick={() =>
                       router.push(
-                        `/training/${course.id}/chapters/${course?.chapters[0]?.id}`
+                        course?.enrolled
+                          ? `/training/${course.id}/chapters/${course?.chapters[0]?.id}`
+                          : `/training/${course.id}/chapters/${course?.chapters[0]?.id}`
                       )
                     }
                     variant="secondary"
                     className="w-full text-xs font-[400] flex items-center justify-center gap-2"
                   >
                     <BiSolidVideos className="w-4 h-4 mr-2" />
-                    Continue watching
+                    {course?.enrolled ? "Continue watching" : "Enroll now"}
                   </Button>
                 </div>
               </div>

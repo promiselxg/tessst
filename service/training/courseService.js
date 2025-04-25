@@ -25,7 +25,7 @@ export const getTrainingProgress = async (courseId) => {
 
 export const getChapter = async ({ userId, courseId, chapterId }) => {
   try {
-    const course = await prisma.course.findUnique({
+    const course = await prisma.course.findFirst({
       where: { id: courseId, isPublished: true },
       include: {
         chapters: {
@@ -46,7 +46,7 @@ export const getChapter = async ({ userId, courseId, chapterId }) => {
       },
     });
 
-    const chapter = await prisma.chapter.findUnique({
+    const chapter = await prisma.chapter.findFirst({
       where: { id: chapterId, isPublished: true },
     });
 

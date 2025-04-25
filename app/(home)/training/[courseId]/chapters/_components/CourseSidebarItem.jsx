@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "@/lib/utils";
-import { CheckCircle, Compass, Lock, LockIcon, PlayCircle } from "lucide-react";
+import { CheckCircle, Lock, PlayCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 

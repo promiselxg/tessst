@@ -82,7 +82,6 @@ export function LoginForm() {
 
   if (!isMounted) return null;
 
-  console.log(callbackUrl);
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card className="overflow-hidden">

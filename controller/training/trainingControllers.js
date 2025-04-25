@@ -859,11 +859,20 @@ const getSingleCourse = async (req, params) => {
       },
     });
 
+    const enrolled = await prisma.purchase.findUnique({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId: id,
+        },
+      },
+    });
+
     if (!course) {
       return customMessage("Course not found", {}, 404);
     }
 
-    return customMessage("Course found", { course }, 200);
+    return customMessage("Course found", { course, enrolled }, 200);
   } catch (error) {
     return ServerError(error, {}, 500);
   }

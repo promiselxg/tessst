@@ -12,7 +12,7 @@ const Preview = ({ value }) => {
 
   return (
     <>
-      <div className="bg-white">
+      <div className="bg-white text-muted-foreground">
         <ReactQuill theme="bubble" value={value} readOnly />
       </div>
     </>
