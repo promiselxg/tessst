@@ -49,7 +49,7 @@ const VideoPlayer = ({
       console.error(error);
       toast.error("Something went wrong");
     }
-  }, [completeOnEnd, courseId, chapterId, nextChapterId, router]);
+  }, [completeOnEnd, courseId, chapterId, nextChapterId, router, confetti]);
 
   useEffect(() => {
     if (cloudinaryRef.current) return;
