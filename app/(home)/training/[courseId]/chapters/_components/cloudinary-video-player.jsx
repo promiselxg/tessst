@@ -80,7 +80,7 @@ const VideoPlayer = ({
     player.on("error", (error) => {
       console.error("Error occurred:", error);
     });
-  }, [playerConfig, publicId, sourceConfig]);
+  }, [playerConfig, publicId, sourceConfig, handleUpdateChapterProgress]);
 
   return (
     <video
