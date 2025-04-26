@@ -20,7 +20,7 @@ const VideoPlayer = ({
     cloudinaryRef.current = cloudinary;
 
     const player = cloudinaryRef.current.videoPlayer(playerRef.current, {
-      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "ysfon",
+      cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "promiselxg",
       secure: true,
       controls: true,
       ...playerConfig,
