@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import cloudinary from "cloudinary-video-player";
 import "cloudinary-video-player/cld-video-player.min.css";
 import { useRouter } from "next/navigation";
@@ -25,15 +25,13 @@ const VideoPlayer = ({
   const router = useRouter();
   const confetti = useConfettiStore();
 
-  const handleUpdateChapterProgress = async () => {
+  const handleUpdateChapterProgress = useCallback(async () => {
     try {
       if (completeOnEnd) {
         await apiCall(
           "put",
           `/training/course/${courseId}/chapter/${chapterId}/progress`,
-          {
-            isCompleted: true,
-          }
+          { isCompleted: true }
         );
 
         if (!nextChapterId) {
@@ -48,10 +46,10 @@ const VideoPlayer = ({
         }
       }
     } catch (error) {
-      console.log(error);
-      toast.error("something went wrong");
+      console.error(error);
+      toast.error("Something went wrong");
     }
-  };
+  }, [completeOnEnd, courseId, chapterId, nextChapterId, router]);
 
   useEffect(() => {
     if (cloudinaryRef.current) return;
