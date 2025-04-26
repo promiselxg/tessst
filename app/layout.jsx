@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import LayoutWrapper from "./layout-wrapper";
 import { Toaster } from "@/components/ui/sonner";
+import { ConfettiProvider } from "@/context/confettiContext";
 
 const euclid = localFont({
   src: [
@@ -45,6 +46,7 @@ export default function RootLayout({ children }) {
       <body className="font-euclid">
         <LayoutWrapper>{children}</LayoutWrapper>
         <Toaster richColors />
+        <ConfettiProvider />
       </body>
     </html>
   );

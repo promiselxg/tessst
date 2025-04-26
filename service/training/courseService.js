@@ -4,7 +4,7 @@ import { apiClient } from "@/lib/utils/host";
 
 export const getAllTrainingCategories = async () => {
   try {
-    const { data } = await apiClient("/category");
+    const { data } = await apiClient("/training/course/category");
     return data.categories;
   } catch (error) {
     console.error(error);
@@ -31,6 +31,9 @@ export const getChapter = async ({ userId, courseId, chapterId }) => {
         chapters: {
           where: {
             isPublished: true,
+          },
+          include: {
+            userProgress: true,
           },
           orderBy: { position: "asc" },
         },

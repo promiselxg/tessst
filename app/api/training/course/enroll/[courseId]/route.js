@@ -4,10 +4,8 @@ import { verifyToken } from "@/lib/middleware/verifyToken";
 import ROLES from "@/lib/utils/roles";
 import { withMiddleware } from "@/lib/utils/withMiddleware";
 
-export const POST = async (req) =>
+export const GET = async (req, { params }) =>
   withMiddleware(verifyToken, verifyUserRoles(ROLES.admin, ROLES.moderator))(
     req,
-    () => trainingControllers.createCourseCategory(req)
+    () => trainingControllers.enrollInCourse(req, params)
   );
-
-export const GET = async (req) => trainingControllers.getAllCategories(req);

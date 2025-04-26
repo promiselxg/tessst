@@ -3,9 +3,14 @@ import { verifyUserRoles } from "@/lib/middleware/verifyRole";
 import { verifyToken } from "@/lib/middleware/verifyToken";
 import ROLES from "@/lib/utils/roles";
 import { withMiddleware } from "@/lib/utils/withMiddleware";
+import { parse } from "url";
 
-export const GET = async (req, params) =>
-  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin, ROLES.moderator))(
-    req,
-    () => trainingControllers.getAllPublishedCourses(req, params)
-  );
+export const GET = async (req) => {
+  const parsedUrl = parse(req.url, true);
+  const queryParams = parsedUrl.query;
+
+  return withMiddleware(
+    verifyToken,
+    verifyUserRoles(ROLES.admin, ROLES.moderator)
+  )(req, () => trainingControllers.getAllPublishedCourses(req, queryParams));
+};

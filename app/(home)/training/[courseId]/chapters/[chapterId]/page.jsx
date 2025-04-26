@@ -8,9 +8,9 @@ import CourseSidebarItem from "../_components/CourseSidebarItem";
 import Banner from "@/components/banner/banner";
 import { getChapter } from "@/service/training/courseService";
 import CourseVideoPlayer from "../_components/CourseVideoPlayer";
-import CourseEnrollButton from "../_components/course-enroll-button";
 import Preview from "@/components/editor/preview";
 import { Separator } from "@/components/ui/separator";
+import CourseProgressButton from "../_components/course-progress-button";
 
 const page = async ({ params }) => {
   const cookieStore = cookies();
@@ -62,15 +62,15 @@ const page = async ({ params }) => {
   const isLocked = !chapter.isFree && !purchase;
   const isCompleted = !!purchase && !userProgress?.isCompleted;
 
-  console.log("chapter", chapter);
-  console.log("purchase", purchase);
-  console.log("muxData", muxData);
-  console.log("attachments", attachments);
-  console.log("nextChapter", nextChapter);
-  console.log("userProgress", userProgress);
-  console.log("isCompleted", isCompleted);
-  console.log("publicId", muxData?.publicId);
-  console.log("userLevel", user);
+  console.log("course", course);
+  // console.log("purchase", purchase);
+  // console.log("muxData", muxData);
+  // console.log("attachments", attachments);
+  // console.log("nextChapter", nextChapter);
+  // console.log("userProgress", userProgress);
+  // console.log("isCompleted", isCompleted);
+
+  // console.log("userLevel", user.roles);
   return (
     <>
       <CourseDetailsHeader courseId={course.id} links={course?.chapters} />
@@ -103,7 +103,6 @@ const page = async ({ params }) => {
             </div>
             <div className="w-full">
               <CourseVideoPlayer
-                videoUrl={chapter?.videoUrl}
                 title={chapter?.title}
                 isLocked={isLocked}
                 courseId={courseId}
@@ -115,15 +114,14 @@ const page = async ({ params }) => {
               />
             </div>
             <div className="w-full">
-              <div className="p-4 flex flex-col md:flex-row justify-between">
+              <div className="p-4 flex flex-col md:flex-row justify-between md:items-center gap-y-2">
                 <h1 className="text-2xl font-semibold">{chapter?.title}</h1>
-                {purchase ? (
-                  <>{/* display course progress */}</>
-                ) : (
-                  <CourseEnrollButton
+                {purchase && (
+                  <CourseProgressButton
+                    chapterId={chapterId}
                     courseId={courseId}
-                    userId={userId}
-                    userRoles={user?.roles}
+                    nextChapterId={nextChapter?.id}
+                    isCompleted={!!userProgress?.isCompleted}
                   />
                 )}
               </div>

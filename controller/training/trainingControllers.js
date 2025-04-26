@@ -192,6 +192,69 @@ const updateCategory = async (req, params) => {
   }
 };
 
+const enrollInCourse = async (req, params) => {
+  const { courseId } = await params;
+
+  const userId = req.user.id;
+
+  if (!courseId) {
+    return customMessage("Course ID is required", {}, 400);
+  }
+
+  if (!userId) {
+    return customMessage("User ID is required", {}, 400);
+  }
+
+  if (!isValidUUID(courseId) || !isValidUUID(userId)) {
+    return customMessage("Invalid Course ID or User ID", {}, 400);
+  }
+
+  try {
+    const course = await prisma.course.findUnique({
+      where: { id: courseId },
+      include: {
+        chapters: {
+          orderBy: {
+            position: "asc",
+          },
+        },
+      },
+    });
+
+    if (!course) {
+      return customMessage("Course not found", {}, 404);
+    }
+
+    const purchase = await prisma.purchase.findUnique({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId,
+        },
+      },
+    });
+
+    if (purchase) {
+      return customMessage("Already enrolled in this course", {}, 409);
+    }
+
+    await prisma.purchase.create({
+      data: {
+        userId,
+        courseId,
+      },
+    });
+
+    return customMessage(
+      "Enrolled in course successfully",
+      { chapterId: course.chapters[0].id },
+      201
+    );
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
 const updateCourse = async (req, params) => {
   try {
     const { id } = await params;
@@ -728,14 +791,15 @@ const getAllCourses = async (req) => {
   }
 };
 
-const getAllPublishedCourses = async (req, params) => {
-  const { title, categoryId } = params;
+const getAllPublishedCourses = async (req, queryParams) => {
+  const { title, categoryId, page = 1, limit = 10 } = queryParams || {};
+  const skip = (page - 1) * limit;
   try {
     const courses = await prisma.course.findMany({
       where: {
         isPublished: true,
-        title: { contains: title },
-        categoryId,
+        ...(title && { title: { contains: title } }),
+        ...(categoryId && { categoryId }),
       },
       include: {
         category: true,
@@ -755,6 +819,8 @@ const getAllPublishedCourses = async (req, params) => {
       },
 
       orderBy: { createdAt: "desc" },
+      skip,
+      take: parseInt(limit),
     });
 
     const coursesWithProgress = await Promise.all(
@@ -766,9 +832,34 @@ const getAllPublishedCourses = async (req, params) => {
           };
         }
 
-        const progressPercentage = await getProgress(req, {
-          courseId: course.id,
+        const publishedChapters = await prisma.chapter.findMany({
+          where: {
+            courseId: course.id,
+            isPublished: true,
+          },
+          select: {
+            id: true,
+          },
         });
+
+        const publishedChapterIds = publishedChapters.map(
+          (chapter) => chapter.id
+        );
+
+        const completedChapters = await prisma.userProgress.count({
+          where: {
+            userId: req.user.id,
+            chapterId: {
+              in: publishedChapterIds,
+            },
+            isCompleted: true,
+          },
+        });
+
+        const progressPercentage =
+          publishedChapterIds.length > 0
+            ? (completedChapters / publishedChapterIds.length) * 100
+            : 0;
 
         return {
           ...course,
@@ -776,6 +867,7 @@ const getAllPublishedCourses = async (req, params) => {
         };
       })
     );
+
     return customMessage(
       "Courses retrieved successfully",
       { count: courses.length, courses: coursesWithProgress },
@@ -819,6 +911,44 @@ const getProgress = async (req, params) => {
       200
     );
   } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
+const markChapterAsCompleted = async (req, queryParams) => {
+  try {
+    const { isCompleted } = await req.json();
+    const { id: courseId, chapterId } = queryParams;
+
+    const userId = req.user.id;
+
+    if (!courseId) {
+      return customMessage("course ID is required", {}, 400);
+    }
+
+    if (!isValidUUID(courseId)) {
+      return customMessage("Invalid course ID", {}, 400);
+    }
+
+    const userProgress = await prisma.userProgress.upsert({
+      where: {
+        userId_chapterId: {
+          userId,
+          chapterId,
+        },
+      },
+      update: {
+        isCompleted,
+      },
+      create: {
+        userId,
+        chapterId,
+        isCompleted,
+      },
+    });
+    return customMessage("Course progress updated", { userProgress }, 200);
+  } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };
@@ -1213,6 +1343,7 @@ export const trainingControllers = {
   createNewCourse,
   createCourseCategory,
   createCourseChapter,
+  enrollInCourse,
   updateCategory,
   updateCourse,
   reorderCourceChapter,
@@ -1232,4 +1363,5 @@ export const trainingControllers = {
   deleteCourseChapter,
   deleteCourseAttachment,
   deleteMultipleCourses,
+  markChapterAsCompleted,
 };

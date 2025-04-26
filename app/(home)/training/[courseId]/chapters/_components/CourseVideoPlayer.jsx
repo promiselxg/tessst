@@ -5,7 +5,6 @@ import { useState } from "react";
 import CloudinaryVideoPlayer from "./cloudinary-video-player";
 
 const CourseVideoPlayer = ({
-  videoUrl,
   title,
   isLocked,
   courseId,
@@ -34,6 +33,11 @@ const CourseVideoPlayer = ({
         <CloudinaryVideoPlayer
           id={courseId}
           publicId={publicId}
+          nextChapterId={nextChapterId}
+          courseId={courseId}
+          chapterId={chapterId}
+          purchaseId={purchaseId}
+          completeOnEnd={completeOnEnd}
           playerConfig={{
             posterOptions: {
               transformation: { effect: "blur" },

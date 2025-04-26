@@ -8,13 +8,14 @@ import { apiCall } from "@/lib/utils/api";
 import CourseDetailsHeader from "../_components/course-details-header";
 
 import { useRouter } from "next/navigation";
-import { BookOpen, Compass } from "lucide-react";
+import { BookOpen, Compass, Lock } from "lucide-react";
 import { BiSolidVideos } from "react-icons/bi";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import VideoPlayer from "@/components/video/videoPlayer";
+import { toast } from "sonner";
 
 const menuItems = [
   { label: "Browse all courses", icon: Compass, href: "/training" },
@@ -25,6 +26,7 @@ const SingleCoursePage = ({ params }) => {
   const [course, setCourse] = useState(null);
   const [courseProgress, setCourseProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [enrollLoader, setEnrollLoader] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -81,6 +83,33 @@ const SingleCoursePage = ({ params }) => {
       </div>
     );
   }
+
+  const handleEnroll = async (courseId) => {
+    try {
+      setEnrollLoader(true);
+      const response = await apiCall(
+        "get",
+        `/training/course/enroll/${courseId}`
+      );
+      if (response) {
+        toast.success(response?.message || "Enrolled successfully!");
+        router.replace(`/training/${courseId}/chapters/${response?.chapterId}`);
+      }
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Error enrolling in course"
+      );
+      console.error("Error enrolling in course:", error);
+    } finally {
+      setEnrollLoader(false);
+    }
+  };
+
+  const handleContinueLearning = async () => {
+    router.push(`/training/${course.id}/chapters/${course?.chapters[0]?.id}`);
+  };
 
   return (
     <>
@@ -165,18 +194,31 @@ const SingleCoursePage = ({ params }) => {
                       : "Track your progress, watch with subtitles, change quality & speed, and more."}
                   </p>
                   <Button
+                    disabled={enrollLoader}
                     onClick={() =>
-                      router.push(
-                        course?.enrolled
-                          ? `/training/${course.id}/chapters/${course?.chapters[0]?.id}`
-                          : `/training/${course.id}/chapters/${course?.chapters[0]?.id}`
-                      )
+                      course?.enrolled
+                        ? handleContinueLearning()
+                        : handleEnroll(course.id)
                     }
                     variant="secondary"
-                    className="w-full text-xs font-[400] flex items-center justify-center gap-2"
+                    className="w-full text-sm font-[400] flex items-center justify-center gap-2"
                   >
-                    <BiSolidVideos className="w-4 h-4 mr-2" />
-                    {course?.enrolled ? "Continue watching" : "Enroll now"}
+                    {enrollLoader ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-[--app-primary-color] border-t-transparent" />
+                        <span>please wait...</span>
+                      </div>
+                    ) : course?.enrolled ? (
+                      <div className="flex items-center gap-2">
+                        <BiSolidVideos className="w-4 h-4" />
+                        <span>Continue watching</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-4 h-4" />
+                        <span>Enroll now</span>
+                      </div>
+                    )}
                   </Button>
                 </div>
               </div>

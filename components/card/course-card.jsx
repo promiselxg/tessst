@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import CourseProgress from "../progress/course-progress";
 
 export const CourseCard = ({ course, href }) => {
   return (
@@ -31,9 +32,16 @@ export const CourseCard = ({ course, href }) => {
         <div className="flex items-center gap-2 text-sm font-euclid">
           <div className="flex items-center gap-2 ">
             <BookOpen className="h-4 w-4" />
-            {course?.chapters} Chapters
+            {course?.chapters} {course?.chapters === 1 ? "Chapter" : "Chapters"}
           </div>
         </div>
+        {course.progress !== null && (
+          <CourseProgress
+            variant={course.progress === 100 ? "success" : "default"}
+            size="sm"
+            value={course.progress}
+          />
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { Footer } from "@/components/footer/footer";
 import Navbar from "@/components/navbar/navbar";
 import { AuthProvider } from "@/context/authProvider";
+import { ConfettiProvider } from "@/context/confettiContext";
 import { usePathname } from "next/navigation";
 
 export default function LayoutWrapper({ children }) {
@@ -18,6 +19,7 @@ export default function LayoutWrapper({ children }) {
       {showLayout && !isCourseOrChapterPage && <Navbar />}
       {children}
       {showLayout && !isCourseOrChapterPage && <Footer />}
+      <ConfettiProvider />
     </AuthProvider>
   );
 }

@@ -3,16 +3,55 @@
 import { useEffect, useRef } from "react";
 import cloudinary from "cloudinary-video-player";
 import "cloudinary-video-player/cld-video-player.min.css";
+import { useRouter } from "next/navigation";
+import useConfettiStore from "@/store/confettiStore";
+import { toast } from "sonner";
+import { apiCall } from "@/lib/utils/api";
 
 const VideoPlayer = ({
   id,
   publicId,
+  nextChapterId,
+  courseId,
+  chapterId,
+  purchaseId,
+  completeOnEnd,
   playerConfig,
   sourceConfig,
   ...props
 }) => {
   const cloudinaryRef = useRef();
   const playerRef = useRef();
+  const router = useRouter();
+  const confetti = useConfettiStore();
+
+  const handleUpdateChapterProgress = async () => {
+    try {
+      if (completeOnEnd) {
+        await apiCall(
+          "put",
+          `/training/course/${courseId}/chapter/${chapterId}/progress`,
+          {
+            isCompleted: true,
+          }
+        );
+
+        if (!nextChapterId) {
+          confetti.showConfetti();
+        }
+
+        toast.success("Progress updated");
+        router.refresh();
+
+        if (nextChapterId) {
+          router.push(`/training/${courseId}/chapters/${nextChapterId}`);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("something went wrong");
+    }
+  };
 
   useEffect(() => {
     if (cloudinaryRef.current) return;
@@ -33,9 +72,10 @@ const VideoPlayer = ({
     });
 
     player.on("ended", () => {
-      //   if (nextChapterUrl) {
-      //     router.push(nextChapterUrl);
-      //   }
+      handleUpdateChapterProgress();
+      // if (nextChapterId) {
+      //   router.push(nextChapterUrl);
+      // }
     });
     player.on("error", (error) => {
       console.error("Error occurred:", error);

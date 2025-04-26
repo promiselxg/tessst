@@ -15,13 +15,21 @@ const AllCourses = ({ params }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const query = React.useMemo(
+    () => ({
+      title: params?.title,
+      categoryId: params.categoryId,
+      page: 1,
+      limit: 10,
+    }),
+    [params?.title, params.categoryId]
+  );
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-
-        const data = await apiCall("get", "/training/course/published", params);
-
+        const data = await apiCall("get", "/training/course/published", query);
         setCourses(data.courses);
       } catch (err) {
         console.error("Failed to fetch courses", err);
@@ -31,7 +39,7 @@ const AllCourses = ({ params }) => {
     };
 
     fetchCourses();
-  }, [params]);
+  }, [query]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -46,9 +54,8 @@ const AllCourses = ({ params }) => {
     fetchCategories();
   }, []);
 
-  //console.log("Courses:", courses);
   return (
-    <div className="w-full flex h-fit md:min-h-screen py-[40px] md:py-[85px]">
+    <div className="w-full flex h-fit  py-[40px] md:py-[85px]">
       <div className="flex flex-col w-full mx-auto">
         <Container className="w-[90%] md:w-[1100px] mx-auto mt-10">
           <SearchInput />
