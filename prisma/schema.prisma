@@ -107,7 +107,6 @@ model Customer {
   refunds   Refund[]
   invoices  Invoice[]
   createdAt DateTime   @default(now())
-  
 }
 
 model Order {
