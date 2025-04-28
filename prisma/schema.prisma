@@ -95,9 +95,13 @@ model Category {
 
 model Customer {
   id        String     @id @default(uuid())
-  name      String
+  name      String?
   email     String     @unique
-  password  String
+  phone     String?
+  password  String?
+  customer_code String?
+  metadata  Json?
+  phone_format String?
   orders    Order[]
   payments  Payment[]
   refunds   Refund[]
@@ -107,20 +111,24 @@ model Customer {
 }
 
 model Order {
+  userId     String?
   id         String      @id @default(uuid())
-  userId     String
-  total      Float       @db.Float
-  status     OrderStatus @default(PENDING)
+  email      String
+  amount     Int
+  paymentReference String?
+  status     PaymentStatus @default(PENDING)
   orderItems OrderItem[]
   payment    Payment?
   invoice    Invoice?
   couponId   String?
-  user       Customer    @relation(fields: [userId], references: [id])
+  user       Customer?    @relation(fields: [userId], references: [id])
   coupon     Coupon?     @relation(fields: [couponId], references: [id])
   createdAt  DateTime    @default(now())
-
+  paidAt     DateTime?
+  
   @@index([userId])
   @@index([couponId])
+
 }
 
 model OrderItem {
@@ -139,12 +147,14 @@ model OrderItem {
 model Payment {
   id        String        @id @default(uuid())
   orderId   String        @unique
-  userId    String
-  user      Customer      @relation(fields: [userId], references: [id])
-  order     Order         @relation(fields: [orderId], references: [id])
-  amount    Float         @db.Float
+  userId    String?
+  currency  String?
+  reference String?
+  user      Customer?      @relation(fields: [userId], references: [id])
+  order     Order?         @relation(fields: [orderId], references: [id])
+  amount    Float?         @db.Float
   status    PaymentStatus @default(PENDING)
-  method    PaymentMethod
+  method    PaymentMethod?
   refund    Refund?
   createdAt DateTime      @default(now())
 
@@ -330,6 +340,15 @@ model BlogCategory {
   updatedAt DateTime @updatedAt
 }
 
+model WebhookLog {
+  id         String   @id @default(uuid())
+  event      String   
+  status     String   
+  rawData    Json     
+  error      String?  
+  createdAt  DateTime @default(now())
+}
+
 enum OrderStatus {
   PENDING
   PROCESSING
@@ -340,14 +359,13 @@ enum OrderStatus {
 
 enum PaymentStatus {
   PENDING
-  COMPLETED
+  PAID
   FAILED
   REFUNDED
 }
 
 enum PaymentMethod {
-  CREDIT_CARD
-  DEBIT_CARD
+  CARD
   PAYPAL
   BANK_TRANSFER
   CASH_ON_DELIVERY
