@@ -9,13 +9,12 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 const CheckoutPage = () => {
-  const [orderId, setOrderId] = useState(null);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
 
   const { openPaystackModal, isReady } = usePaystackPayment({
     email: "okeydeede@gmail.com",
-    amount: toKobo(5000),
+    amount: toKobo(7000),
     publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
   });
 
@@ -28,9 +27,8 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      // 1. Create pending order
       const pendingOrder = await createPendingOrder({
-        amount: toKobo(5000),
+        amount: toKobo(7000),
         email: "okeydeede@gmail.com",
       });
 
@@ -39,10 +37,8 @@ const CheckoutPage = () => {
         return;
       }
 
-      // 2. Create payment linked to the order
       await createPayment(pendingOrder.id, user?.id);
 
-      // 3. Open Paystack payment modal
       openPaystackModal({
         metadata: {
           orderId: pendingOrder.id,

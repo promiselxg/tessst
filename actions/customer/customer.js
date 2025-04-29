@@ -26,7 +26,6 @@ export async function createOrUpdateCustomerInfo(customer, userId) {
       customer_code: customer.customer_code || null,
       metadata: customer.metadata || null,
       phone_format: customer.international_format_phone || null,
-      userId,
     },
   });
 

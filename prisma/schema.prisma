@@ -344,7 +344,7 @@ model WebhookLog {
   event      String   
   status     String   
   rawData    Json     
-  error      String?  
+  error      String?  @db.LongText
   createdAt  DateTime @default(now())
 }
 

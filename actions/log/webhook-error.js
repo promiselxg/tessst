@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 const { logWebhookEvent } = require("./webhook-log");
 
 export async function handleWebhookError(
