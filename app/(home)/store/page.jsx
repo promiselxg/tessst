@@ -14,6 +14,7 @@ const page = () => {
         title="Store"
         pathname={[{ label: "Store", href: "/store" }]}
         banner="/img/bg.png"
+        height="200px"
       />
 
       <div className="w-full flex h-fit md:min-h-screen py-[40px] md:py-[85px]">

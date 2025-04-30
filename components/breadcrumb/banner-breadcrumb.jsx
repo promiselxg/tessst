@@ -3,15 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "../animation/reveal";
+import { cn } from "@/lib/utils";
 
 export default function BreadcrumbBanner({
   title = "Page",
   description,
   pathname = [],
   banner,
+  height = "300px",
 }) {
   return (
-    <div className="relative w-full h-[200px] md:h-[300px] mt-[85px]">
+    <div
+      className={cn(
+        `relative w-full h-[200px] ${
+          height ? `md:h-[${height}]` : "md:h-[300px]"
+        } mt-[85px]`
+      )}
+    >
       <Image src={banner} alt="Banner Image" fill className="object-cover" />
 
       <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center text-white space-y-2">

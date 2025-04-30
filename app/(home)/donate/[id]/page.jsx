@@ -2,10 +2,12 @@ import ImageFadeIn from "@/components/animation/imageFadeIn";
 import TextFadeIn from "@/components/animation/textFadeIn";
 import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
 import Container from "@/components/container/container";
-import { Button } from "@/components/ui/button";
+
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import React from "react";
+
+import DonateUserInfo from "./_component/donate-user-info";
 
 const page = ({ params }) => {
   return (
@@ -71,9 +73,9 @@ const page = ({ params }) => {
                     </div>
                   </div>
                   <div className="bg-white p-5 shadow-md justify-center flex flex-col items-center rounded-[5px]">
-                    <Button className="w-full bg-[--app-primary-color]">
-                      Donate
-                    </Button>
+                    <div className="w-full">
+                      <DonateUserInfo productId={params.id} />
+                    </div>
                     <ImageFadeIn
                       src="/img/payment_medias.png"
                       width={300}

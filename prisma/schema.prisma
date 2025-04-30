@@ -348,6 +348,48 @@ model WebhookLog {
   createdAt  DateTime @default(now())
 }
 
+model Campaign {
+  id            String     @id @default(uuid())
+  title         String
+  description   String
+  goalAmount    Int        
+  asset         Json?   
+  donations     Donation[]
+  due_date      DateTime?
+  created_by    String
+  target        String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Donation {
+  id            String     @id @default(uuid())
+  campaignId    String
+  campaign      Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  firstName     String?
+  lastName      String?
+  phone         String?
+  customer_code String?
+  email         String
+  amount        Int        
+  reference     String     @unique
+  status        DonationStatus @default(PENDING)
+  isAnonymous   Boolean    @default(false)
+  paid_At       DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+   @@index([campaignId])
+   @@unique([campaignId, id])
+}
+
+enum DonationStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+
 enum OrderStatus {
   PENDING
   PROCESSING

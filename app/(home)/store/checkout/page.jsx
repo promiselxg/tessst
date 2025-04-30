@@ -42,6 +42,7 @@ const CheckoutPage = () => {
       openPaystackModal({
         metadata: {
           orderId: pendingOrder.id,
+          transactionType: "store",
           userId: user?.id || "",
         },
       });
