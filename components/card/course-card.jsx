@@ -21,14 +21,14 @@ export const CourseCard = ({ course, href }) => {
         </div>
 
         <div className="p-4 bg-white rounded-b-lg space-y-2 shadow border border-[rgba(0,0,0,0.1)]">
-          <Link
-            href={href}
+          <h1
             className={cn(
               `${course?.font} text-[--app-primary-color] text-[20px] font-[400] break-words line-clamp-1 group-hover:text-sky-700 transition`
             )}
           >
             {course?.title}
-          </Link>
+          </h1>
+
           <div className="text-xs text-muted-foreground">
             {course?.category}
           </div>

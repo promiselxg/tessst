@@ -11,7 +11,7 @@ import CourseVideoPlayer from "../_components/CourseVideoPlayer";
 import Preview from "@/components/editor/preview";
 import { Separator } from "@/components/ui/separator";
 import CourseProgressButton from "../_components/course-progress-button";
-import BreadcrumbBanner from "@/components/breadcrumb/banner-breadcrumb";
+
 import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
 
 const page = async ({ params }) => {

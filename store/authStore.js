@@ -49,10 +49,12 @@ export const useAuthStore = create(
           Cookies.remove("refreshToken");
 
           set({ user: null, isAuthenticated: false });
+          window.location = window.location;
         } catch (error) {
           console.error("Logout failed", error);
         }
       },
+      setUser: (user) => set({ user, isAuthenticated: true }),
     }),
     {
       name: "userInfo",

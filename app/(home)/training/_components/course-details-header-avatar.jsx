@@ -22,7 +22,9 @@ const CourseHeaderUserAvatar = () => {
       <DropdownMenuTrigger className="cursor-pointer border-none outline-none ">
         <div className="w-full border-[3px] border-[green] h-full flex items-center justify-center rounded-full p-[2px]">
           <Avatar className="cursor-pointer border-none outline-none ">
-            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarImage
+              src={user?.avatar || "https://github.com/shadcn.png"}
+            />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </div>
@@ -38,19 +40,19 @@ const CourseHeaderUserAvatar = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <div className="w-full flex items-center gap-2 text-sm">
+          <div className="w-full flex items-center gap-2 text-sm cursor-pointer">
             <FiHome className="w-4 h-4" />
             Home
           </div>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <div className="w-full flex items-center gap-2 text-sm">
+          <div className="w-full flex items-center gap-2 text-sm cursor-pointer">
             <Settings className="w-4 h-4" />
             Setting
           </div>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <div className="w-full flex items-center gap-2 text-sm">
+          <div className="w-full flex items-center gap-2 text-sm cursor-pointer">
             <IdCard className="w-4 h-4" />
             Billing &amp; subscription
           </div>
@@ -58,7 +60,7 @@ const CourseHeaderUserAvatar = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <div
-            className="w-full flex items-center gap-2 text-sm"
+            className="w-full flex items-center gap-2 text-sm cursor-pointer"
             onClick={() => logoutUser()}
           >
             <LogOut className="w-4 h-4" />

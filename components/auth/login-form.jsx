@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -21,9 +21,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
-import { getCookie } from "cookies-next";
 import { useAuthStore } from "@/store/authStore";
 import { useAuth } from "@/context/authProvider";
+import { FaGoogle } from "react-icons/fa6";
+import { signIn } from "next-auth/react";
+import { useCallbackUrl } from "@/hooks/use-callback-url";
+import { Separator } from "@radix-ui/react-select";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -38,14 +41,10 @@ export function LoginForm() {
   const router = useRouter();
   const { loginUser } = useAuthStore();
   const { user } = useAuth();
-  const searchParams = useSearchParams();
-
+  const [loading, setLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  const callbackUrl =
-    searchParams.get("callbackUrl")?.toString() ||
-    getCookie("redirectUrl")?.toString() ||
-    "/dashboard/training";
+  const callbackUrl = useCallbackUrl();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -73,6 +72,19 @@ export function LoginForm() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      await signIn("google", {
+        callbackUrl: "/auth/google",
+      });
+    } catch (err) {
+      console.error("Google login error", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     setIsMounted(true);
 
@@ -85,8 +97,8 @@ export function LoginForm() {
 
   return (
     <div className={cn("flex flex-col gap-6")}>
-      <Card className="overflow-hidden">
-        <CardContent className="grid p-0 md:grid-cols-2">
+      <Card className="overflow-hidden w-full md:w-1/2 mx-auto">
+        <CardContent className="grid p-0 md:grid-cols-1">
           <div className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
@@ -119,7 +131,6 @@ export function LoginForm() {
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="password"
@@ -147,10 +158,9 @@ export function LoginForm() {
                       </FormItem>
                     )}
                   />
-
                   <Button
                     type="submit"
-                    disabled={!isValid || isSubmitting}
+                    disabled={!isValid || isSubmitting || loading}
                     className="w-full gap-2"
                   >
                     {isSubmitting ? (
@@ -162,20 +172,37 @@ export function LoginForm() {
                       "Login"
                     )}
                   </Button>
+                  <div className="flex gap-5 items-center text-sm text-gray-700">
+                    <Separator
+                      orientation="vertical"
+                      className="h-[1px]  bg-[#eee] w-full"
+                    />
+                    or
+                    <Separator
+                      orientation="vertical"
+                      className="h-[1px]  bg-[#eee] w-full"
+                    />
+                  </div>
+                  <Button
+                    className="w-full gap-2 bg-[#34A853] hover:bg-[#34A853] hover:text-slate-700 transition-all"
+                    onClick={handleGoogleLogin}
+                    disabled={loading || isSubmitting}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Redirecting...
+                      </>
+                    ) : (
+                      <>
+                        <FaGoogle className="h-5 w-5" />
+                        Continue with Google
+                      </>
+                    )}
+                  </Button>
                 </form>
               </Form>
             </div>
-          </div>
-
-          <div className="relative hidden bg-muted md:block">
-            <Image
-              src="/placeholder.svg"
-              alt="Authentication"
-              fill
-              priority
-              className="object-cover"
-              quality={80}
-            />
           </div>
         </CardContent>
       </Card>

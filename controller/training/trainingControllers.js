@@ -874,7 +874,6 @@ const getAllPublishedCourses = async (req, queryParams) => {
       200
     );
   } catch (error) {
-    console.log("COURSE ERROR ", error);
     return ServerError(error, {}, 500);
   }
 };

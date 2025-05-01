@@ -4,14 +4,12 @@ import HamburgerMenu from "@/components/navbar/hamburgerMenu";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import CourseHeaderUserAvatar from "./course-details-header-avatar";
 
 import MobileMenu from "@/components/navbar/mobileMenu";
 
 const CourseDetailsHeader = ({ courseId, links }) => {
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
   return (

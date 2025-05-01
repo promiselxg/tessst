@@ -11,12 +11,16 @@ import { Badge } from "../ui/badge";
 import { useCartStore } from "@/store/cartStore";
 import { navLinks } from "@/data/navbar";
 import { usePathname, useRouter } from "next/navigation";
+import CourseHeaderUserAvatar from "@/app/(home)/training/_components/course-details-header-avatar";
+import { useAuth } from "@/context/authProvider";
+import { cn } from "@/lib/utils";
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const { cart } = useCartStore();
+  const { user } = useAuth();
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const isParentLinkActive = (linkHref) => {
@@ -38,7 +42,7 @@ export default function Navbar() {
   return (
     <nav className="w-full px-4 py-3 flex items-center justify-between shadow bg-white fixed top-0 left-0 z-50 h-[85px]">
       <div className="container w-[1300px] mx-auto flex items-center justify-between">
-        <div className="md:w-1/4">
+        <div className={cn("md:w-1/4", user && "md:w-[20%]")}>
           <Link href="/" className="w-fit cursor-default">
             <Image
               src="/img/ysfon-logo.png"
@@ -86,6 +90,7 @@ export default function Navbar() {
             >
               Donate
             </Button>
+            {user && <CourseHeaderUserAvatar />}
           </div>
 
           <div className="md:hidden">

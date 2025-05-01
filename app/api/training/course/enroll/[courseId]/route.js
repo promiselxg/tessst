@@ -5,7 +5,7 @@ import ROLES from "@/lib/utils/roles";
 import { withMiddleware } from "@/lib/utils/withMiddleware";
 
 export const GET = async (req, { params }) =>
-  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin, ROLES.moderator))(
-    req,
-    () => trainingControllers.enrollInCourse(req, params)
-  );
+  withMiddleware(
+    verifyToken,
+    verifyUserRoles(ROLES.admin, ROLES.moderator, ROLES.user)
+  )(req, () => trainingControllers.enrollInCourse(req, params));

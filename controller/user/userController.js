@@ -43,6 +43,7 @@ const getSingleUser = async (req, params) => {
         username: true,
         email_address: true,
         accountStatus: true,
+        avatar: true,
         createdAt: true,
       },
     });
@@ -244,11 +245,7 @@ const updateUserRoles = async ({ id, roles }) => {
     if (!id || !roles || roles.length === 0) {
       return customMessage("User ID and roles are required.", {}, 400);
     }
-
-    // Convert ROLES object values to an array [2200, 1500]
     const validRoles = Object.values(ROLES);
-
-    // Validate that all sent roles exist in the allowed ROLES
     const invalidRoles = roles.filter((role) => !validRoles.includes(role));
     if (invalidRoles.length > 0) {
       return customMessage(
@@ -266,12 +263,10 @@ const updateUserRoles = async ({ id, roles }) => {
       return customMessage("User no found.", {}, 404);
     }
 
-    // Delete existing roles before assigning new ones
     await prisma.userRole.deleteMany({
       where: { userId: id },
     });
 
-    // Assign new valid roles
     await prisma.userRole.createMany({
       data: roles.map((role) => ({
         userId: id,
@@ -305,19 +300,24 @@ const updateUserRoles = async ({ id, roles }) => {
 };
 
 const deleteAccount = async (userId) => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
 
-  if (!user) {
-    return customMessage("User not found", {}, 404);
+    if (!user) {
+      return customMessage("User not found", {}, 404);
+    }
+
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return customMessage("Account deleted successfully", {}, 200);
+  } catch (error) {
+    console.log(error);
+    return ServerError(error, {}, 500);
   }
-
-  await prisma.user.delete({
-    where: { id: userId },
-  });
-
-  return customMessage("Account deleted successfully", {}, 200);
 };
 
 const getRegisteredUsers = async () => {
@@ -329,6 +329,8 @@ const getRegisteredUsers = async () => {
       username: true,
       email_address: true,
       accountStatus: true,
+      provider: true,
+      avatar: true,
       createdAt: true,
     },
   });

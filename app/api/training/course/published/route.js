@@ -11,6 +11,6 @@ export const GET = async (req) => {
 
   return withMiddleware(
     verifyToken,
-    verifyUserRoles(ROLES.admin, ROLES.moderator)
+    verifyUserRoles(ROLES.admin, ROLES.moderator, ROLES.user)
   )(req, () => trainingControllers.getAllPublishedCourses(req, queryParams));
 };

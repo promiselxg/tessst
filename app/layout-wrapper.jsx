@@ -5,6 +5,7 @@ import Navbar from "@/components/navbar/navbar";
 import { AuthProvider } from "@/context/authProvider";
 import { ConfettiProvider } from "@/context/confettiContext";
 import { usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
@@ -16,10 +17,12 @@ export default function LayoutWrapper({ children }) {
 
   return (
     <AuthProvider>
-      {showLayout && !isCourseOrChapterPage && <Navbar />}
-      {children}
-      {showLayout && !isCourseOrChapterPage && <Footer />}
-      <ConfettiProvider />
+      <SessionProvider>
+        {showLayout && !isCourseOrChapterPage && <Navbar />}
+        {children}
+        {showLayout && !isCourseOrChapterPage && <Footer />}
+        <ConfettiProvider />
+      </SessionProvider>
     </AuthProvider>
   );
 }
