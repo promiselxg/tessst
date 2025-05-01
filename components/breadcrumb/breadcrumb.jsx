@@ -32,18 +32,22 @@ export const BreadcrumbNav = ({
               asChild
               className="hover:text-[whitesmoke] transition-all"
             >
-              <Link href={prev.href}>{prev.label}</Link>
+              <Link href={prev.href} className="line-clamp-1">
+                {prev.label}
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
         </>
       )}
       {slug && (
-        <BreadcrumbItem>
-          <BreadcrumbPage className={cn("italic line-clamp-1", className)}>
-            {slug}
-          </BreadcrumbPage>
-        </BreadcrumbItem>
+        <div className="flex items-center gap-2">
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage className={cn("italic line-clamp-1", className)}>
+              {slug}
+            </BreadcrumbPage>
+          </BreadcrumbItem>
+        </div>
       )}
     </BreadcrumbList>
   </Breadcrumb>

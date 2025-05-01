@@ -15,9 +15,14 @@ export const useCartStore = create(
 
         setTimeout(() => {
           const { cart } = get();
-          const exists = cart.find((item) => item.id === product.id);
+          const itemExist = cart.find((item) => item.id === product.id);
 
-          if (exists) {
+          if (itemExist) {
+            if (itemExist.quantity >= product.stock) {
+              toast.error(`Only ${product.quantity} of this item is in stock.`);
+              set({ loading: false, loadingProductId: null });
+              return;
+            }
             set({
               cart: cart.map((item) =>
                 item.id === product.id
@@ -60,7 +65,7 @@ export const useCartStore = create(
 
         toast.success("Item quantity updated.");
       },
-
+      // Remove item from cart
       removeFromCart: (id) => {
         const { cart } = get();
         set({

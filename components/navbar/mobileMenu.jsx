@@ -1,11 +1,11 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ScrollArea } from "../ui/scroll-area";
+import { useRouter, usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "../ui/scroll-area";
 import { PlayCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function MobileMenu({
   isOpen,
@@ -15,6 +15,22 @@ export default function MobileMenu({
   courseLinks,
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isParentLinkActive = (linkHref) => {
+    if (linkHref === "/store") {
+      return pathname.startsWith("/store");
+    }
+    if (linkHref === "/projects") {
+      return pathname.startsWith("/projects");
+    }
+    if (linkHref === "/training") {
+      return pathname.startsWith("/training");
+    }
+    if (linkHref === "/pro") {
+      return pathname.startsWith("/pro");
+    }
+    return pathname === linkHref;
+  };
   return (
     <AnimatePresence>
       {isOpen && (
@@ -34,8 +50,10 @@ export default function MobileMenu({
             exit={{ x: "-100%" }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              courseLinks ? "border border-slate-600 pt-10 " : "p-6 w-64",
-              "fixed top-0 left-0  h-full bg-white z-50 shadow-lg"
+              courseLinks
+                ? "border border-slate-600 pt-10 w-[80%]"
+                : "p-6 w-64",
+              "fixed top-0 left-0 h-full bg-white z-50 shadow-lg"
             )}
           >
             <ScrollArea className="h-full">
@@ -52,44 +70,55 @@ export default function MobileMenu({
                   hidden: {},
                 }}
                 className={cn(
-                  "flex flex-col  space-y-4",
+                  "flex flex-col space-y-4",
                   courseLinks && "space-y-0"
                 )}
               >
-                {navLinks.map((link, i) => (
-                  <motion.li
-                    key={i}
-                    variants={{
-                      hidden: { opacity: 0, x: -20 },
-                      visible: { opacity: 1, x: 0 },
-                    }}
-                    className={cn(
-                      "text-lg cursor-pointer hover:text-blue-600 transition-colors",
-                      courseLinks &&
-                        "leading-tight h-12 flex items-center px-4 border-y-[1px] border-slate-100 hover:bg-slate-300/20"
-                    )}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {courseLinks ? (
-                      <button
-                        onClick={() =>
-                          router.push(
-                            `/training/${courseId}/chapters/${link.id}`
-                          )
-                        }
-                        type="button"
-                        className={cn(
-                          "flex items-center text-slate-500 text-sm font-[400] transition-all cursor-pointer"
-                        )}
-                      >
-                        <PlayCircle className="w-5 h-5 inline-block mr-2" />
-                        {link.title}
-                      </button>
-                    ) : (
-                      <Link href={link.href}>{link.label}</Link>
-                    )}
-                  </motion.li>
-                ))}
+                {navLinks.map((link, i) => {
+                  const isActive = isParentLinkActive(link.href);
+
+                  return (
+                    <motion.li
+                      key={i}
+                      variants={{
+                        hidden: { opacity: 0, x: -20 },
+                        visible: { opacity: 1, x: 0 },
+                      }}
+                      className={cn(
+                        "text-lg cursor-pointer transition-colors",
+                        courseLinks &&
+                          "leading-tight h-12 flex items-center px-4 border-y-[1px] border-slate-100 hover:bg-slate-300/20"
+                      )}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {courseLinks ? (
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/training/${courseId}/chapters/${link.id}`
+                            )
+                          }
+                          type="button"
+                          className="flex items-center text-slate-500 text-sm font-[400]"
+                        >
+                          <PlayCircle className="w-5 h-5 inline-block mr-2" />
+                          {link.title}
+                        </button>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className={cn(
+                            isActive
+                              ? "text-[--app-bg-red]"
+                              : "text-gray-700 hover:text-[--app-primary-color]"
+                          )}
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </motion.li>
+                  );
+                })}
               </motion.ul>
             </ScrollArea>
           </motion.div>

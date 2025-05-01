@@ -31,12 +31,12 @@ export const ProductQtyBtnAction = ({ product }) => {
         </Button>
       )}
       {isExisting && (
-        <div className="flex items-center gap-4 mb-5">
+        <div className="flex items-center gap-5 mb-5">
           <Button
             size="icon"
             onClick={() => removeFromCart(product.id)}
             disabled={isLoading}
-            className="bg-[--app-primary-color] shadow-md text-white rounded-[8px]"
+            className="bg-[--app-primary-color] shadow-md text-white rounded-[5px]"
           >
             <Minus />
           </Button>
@@ -51,7 +51,7 @@ export const ProductQtyBtnAction = ({ product }) => {
             size="icon"
             onClick={() => addToCart(product)}
             disabled={isLoading}
-            className="bg-[--app-primary-color] shadow-md text-white rounded-[8px]"
+            className="bg-[--app-primary-color] shadow-md text-white rounded-[5px]"
           >
             <Plus className="w-7 h-7" />
           </Button>{" "}

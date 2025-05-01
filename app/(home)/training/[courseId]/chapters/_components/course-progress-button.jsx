@@ -57,19 +57,19 @@ const CourseProgressButton = ({
       onClick={() => handleCompleted()}
       type="button"
       variant={isCompleted ? "outline" : "success"}
-      className="w-full md:w-auto"
+      className="w-full md:w-auto text-xs "
     >
+      {!isLoading && <Icon className="h-4 w-4 ml-2" />}
       {isLoading ? (
         <div className="flex items-center gap-2">
           <Loader2 className=" animate-spin h-4 w-4" />
           please wait...
         </div>
       ) : isCompleted ? (
-        "Not completed"
+        "Mark as not completed"
       ) : (
         "Mark as complete and continue"
       )}
-      {!isLoading && <Icon className="h-4 w-4 ml-2" />}
     </Button>
   );
 };

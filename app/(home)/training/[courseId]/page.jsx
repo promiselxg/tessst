@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import VideoPlayer from "@/components/video/videoPlayer";
 import { toast } from "sonner";
+import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
 
 const menuItems = [
   { label: "Browse all courses", icon: Compass, href: "/training" },
@@ -56,7 +57,6 @@ const SingleCoursePage = ({ params }) => {
     fetchCourse();
   }, [params.courseId, router]);
 
-  // Fetch progress
   useEffect(() => {
     const fetchCourseProgress = async () => {
       try {
@@ -146,7 +146,15 @@ const SingleCoursePage = ({ params }) => {
             </div>
           </div>
         </div>
-
+        <div className="p-[17px] bg-emerald-950 text-white md:hidden">
+          <BreadcrumbNav
+            prev={{
+              label: `browse all courses`,
+              href: `/training`,
+            }}
+            className="text-[whitesmoke]"
+          />
+        </div>
         {/* Main Content */}
         <div className="w-full md:w-[80%] md:h-screen md:flex md:left-[20%] relative py-8 px-5 flex-col md:flex-row">
           <div className="w-full flex gap-5 flex-col md:flex-row">

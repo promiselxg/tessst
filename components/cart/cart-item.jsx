@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 import CartItemImage from "./cart-item-image";
 import CartItemInfo from "./cart-item-info";
 import QuantityController from "./cart-qty-control";
@@ -9,11 +10,14 @@ const CartItem = ({ item, onRemove, onIncrease, onDecrease }) => {
       <div className="w-full flex justify-between p-5 ">
         <div className="flex flex-col gap-y-2 w-full">
           <div className="flex items-center gap-4">
-            <CartItemImage image={item.image} name={item.name} />
+            <CartItemImage
+              image={item?.product_main_image[0]?.public_url}
+              name={item?.name}
+            />
             <CartItemInfo item={item} />
             <div className="h-fit">
               <p className="font-bold md:text-lg mt-1">
-                &#8358;{item.price.toLocaleString()}
+                {formatCurrency(item?.price)}
               </p>
             </div>
           </div>

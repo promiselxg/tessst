@@ -1,12 +1,14 @@
 import React from "react";
+import Preview from "../editor/preview";
 
-const ProductDescriptionCard = () => {
+const ProductDescriptionCard = ({ description }) => {
   return (
     <>
       <div className="p-5">
         <h1 className="text-lg font-semibold ">Product Details</h1>
         <div className="w-full border-[rgba(0,0,0,0.1)] border-b-[1px] my-2" />
-        <ul className="space-y-2 text-sm text-[--app-primary-color] list-disc px-5">
+
+        {/* <ul className="space-y-2 text-sm text-[--app-primary-color] list-disc px-5">
           <li>Type: IPS LCD</li>
           <li>Aspect Ratio and PPI: 260 ppi density</li>
           <li>Size: 6.88 inches (~84.0% screen-to-body ratio)</li>
@@ -34,7 +36,8 @@ const ProductDescriptionCard = () => {
           <li>Battery Capacity: 5160 mAh</li>
           <li>Charging Type: 18W</li>
           <li>Fast Charging: Yes</li>
-        </ul>
+        </ul> */}
+        <Preview value={description} />
       </div>
     </>
   );

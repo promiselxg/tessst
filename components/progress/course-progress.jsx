@@ -15,16 +15,18 @@ const colorVariant = {
 const CourseProgress = ({ variant, value, size = "default" }) => {
   return (
     <>
-      <Progress variant={variant} value={value} />
-      <p
+      <Progress variant={variant} value={value} className="h-[2px]" />
+      <div
         className={cn(
           "font-medium mt-2",
           colorVariant[variant || "default"],
           sizeVariant[size || "default"]
         )}
       >
-        {Math.round(value)}% Complete
-      </p>
+        <div className="text-xs text-muted-foreground">
+          {value !== 0 ? `${Math.round(value)}% Complete` : "Start course"}
+        </div>
+      </div>
     </>
   );
 };

@@ -22,7 +22,9 @@ export const getAllTrainingProgress = async () => {
 export const getTrainingProgress = async (courseId) => {
   return await apiCall("get", `/training/course/progress/${courseId}`);
 };
+// http://localhost:3000/training/8b90515d-b406-4c97-b354-07f23d6bfd95/chapters/9065ac8a-5ba4-4f12-a5da-e36aab6d3faa
 
+// http://localhost:3000/training/8b90515d-b406-4c97-b354-07f23d6bfd95/chapters/49d66154-974b-42e6-a548-3c15e706bc5c
 export const getChapter = async ({ userId, courseId, chapterId }) => {
   try {
     const course = await prisma.course.findFirst({
@@ -77,6 +79,7 @@ export const getChapter = async ({ userId, courseId, chapterId }) => {
       nextChapter = await prisma.chapter.findFirst({
         where: {
           courseId,
+          isPublished: true,
           position: {
             gt: chapter?.position,
           },

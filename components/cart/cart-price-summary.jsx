@@ -1,5 +1,7 @@
 import React from "react";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { formatCurrency } from "@/lib/utils/formatCurrency";
 
 const CartPriceSummary = ({ subtotal }) => {
   return (
@@ -10,20 +12,18 @@ const CartPriceSummary = ({ subtotal }) => {
         </div>
         <div className="w-full flex justify-between p-3 border-b-[1px] border-[#eee]">
           <span>Subtotal</span>
-          <span className="font-[600]">&#8358;{subtotal.toLocaleString()}</span>
+          <span className="font-[600]">{formatCurrency(subtotal)}</span>
         </div>
-        {/* <div className="w-full flex gap-3 my-3 px-3">
-            <Input placeholder="coupon code" />
-            <Button className="text-sm font-light bg-[--app-primary-color]">
-              Apply
-            </Button>
-          </div> */}
+        <div className="w-full flex gap-3 my-3 px-3">
+          <Input placeholder="coupon code" />
+          <Button className="text-sm font-light bg-[--app-primary-color]">
+            Apply
+          </Button>
+        </div>
         <div className="w-full my-3 px-3">
           <Button className="w-full bg-[--app-bg-red] shadow-md flex items-center gap-2">
             Checkout
-            <span className="font-[600]">
-              (&#8358;{subtotal.toLocaleString()})
-            </span>
+            <span className="font-[600]">({formatCurrency(subtotal)})</span>
           </Button>
         </div>
       </div>

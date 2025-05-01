@@ -11,6 +11,8 @@ import CourseVideoPlayer from "../_components/CourseVideoPlayer";
 import Preview from "@/components/editor/preview";
 import { Separator } from "@/components/ui/separator";
 import CourseProgressButton from "../_components/course-progress-button";
+import BreadcrumbBanner from "@/components/breadcrumb/banner-breadcrumb";
+import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
 
 const page = async ({ params }) => {
   const cookieStore = cookies();
@@ -66,7 +68,7 @@ const page = async ({ params }) => {
   // console.log("purchase", purchase);
   // console.log("muxData", muxData);
   // console.log("attachments", attachments);
-  // console.log("nextChapter", nextChapter);
+  console.log("nextChapter", nextChapter);
   // console.log("userProgress", userProgress);
   // console.log("isCompleted", isCompleted);
 
@@ -96,26 +98,47 @@ const page = async ({ params }) => {
 
         <div className="w-full md:w-[80%] md:flex md:left-[20%] relative flex-col md:flex-row mb-20">
           <div className="w-full flex flex-col ">
+            <div className="p-[17px] bg-emerald-950 text-white">
+              <BreadcrumbNav
+                prev={{
+                  label: `${course.title}`,
+                  href: `/training/${courseId}`,
+                }}
+                slug={chapter.title}
+                className="text-[whitesmoke]"
+              />
+            </div>
             <div className="w-full ">
               {isLocked && (
                 <Banner label="You need to register for this course to continue watching." />
               )}
             </div>
+            {course.chapters.videoUrl && (
+              <div className="w-full">
+                <CourseVideoPlayer
+                  title={chapter?.title}
+                  isLocked={isLocked}
+                  courseId={courseId}
+                  chapterId={chapterId}
+                  nextChapterId={nextChapter?.id}
+                  purchaseId={purchase?.id}
+                  completeOnEnd={isCompleted}
+                  publicId={muxData?.publicId}
+                />
+              </div>
+            )}
             <div className="w-full">
-              <CourseVideoPlayer
-                title={chapter?.title}
-                isLocked={isLocked}
-                courseId={courseId}
-                chapterId={chapterId}
-                nextChapterId={nextChapter?.id}
-                purchaseId={purchase?.id}
-                completeOnEnd={isCompleted}
-                publicId={muxData?.publicId}
-              />
-            </div>
-            <div className="w-full">
-              <div className="p-4 flex flex-col md:flex-row justify-between md:items-center gap-y-2">
-                <h1 className="text-2xl font-semibold">{chapter?.title}</h1>
+              <div className="flex flex-col gap-y-2">
+                <div className="px-5 pt-5">
+                  <h1 className="text-2xl font-semibold">{chapter?.title}</h1>
+                </div>
+                {purchase && (
+                  <div className="px-1">
+                    <Preview value={chapter?.description} />
+                  </div>
+                )}
+              </div>
+              <div className="p-5">
                 {purchase && (
                   <CourseProgressButton
                     chapterId={chapterId}
@@ -125,11 +148,6 @@ const page = async ({ params }) => {
                   />
                 )}
               </div>
-              {purchase && (
-                <div className="-mt-5">
-                  <Preview value={chapter?.description} />
-                </div>
-              )}
               <Separator />
               {!!attachments?.length && (
                 <div className="p-4">
