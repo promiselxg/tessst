@@ -1,9 +1,10 @@
 "use server";
 import prisma from "@/lib/utils/dbConnect";
 
-export async function createPendingOrder({ amount, email }) {
+export async function createPendingOrder({ amount, email, customerId }) {
   const order = await prisma.order.create({
     data: {
+      customerId,
       email,
       amount,
       status: "PENDING",

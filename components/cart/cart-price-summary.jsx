@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 
-const CartPriceSummary = ({ subtotal }) => {
+const CartPriceSummary = ({ subtotal, isValid, router, invalidItems }) => {
   return (
     <>
       <div className="w-full md:w-[30%] bg-white h-fit shadow-sm border border-[#eee] sticky top-[100px]">
@@ -21,9 +21,24 @@ const CartPriceSummary = ({ subtotal }) => {
           </Button>
         </div>
         <div className="w-full my-3 px-3">
-          <Button className="w-full bg-[--app-bg-red] shadow-md flex items-center gap-2">
-            Checkout
-            <span className="font-[600]">({formatCurrency(subtotal)})</span>
+          <Button
+            disabled={!isValid}
+            onClick={() => router.push("/store/checkout")}
+            className="w-full bg-[--app-bg-red] shadow-md flex items-center justify-center gap-2 py-3 rounded text-white disabled:cursor-not-allowed"
+          >
+            {!isValid ? (
+              <span className="text-xs text-white">
+                You have {invalidItems.length} item
+                {invalidItems.length > 1 ? "s" : ""} out of stock.
+              </span>
+            ) : (
+              <>
+                Checkout
+                <span className="font-semibold">
+                  ({formatCurrency(subtotal)})
+                </span>
+              </>
+            )}
           </Button>
         </div>
       </div>

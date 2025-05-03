@@ -49,7 +49,7 @@ export default function Navbar() {
               alt="ysfon-logo"
               width={80}
               height={80}
-              className="cursor-pointer"
+              className="cursor-pointer w-[60px] h-[50px] md:w-[75px] md:h-[60px]"
               priority
             />
           </Link>
@@ -75,10 +75,17 @@ export default function Navbar() {
             })}
           </div>
 
-          <div className="flex items-center gap-5 md:gap-10">
-            <Link href="/cart" className="flex items-center relative">
+          <div className="flex items-center gap-5 md:gap-10 ">
+            <Link
+              href="/cart"
+              className={cn(
+                "relative items-center hidden md:flex",
+                cart?.length === 0 && "pointer-events-none opacity-50",
+                cart?.length > 0 && "flex"
+              )}
+            >
               <MdShoppingCart className="h-7 w-7 text-gray-800" />
-              {cart.length > 0 && (
+              {cart?.length > 0 && (
                 <Badge className="absolute -top-1 -right-1 px-[6px] py-[1px] bg-red-500 hover:bg-red-800 text-white text-xs rounded-full transition-all">
                   {cart.length}
                 </Badge>

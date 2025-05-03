@@ -4,18 +4,20 @@ import { ProductQtyBtnAction } from "@/app/(home)/store/_components/product-butt
 
 export const ProductDetailsCard = ({ product }) => {
   return (
-    <div className="w-full md:w-[90%] p-5">
+    <div className="w-full md:w-[90%] p-5 space-y-4">
       <div>
         <h1 className=" font-euclid text-[18px] md:text-[25px] font-[400] md:leading-tight">
           {product.name}
         </h1>
-        <div className="flex items-center gap-2 text-xs my-2">
-          <span>Brand:</span>
-          <span>Xiaomi</span>
-        </div>
+        {product.manufacturer && (
+          <div className="flex items-center gap-2 text-xs my-2">
+            <span>Brand:</span>
+            <span>{product.manufacturer}</span>
+          </div>
+        )}
       </div>
       <div className="w-full border-[rgba(0,0,0,0.1)] border-b-[1px] my-2" />
-      <div className="flex flex-col gap-2 mb-4">
+      <div className="flex flex-col gap-2 mb-4 space-y-2">
         <p className="font-bold text-lg text-gray-800">
           &#8358;{product?.price?.toLocaleString()}
         </p>

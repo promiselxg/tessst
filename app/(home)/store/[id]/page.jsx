@@ -8,7 +8,7 @@ import prisma from "@/lib/utils/dbConnect";
 
 const page = async ({ params }) => {
   const product = await prisma.product.findUnique({
-    where: { id: params.slug },
+    where: { id: params.id },
     include: {
       tags: true,
       product_variants: true,
@@ -18,11 +18,11 @@ const page = async ({ params }) => {
 
   const formattedProduct = {
     ...product,
-    price: Number(product.price),
-    discount_percent: Number(product.discount_percent),
-    product_variants: product.product_variants.map((variant) => ({
+    price: Number(product?.price),
+    discount_percent: Number(product?.discount_percent),
+    product_variants: product?.product_variants.map((variant) => ({
       ...variant,
-      price: Number(variant.price),
+      price: Number(variant?.price),
     })),
   };
   return (

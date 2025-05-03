@@ -7,6 +7,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { truncateText } from "@/lib/utils/trucateText";
 import Link from "next/link";
 
 export const BreadcrumbNav = ({
@@ -44,7 +45,8 @@ export const BreadcrumbNav = ({
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage className={cn("italic line-clamp-1", className)}>
-              {slug}
+              <span className="flex md:hidden">{truncateText(slug, 25)}</span>
+              <span className="hidden md:flex">{slug}</span>
             </BreadcrumbPage>
           </BreadcrumbItem>
         </div>

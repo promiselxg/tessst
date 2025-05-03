@@ -4,7 +4,6 @@ import prisma from "@/lib/utils/dbConnect";
 
 export async function createOrUpdateCustomerInfo(customer, userId) {
   if (!customer?.email) {
-    console.error("Cannot upsert customer: Email is missing", customer);
     return null;
   }
 

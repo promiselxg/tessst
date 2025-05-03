@@ -97,38 +97,61 @@ model Category {
 }
 
 model Customer {
-  id        String     @id @default(uuid())
-  name      String?
-  email     String     @unique
-  phone     String?
-  password  String?
-  customer_code String?
-  metadata  Json?
-  phone_format String?
-  orders    Order[]
-  payments  Payment[]
-  refunds   Refund[]
-  invoices  Invoice[]
-  createdAt DateTime   @default(now())
+  id                String     @id @default(uuid())
+  name              String?
+  email             String     @unique
+  phone             String?
+  password          String?
+  customer_code     String?
+  metadata          Json?
+  phone_format      String?
+  orders            Order[]
+  payments          Payment[]
+  refunds           Refund[]
+  invoices          Invoice[]
+  addresses         Address[]
+  createdAt         DateTime   @default(now())
+}
+
+model Address {
+  id                String   @id @default(uuid())
+  customerId        String  
+  fullName          String
+  phone             String
+  additional_phone  String?
+  delivery_address  String
+  additional_info   String?
+  city              String
+  state             String
+  postalCode        String?
+  country           String?
+  isDefault         Boolean  @default(false)
+  type              AddressType @default(CHECKOUT)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  customer          Customer? @relation(fields: [customerId], references: [id])
+
+   @@index([customerId])
 }
 
 model Order {
-  userId     String?
-  id         String      @id @default(uuid())
-  email      String
-  amount     Int
-  paymentReference String?
-  status     PaymentStatus @default(PENDING)
-  orderItems OrderItem[]
-  payment    Payment?
-  invoice    Invoice?
-  couponId   String?
-  user       Customer?    @relation(fields: [userId], references: [id])
-  coupon     Coupon?     @relation(fields: [couponId], references: [id])
-  createdAt  DateTime    @default(now())
-  paidAt     DateTime?
+  customerId            String?
+  id                    String      @id @default(uuid())
+  email                 String
+  amount                Int
+  paymentReference      String?
+  status                PaymentStatus @default(PENDING)
+  orderItems            OrderItem[]
+  payment               Payment?
+  invoice               Invoice?
+  couponId              String?
+  user                  Customer?    @relation(fields: [customerId], references: [id])
+  coupon                Coupon?     @relation(fields: [couponId], references: [id])
+  createdAt             DateTime    @default(now())
+  paidAt                DateTime?
   
-  @@index([userId])
+  @@index([customerId])
   @@index([couponId])
 
 }
@@ -425,4 +448,10 @@ enum RefundStatus {
 enum MediaType {
   IMAGE
   VIDEO
+}
+
+enum AddressType {
+  SHIPPING
+  BILLING
+  CHECKOUT
 }

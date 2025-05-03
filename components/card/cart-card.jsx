@@ -7,19 +7,19 @@ import CartPriceSummary from "../cart/cart-price-summary";
 import { ShoppingBasket } from "lucide-react";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import { useRouter } from "next/navigation";
+import { useCartSummary } from "@/hooks/use-cart-summary";
 
 const CartItems = () => {
   const { cart, addToCart, removeFromCart, decreaseQuantity } = useCartStore();
+  const { subtotal, isValid, invalidItems } = useCartSummary();
+
+  const router = useRouter();
   const [isLoading, setisLoading] = useState(false);
 
   useEffect(() => {
     setisLoading(true);
   }, []);
-
-  const subtotal = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
 
   if (!isLoading) {
     return (
@@ -60,6 +60,7 @@ const CartItems = () => {
       </div>
     );
   }
+
   return (
     <>
       {cart.length > 0 && (
@@ -82,7 +83,12 @@ const CartItems = () => {
               ))}
             </div>
           </div>
-          <CartPriceSummary subtotal={subtotal} />
+          <CartPriceSummary
+            subtotal={subtotal}
+            isValid={isValid}
+            invalidItems={invalidItems}
+            router={router}
+          />
         </div>
       )}
     </>
