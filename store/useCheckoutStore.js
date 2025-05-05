@@ -7,10 +7,15 @@ export const useCheckoutStore = create(
       customerAddress: [],
       selectedDeliveryAddress: null,
       selectedCustomerAddress: null,
+      selectedPaymenthMethod: null,
 
       setselectedDeliveryAddress: (address) =>
         set({
           selectedDeliveryAddress: address,
+        }),
+      setSelectedPaymentMethod: (paymentMethod) =>
+        set({
+          selectedPaymenthMethod: paymentMethod,
         }),
 
       setselectedCustomerAddress: (address) =>
@@ -35,6 +40,7 @@ export const useCheckoutStore = create(
           customerAddress: [],
           selectedDeliveryAddress: null,
           selectedCustomerAddress: null,
+          selectedPaymenthMethod: null,
         }),
     }),
     {

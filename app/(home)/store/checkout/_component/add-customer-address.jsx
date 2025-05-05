@@ -25,6 +25,7 @@ import {
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -90,12 +91,12 @@ const AddCustomerAddress = () => {
     <div className="p-5 text-sm text-slate-700 space-y-2 flex  w-full flex-col bg-white shadow-sm rounded-[8px]">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <div className="flex items-center justify-between gap-5">
+          <div className="flex items-center justify-between gap-5 md:flex-row flex-col">
             <FormField
               control={form.control}
               name="firstName"
               render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className="w-full md:w-1/2">
                   <FormLabel>First Name</FormLabel>
                   <FormControl>
                     <Input placeholder="First Name" {...field} />
@@ -108,7 +109,7 @@ const AddCustomerAddress = () => {
               control={form.control}
               name="lastName"
               render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className="w-full md:w-1/2">
                   <FormLabel>Last Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Last Name" {...field} />
@@ -119,12 +120,12 @@ const AddCustomerAddress = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between gap-5">
+          <div className="flex items-center justify-between gap-5 md:flex-row flex-col">
             <FormField
               control={form.control}
               name="phone"
               render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className="w-full md:w-1/2">
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
                     <Input placeholder="Phone Number" {...field} />
@@ -137,7 +138,7 @@ const AddCustomerAddress = () => {
               control={form.control}
               name="additional_phone"
               render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className="w-full md:w-1/2">
                   <FormLabel>Additional Phone Number</FormLabel>
                   <FormControl>
                     <Input
@@ -167,12 +168,12 @@ const AddCustomerAddress = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between gap-5">
+          <div className="flex md:items-center justify-between gap-5 md:flex-row flex-col">
             <FormField
               control={form.control}
               name="region"
               render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className="w-full md:w-1/2">
                   <FormLabel>Region</FormLabel>
                   <Select
                     onValueChange={(val) => {
@@ -205,7 +206,7 @@ const AddCustomerAddress = () => {
               control={form.control}
               name="city"
               render={({ field }) => (
-                <FormItem className="w-1/2">
+                <FormItem className="w-full md:w-1/2">
                   <FormLabel>City</FormLabel>
                   <Select
                     onValueChange={field.onChange}
@@ -250,13 +251,9 @@ const AddCustomerAddress = () => {
             />
           </div>
           <div className="w-full justify-end gap-6 items-center flex">
-            <Button
-              variant="ouline"
-              disabled={isSubmitting || isLoading}
-              onClick={() => router.push("/store/checkout")}
-            >
+            <Link href="/store/checkout" disabled={isSubmitting || isLoading}>
               Cancel
-            </Button>
+            </Link>
             <Button
               type="submit"
               disabled={isSubmitting || !isValid || isLoading}

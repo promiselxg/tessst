@@ -4,12 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartSummary } from "@/hooks/use-cart-summary";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { usePathname, useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
 
 const CheckoutSummary = () => {
   const { subtotal, total, isValid, delivery_fee, cart } = useCartSummary();
+  const {
+    selectedDeliveryAddress,
+    selectedCustomerAddress,
+    selectedPaymenthMethod,
+  } = useCheckoutStore();
+
   const [disableButton, setDisableButton] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -50,17 +57,25 @@ const CheckoutSummary = () => {
             {formatCurrency(total)}
           </span>
         </div>
-        {!disableButton && (
-          <div className="w-full flex gap-3 my-3 px-3">
-            <Input placeholder="coupon code" />
-            <Button className="text-sm font-light bg-[--app-primary-color]">
-              Apply
-            </Button>
-          </div>
-        )}
+        {selectedDeliveryAddress &&
+          selectedCustomerAddress &&
+          selectedPaymenthMethod && (
+            <div className="w-full flex gap-3 my-3 px-3">
+              <Input placeholder="coupon code" />
+              <Button className="text-sm font-light bg-[--app-primary-color]">
+                Apply
+              </Button>
+            </div>
+          )}
         <div className="w-full my-3 px-3">
           <Button
-            disabled={!isValid || disableButton}
+            disabled={
+              !isValid ||
+              disableButton ||
+              !selectedDeliveryAddress ||
+              !selectedCustomerAddress ||
+              !selectedPaymenthMethod
+            }
             className="w-full bg-[--app-bg-red] shadow-md flex items-center justify-center gap-2 py-3 rounded text-white disabled:cursor-not-allowed"
           >
             Confirm Order
