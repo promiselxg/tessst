@@ -45,12 +45,14 @@ const CheckoutSummary = () => {
             {formatCurrency(subtotal)}
           </span>
         </div>
-        <div className="w-full flex justify-between p-3 border-b-[1px] border-[#eee]">
-          <span className="text-xs">Delivery fee</span>
-          <span className="text-sm font-medium">
-            {formatCurrency(delivery_fee)}
-          </span>
-        </div>
+        {selectedDeliveryAddress && (
+          <div className="w-full flex justify-between p-3 border-b-[1px] border-[#eee]">
+            <span className="text-xs">Delivery fee</span>
+            <span className="text-sm font-medium">
+              {formatCurrency(delivery_fee)}
+            </span>
+          </div>
+        )}
         <div className="w-full flex justify-between p-3 border-b-[1px] border-[#eee]">
           <span className="text-sm">Total</span>
           <span className="text-[16px] font-[600]">
