@@ -39,7 +39,7 @@ const AddressBook = () => {
     } else {
       setSelectedOption(customerAddress[0]?.id);
     }
-  }, [selectedCustomerAddress]);
+  }, [customerAddress, selectedCustomerAddress]);
 
   return (
     <div className="w-full flex-col bg-white shadow-sm rounded-[8px]">
