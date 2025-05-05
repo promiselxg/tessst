@@ -10,6 +10,11 @@ import { FiChevronLeft } from "react-icons/fi";
 import CheckoutSummary from "../_components/checkout/checkout-summary";
 import ProtectedRouteWrapper from "@/middleware/protectedRoute";
 
+export const metadata = {
+  title: "YSFON | Checkout",
+  description: "YESFON Checkout",
+};
+
 const page = () => {
   return (
     <>

@@ -1,12 +1,11 @@
-import Link from "next/link";
-import React from "react";
-import { FiChevronLeft } from "react-icons/fi";
-import CheckoutSummary from "../../_components/checkout/checkout-summary";
-import Container from "@/components/container/container";
 import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
+import Container from "@/components/container/container";
 import CheckoutStepHeader from "../../_components/checkout/checkout-step-header";
 import { CheckCircle2 } from "lucide-react";
-import DeliveryAddress from "../_component/delivery-address";
+import CheckoutSummary from "../../_components/checkout/checkout-summary";
+import Link from "next/link";
+import { FiChevronLeft } from "react-icons/fi";
+import CheckoutPaymentMethod from "../../_components/checkout/checkout-payment-method";
 
 const page = () => {
   return (
@@ -17,7 +16,7 @@ const page = () => {
             <Container className="w-[90%] md:w-[1300px] mx-auto">
               <BreadcrumbNav
                 prev={{ label: "Checkout", href: "/store/checkout" }}
-                slug="Delivery Address"
+                slug="Payment Method"
                 className="text-[whitesmoke]"
               />
             </Container>
@@ -31,12 +30,14 @@ const page = () => {
                     label="1. Customer Address"
                   />
                 </div>
-                <DeliveryAddress />
                 <div className="w-full flex-col bg-white shadow-sm rounded-[8px]">
                   <CheckoutStepHeader
                     icon={CheckCircle2}
-                    label="3. Payment method"
+                    label="2. Delivery Address"
                   />
+                </div>
+                <div className="w-full flex-col bg-white shadow-sm rounded-[8px]">
+                  <CheckoutPaymentMethod />
                 </div>
               </div>
               <div className="w-full md:w-[25%]">

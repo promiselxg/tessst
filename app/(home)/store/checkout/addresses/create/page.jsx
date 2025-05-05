@@ -43,7 +43,7 @@ const page = () => {
                 <CheckoutSummary />
               </div>
             </div>
-            <div className="w-full mt-5">
+            <div className="w-fit mt-5">
               <Link
                 href="/store"
                 className="flex items-center gap-1 text-blue-600 text-xs hover:underline"

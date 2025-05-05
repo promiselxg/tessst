@@ -8,6 +8,7 @@ import Link from "next/link";
 import { CustomToolTip } from "@/components/tooltip/tooltip";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import DeleteDialog from "@/components/alert/deleteDialog";
+import { truncateText } from "@/lib/utils/trucateText";
 
 export const columns = [
   {
@@ -69,7 +70,7 @@ export const columns = [
                 target="_blank"
                 className="hover:underline hover:text-[#e97688] transition-all delay-75"
               >
-                {name}
+                {truncateText(name, 50)}
               </Link>
             </h1>
           </div>

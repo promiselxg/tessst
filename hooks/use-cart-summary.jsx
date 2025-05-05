@@ -1,8 +1,14 @@
 import { useCartStore } from "@/store/cartStore";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 
 export const useCartSummary = () => {
   const { cart } = useCartStore();
-  const delivery_fee = 1900;
+  const { selectedDeliveryAddress } = useCheckoutStore();
+  let delivery_fee = 0;
+
+  if (selectedDeliveryAddress) {
+    delivery_fee = 1900;
+  }
 
   const subtotal = cart.reduce(
     (acc, item) => acc + item.price * item.quantity,

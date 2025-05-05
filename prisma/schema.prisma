@@ -20,8 +20,6 @@ model User {
   roles                      UserRole[]
   accountStatus              Boolean        @default(false)
   isAdmin                    Boolean        @default(false)
-  resetPasswordToken         String?
-  resetPasswordTokenExpireAt DateTime?
   createdAt                  DateTime       @default(now())
   updatedAt                  DateTime       @updatedAt
   refreshTokens              RefreshToken[]
@@ -80,13 +78,25 @@ model ProductTag {
 }
 
 model ProductVariant {
-  id        String  @id @default(uuid())
-  name      String?
-  value     String?
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id                String              @id @default(uuid())
+  name              String?
+  value             String?
+  productId         String
+  product           Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems        OrderItem[]
+  orderItemVariants OrderItemVariant[]  @relation("ProductVariantToOrderItemVariant")
 
   @@index([productId])
+}
+
+model OrderItemVariant {
+  id           String          @id @default(uuid())
+  orderItemId  String
+  variantId    String
+  variant      ProductVariant  @relation("ProductVariantToOrderItemVariant", fields: [variantId], references: [id])
+
+  @@index([orderItemId])
+  @@index([variantId])
 }
 
 model Category {
@@ -101,7 +111,6 @@ model Customer {
   name              String?
   email             String     @unique
   phone             String?
-  password          String?
   customer_code     String?
   metadata          Json?
   phone_format      String?
@@ -136,37 +145,51 @@ model Address {
 }
 
 model Order {
-  customerId            String?
-  id                    String      @id @default(uuid())
-  email                 String
-  amount                Int
-  paymentReference      String?
-  status                PaymentStatus @default(PENDING)
-  orderItems            OrderItem[]
-  payment               Payment?
-  invoice               Invoice?
-  couponId              String?
-  user                  Customer?    @relation(fields: [customerId], references: [id])
-  coupon                Coupon?     @relation(fields: [couponId], references: [id])
-  createdAt             DateTime    @default(now())
-  paidAt                DateTime?
-  
+  id                String        @id @default(uuid())
+  email             String
+  customerId        String?
+  user              Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  amount            Decimal       @db.Decimal(10, 2)
+  delivery_fee      Decimal?      @db.Decimal(10, 2)
+  paymentReference  String?
+  status            PaymentStatus @default(PENDING)
+  metadata          Json?
+  couponId          String?
+  coupon            Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull)
+
+  orderItems        OrderItem[]
+  payment           Payment?
+  invoice           Invoice?
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  paidAt           DateTime?
+
   @@index([customerId])
   @@index([couponId])
-
 }
 
 model OrderItem {
-  id        String  @id @default(uuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Float   @db.Float
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  variantId  String?  
+  variant    ProductVariant? @relation(fields: [variantId], references: [id])
+  quantity   Int
+  price      Decimal  @db.Decimal(10, 2)
+
+  subtotal   Decimal  @db.Decimal(10, 2)
+  discount   Decimal? @db.Decimal(10, 2) 
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([orderId])
   @@index([productId])
+  @@index([variantId])
 }
 
 model Payment {
@@ -177,7 +200,7 @@ model Payment {
   reference String?
   user      Customer?      @relation(fields: [userId], references: [id])
   order     Order?         @relation(fields: [orderId], references: [id])
-  amount    Float?         @db.Float
+  amount    Decimal @db.Decimal(10, 2)
   status    PaymentStatus @default(PENDING)
   method    PaymentMethod?
   refund    Refund?
@@ -192,7 +215,7 @@ model Refund {
   userId    String
   payment   Payment      @relation(fields: [paymentId], references: [id])
   user      Customer     @relation(fields: [userId], references: [id])
-  amount    Float        @db.Float
+  amount    Decimal @db.Decimal(10, 2)
   reason    String
   status    RefundStatus @default(PENDING)
   createdAt DateTime     @default(now())
@@ -206,19 +229,19 @@ model Invoice {
   order    Order    @relation(fields: [orderId], references: [id])
   userId   String
   customer Customer @relation(fields: [userId], references: [id])
-  total    Float    @db.Float
+  total    Decimal @db.Decimal(10, 2)
   issuedAt DateTime @default(now())
 
   @@index([userId])
 }
 
 model Coupon {
-  id        String   @id @default(uuid())
-  code      String   @unique
-  discount  Float    @db.Float
+  id        String    @id @default(uuid())
+  code      String    @unique
+  discount  Decimal   @db.Decimal(5, 2) 
   expiresAt DateTime
   orders    Order[]
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Course {

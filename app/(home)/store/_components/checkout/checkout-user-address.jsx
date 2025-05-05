@@ -8,16 +8,17 @@ import { FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 
 const CheckOutLoggedInUserAccountInfo = () => {
-  const { customerAddress, selectedCustomerAddress } = useCheckoutStore();
+  const { customerAddress = [], selectedCustomerAddress } = useCheckoutStore();
 
-  const isCompleted = !!selectedCustomerAddress?.id;
-
-  // Find the default address only if no selected address
   const defaultAddress = !selectedCustomerAddress
-    ? customerAddress.find((address) => address.isDefault)
+    ? customerAddress.find((address) => address.isDefault) ||
+      customerAddress[0] ||
+      null
     : null;
 
   const displayAddress = selectedCustomerAddress || defaultAddress;
+
+  const isCompleted = !!displayAddress;
 
   return (
     <div className="w-full flex-col bg-white shadow-sm rounded-[8px]">
@@ -51,22 +52,31 @@ const CheckOutLoggedInUserAccountInfo = () => {
         </div>
       </div>
 
-      {displayAddress && (
-        <div className="p-3 text-sm text-slate-700 space-y-2 flex flex-col">
+      <div className="p-3 text-sm text-slate-700 space-y-2 flex flex-col">
+        <div className="w-full p-3 flex items-start justify-between flex-col">
           <h1>
-            {displayAddress.firstName} {displayAddress.lastName}
-          </h1>
-          <span className="text-xs font-normal">
-            {displayAddress.delivery_address}&nbsp;|&nbsp;
-            {displayAddress.state}&nbsp;-&nbsp;
-            {displayAddress.city}&nbsp;|&nbsp;
-            {displayAddress.phone}
-            {displayAddress.additional_phone && (
-              <>&nbsp;|&nbsp;{displayAddress.additional_phone}</>
+            {displayAddress ? (
+              <>
+                {displayAddress.firstName} {displayAddress.lastName}
+              </>
+            ) : (
+              "You have not added a delivery address"
             )}
-          </span>
+          </h1>
+
+          {displayAddress && (
+            <span className="text-xs font-normal">
+              {displayAddress.delivery_address}&nbsp;|&nbsp;
+              {displayAddress.state}&nbsp;-&nbsp;
+              {displayAddress.city}&nbsp;|&nbsp;
+              {displayAddress.phone}
+              {displayAddress.additional_phone && (
+                <>&nbsp;|&nbsp;{displayAddress.additional_phone}</>
+              )}
+            </span>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

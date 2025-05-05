@@ -1,8 +1,6 @@
 "use server";
 
-import prisma from "@/lib/utils/dbConnect";
-
-export async function createOrUpdateCustomerInfo(customer, userId) {
+export async function createOrUpdateCustomerInfo(tx, customer, userId) {
   if (!customer?.email) {
     return null;
   }
@@ -11,7 +9,7 @@ export async function createOrUpdateCustomerInfo(customer, userId) {
     [customer.first_name, customer.last_name].filter(Boolean).join(" ") ||
     "Unknown";
 
-  const user = await prisma.customer.upsert({
+  const user = await tx.customer.upsert({
     where: { email: customer.email },
     update: {
       name: fullName,

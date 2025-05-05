@@ -19,14 +19,16 @@ const CheckouDeliveryAddress = () => {
           completed={isCompleted}
         />
         <div className="p-3 text-sm text-slate-700 space-y-1 flex flex-col">
-          <h1>
-            {selectedDeliveryAddress?.name || "Set your delivery address"}
-          </h1>
-          {selectedDeliveryAddress && (
-            <p className="text-xs text-slate-700">
-              {selectedDeliveryAddress?.delivery_address}
-            </p>
-          )}
+          <div className="w-full p-3 flex items-start justify-between flex-col">
+            <h1>
+              {selectedDeliveryAddress?.name || "Set your delivery address"}
+            </h1>
+            {selectedDeliveryAddress && (
+              <p className="text-xs text-slate-700">
+                {selectedDeliveryAddress?.delivery_address}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </>

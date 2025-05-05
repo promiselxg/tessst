@@ -1,24 +1,38 @@
 "use server";
+
 import prisma from "@/lib/utils/dbConnect";
 
-export async function createPendingOrder({ amount, email, customerId }) {
-  const order = await prisma.order.create({
+export async function createPendingOrder({
+  tx,
+  amount,
+  email,
+  customerId,
+  metadata = {},
+  delivery_fee,
+}) {
+  const order = await tx.order.create({
     data: {
-      customerId,
+      amount: amount / 100,
       email,
-      amount,
+      customerId,
+      metadata,
       status: "PENDING",
+      ...(delivery_fee !== undefined && { delivery_fee: delivery_fee / 100 }),
     },
   });
 
-  return order;
+  return {
+    ...order,
+    amount: order.amount.toNumber(),
+    delivery_fee: order.delivery_fee?.toNumber() ?? 0,
+  };
 }
 
 export async function updatePendingOrder(orderId, paymentData) {
   const orderStatus = await prisma.order.update({
     where: { id: orderId },
     data: {
-      userId: paymentData.metadata.userId,
+      customerId: paymentData.metadata.userId,
       status: "PAID",
       paidAt: new Date(paymentData.paid_at),
       paymentReference: paymentData.reference,

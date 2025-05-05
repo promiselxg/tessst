@@ -2,19 +2,23 @@
 
 import prisma from "@/lib/utils/dbConnect";
 
-export async function createPayment(orderId, userId) {
+export async function createPayment(tx, orderId, userId, amount) {
   if (!orderId) {
     return null;
   }
 
-  const payment = await prisma.payment.create({
+  const payment = await tx.payment.create({
     data: {
       orderId,
       userId: userId || null,
+      amount: amount / 100,
     },
   });
 
-  return payment;
+  return {
+    ...payment,
+    amount: payment.amount.toNumber(),
+  };
 }
 
 export async function savePayment(paymentData) {
@@ -46,7 +50,10 @@ export async function savePayment(paymentData) {
     },
   });
 
-  return payment;
+  return {
+    ...payment,
+    amount: payment.amount.toNumber(),
+  };
 }
 
 function mapPaystackChannelToPaymentMethod(channel) {

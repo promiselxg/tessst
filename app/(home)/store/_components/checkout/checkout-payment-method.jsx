@@ -10,68 +10,72 @@ import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const pickupStation = [
+const paymentMethod = [
   {
     id: "123456",
-    name: "Pick-up Station",
-    delivery_address: "Access Bank Wuse Market, FCT Abuja",
+    name: "Pay on delivery via bank transfer or cash",
+    method: "CASH_ON_DELIVERY",
+    description:
+      "Kindly note that you would have to make payment before opening your package.",
   },
   {
     id: "7890123",
-    name: "Door delivery",
-    delivery_address: "Delivered to your door within 2-5 working days",
+    name: "Pay with Cards, Bank Transfer or USSD",
+    method: "CARD",
+    description:
+      "Kindly note that you will be redirected to Paystack platform to complete your purchase.",
   },
 ];
 
-const DeliveryAddress = () => {
+const CheckoutPaymentMethod = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const { selectedDeliveryAddress, setselectedDeliveryAddress } =
+  const { selectedPaymenthMethod, setSelectedPaymentMethod } =
     useCheckoutStore();
 
   const handleSelectedAddress = async () => {
-    const currentAddress = pickupStation.find((a) => a.id === selectedId);
-    if (!currentAddress) return;
+    const payment_method = paymentMethod.find((a) => a.id === selectedId);
+    if (!payment_method) return;
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 3000));
-    setselectedDeliveryAddress(currentAddress);
+    setSelectedPaymentMethod(payment_method);
     setIsLoading(false);
     router.replace("/store/checkout");
   };
 
   useEffect(() => {
-    if (selectedDeliveryAddress?.id) {
-      setSelectedId(selectedDeliveryAddress.id);
+    if (selectedPaymenthMethod?.id) {
+      setSelectedId(selectedPaymenthMethod.id);
     } else {
-      setSelectedId(pickupStation[0]?.id);
+      setSelectedId(paymentMethod[0]?.id);
     }
-  }, [selectedDeliveryAddress]);
+  }, [selectedPaymenthMethod]);
 
   return (
     <div className="w-full flex-col bg-white shadow-sm rounded-[8px]">
-      <CheckoutStepHeader icon={CheckCircle2} label="2. Delivery Address" />
+      <CheckoutStepHeader icon={CheckCircle2} label="3. Payment method" />
       <div className="p-3 text-sm text-slate-700 space-y-4 flex flex-col">
         <RadioGroup
           value={selectedId}
           onValueChange={setSelectedId}
           className="space-y-3"
         >
-          {pickupStation.map((address) => (
+          {paymentMethod?.map((method) => (
             <div
-              key={address.id}
+              key={method.id}
               className="flex items-start space-x-2 p-3 border rounded-md border-[#eee]"
             >
               <RadioGroupItem
-                value={address.id}
-                id={address.id}
+                value={method.id}
+                id={method.id}
                 className="mt-1"
               />
-              <Label htmlFor={address.id} className="flex-1 space-y-1">
-                <div className="font-[500] text-sm">{address.name}</div>
-                <div className="text-sm font-thin text-muted-foreground">
-                  {address.delivery_address || "No address provided"}
+              <Label htmlFor={method.id} className="flex-1 space-y-1">
+                <div className="font-[500] text-sm">{method.name}</div>
+                <div className="text-xs font-thin text-muted-foreground">
+                  {method?.description || "No payment method provided"}
                 </div>
               </Label>
             </div>
@@ -97,10 +101,10 @@ const DeliveryAddress = () => {
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Loader2 className=" animate-spin" />
-              saving address...
+              saving...
             </div>
           ) : (
-            "Select delivery address"
+            "Confirm payment method"
           )}
         </Button>
       </div>
@@ -108,4 +112,4 @@ const DeliveryAddress = () => {
   );
 };
 
-export default DeliveryAddress;
+export default CheckoutPaymentMethod;
