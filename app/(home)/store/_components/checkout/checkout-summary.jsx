@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartSummary } from "@/hooks/use-cart-summary";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const CheckoutSummary = () => {
   const { subtotal, total, isValid, delivery_fee, cart } = useCartSummary();
+  const [disableButton, setDisableButton] = useState(false);
+  const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
@@ -17,6 +19,12 @@ const CheckoutSummary = () => {
       router.replace("/cart");
     }
   }, [cart.length, router]);
+
+  useEffect(() => {
+    if (pathname !== "/store/checkout") {
+      setDisableButton(true);
+    }
+  }, [pathname]);
 
   return (
     <>
@@ -42,15 +50,17 @@ const CheckoutSummary = () => {
             {formatCurrency(total)}
           </span>
         </div>
-        <div className="w-full flex gap-3 my-3 px-3">
-          <Input placeholder="coupon code" />
-          <Button className="text-sm font-light bg-[--app-primary-color]">
-            Apply
-          </Button>
-        </div>
+        {!disableButton && (
+          <div className="w-full flex gap-3 my-3 px-3">
+            <Input placeholder="coupon code" />
+            <Button className="text-sm font-light bg-[--app-primary-color]">
+              Apply
+            </Button>
+          </div>
+        )}
         <div className="w-full my-3 px-3">
           <Button
-            disabled={!isValid}
+            disabled={!isValid || disableButton}
             className="w-full bg-[--app-bg-red] shadow-md flex items-center justify-center gap-2 py-3 rounded text-white disabled:cursor-not-allowed"
           >
             Confirm Order

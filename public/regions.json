@@ -1,0 +1,19 @@
+{
+  "states": [
+    {
+      "name": "Federal Capital Territory",
+      "value": "fct",
+      "cities": ["ABUJA-WUSE ZONE 4", "ABUJA-GWARINPA", "ABUJA-UTAKO"]
+    },
+    {
+      "name": "Lagos",
+      "value": "lagos",
+      "cities": ["IKEJA", "VICTORIA ISLAND", "YABA"]
+    },
+    {
+      "name": "Kano",
+      "value": "kano",
+      "cities": ["KANO CENTRAL", "KANO WEST"]
+    }
+  ]
+}

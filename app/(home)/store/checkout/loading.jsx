@@ -10,13 +10,13 @@ const Loading = () => {
         </div>
 
         <Container className="w-[90%] md:w-[1300px] mx-auto">
-          <div className="w-full flex justify-between gap-5 h-fit mt-10">
-            <div className="w-[75%] flex flex-col gap-4">
+          <div className="w-full flex justify-between gap-5 h-fit mt-10 md:flex-row flex-col">
+            <div className="w-full md:w-[75%] flex flex-col gap-4">
               <Skeleton className="h-20 w-full rounded-md" />
               <Skeleton className="h-20 w-full rounded-md" />
               <Skeleton className="h-20 w-full rounded-md" />
             </div>
-            <div className="w-[25%] flex flex-col gap-4">
+            <div className="w-full md:w-[25%] flex flex-col gap-4">
               <Skeleton className="h-40 w-full rounded-md" />
             </div>
           </div>
