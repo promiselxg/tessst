@@ -50,8 +50,8 @@ const page = async ({ searchParams }) => {
             Your order has been confirmed!
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            We'll send you a shipping confirmation email as soon as your order
-            ships.
+            We&apos;ll send you a shipping confirmation email as soon as your
+            order ships.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link href="/store">
