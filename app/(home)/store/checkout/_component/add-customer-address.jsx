@@ -22,16 +22,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCheckoutStore } from "@/store/useCheckoutStore";
+
 import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
+import { apiCall } from "@/lib/utils/api";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useCheckoutStore } from "@/store/useCheckoutStore";
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  phone: z.string().min(7, "Phone number is too short"),
-  additional_phone: z.string().optional(),
+  phone: z.string().regex(/^[0-9]{10,15}$/, "Invalid phone number"),
+  additional_phone: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[0-9]{10,15}$/.test(val), {
+      message: "Invalid phone number",
+    }),
   delivery_address: z.string().min(5, "Delivery address is required"),
   region: z.string().min(1, "Region is required"),
   city: z.string().min(1, "City is required"),
@@ -42,7 +51,6 @@ const AddCustomerAddress = () => {
   const [regions, setRegions] = useState([]);
   const { addCustomerAddress } = useCheckoutStore();
   const [selectedRegion, setSelectedRegion] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -64,16 +72,19 @@ const AddCustomerAddress = () => {
   const { isSubmitting, isValid } = form.formState;
 
   async function onSubmit(values) {
-    const data = {
-      id: crypto.randomUUID(),
-      ...values,
-    };
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    addCustomerAddress(data);
-    setIsLoading(false);
-    router.replace("/store/checkout");
-    console.log("Submitted:", values);
+    try {
+      setIsLoading(true);
+      const response = await apiCall("post", "/customer", {
+        customerInfo: { ...values, state: values.region },
+      });
+      addCustomerAddress(response.data);
+      toast.success(response?.message);
+      router.replace("/store/checkout/addresses");
+    } catch (error) {
+      toast.error(error?.message || "something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -179,7 +190,6 @@ const AddCustomerAddress = () => {
                     onValueChange={(val) => {
                       field.onChange(val);
                       setSelectedRegion(val);
-                      setSelectedCity("");
                       form.setValue("city", "");
                     }}
                     value={field.value}
@@ -236,29 +246,45 @@ const AddCustomerAddress = () => {
               control={form.control}
               name="isDefault"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-4 cursor-pointer">
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 my-4 cursor-pointer">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Set as Default Address</FormLabel>
+                  <div className="leading-none">
+                    <FormLabel className=" cursor-pointer">
+                      Set as Default Address
+                    </FormLabel>
                   </div>
                 </FormItem>
               )}
             />
           </div>
           <div className="w-full justify-end gap-6 items-center flex">
-            <Link href="/store/checkout" disabled={isSubmitting || isLoading}>
-              Cancel
-            </Link>
+            {isSubmitting || isLoading ? (
+              <span className="text-gray-400 cursor-not-allowed">Cancel</span>
+            ) : (
+              <Link
+                href="/store/checkout"
+                className="text-blue-500 hover:underline"
+              >
+                Cancel
+              </Link>
+            )}
             <Button
               type="submit"
               disabled={isSubmitting || !isValid || isLoading}
             >
-              Save
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="animate-spin" />
+                  saving...
+                </div>
+              ) : (
+                "Save"
+              )}
             </Button>
           </div>
         </form>

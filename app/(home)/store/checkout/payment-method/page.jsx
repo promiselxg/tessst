@@ -6,10 +6,11 @@ import CheckoutSummary from "../../_components/checkout/checkout-summary";
 import Link from "next/link";
 import { FiChevronLeft } from "react-icons/fi";
 import CheckoutPaymentMethod from "../../_components/checkout/checkout-payment-method";
+import ProtectedRouteWrapper from "@/middleware/protectedRoute";
 
 const page = () => {
   return (
-    <>
+    <ProtectedRouteWrapper>
       <div className="w-full flex h-fit py-[40px] md:py-[85px] bg-[whitesmoke]">
         <div className="flex flex-col w-full mx-auto">
           <div className="py-5 bg-emerald-950 mt-[45px] md:mt-0">
@@ -56,7 +57,7 @@ const page = () => {
           </Container>
         </div>
       </div>
-    </>
+    </ProtectedRouteWrapper>
   );
 };
 

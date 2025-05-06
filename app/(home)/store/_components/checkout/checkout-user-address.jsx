@@ -1,14 +1,20 @@
 "use client";
 import { CheckCircle2 } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import Link from "next/link";
 import { FiChevronRight } from "react-icons/fi";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/authProvider";
+import { apiCall } from "@/lib/utils/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CheckOutLoggedInUserAccountInfo = () => {
-  const { customerAddress = [], selectedCustomerAddress } = useCheckoutStore();
+  const [customerAddress, setCustomerAddress] = useState([]);
+  const { selectedCustomerAddress } = useCheckoutStore();
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const defaultAddress = !selectedCustomerAddress
     ? customerAddress.find((address) => address.isDefault) ||
@@ -19,6 +25,24 @@ const CheckOutLoggedInUserAccountInfo = () => {
   const displayAddress = selectedCustomerAddress || defaultAddress;
 
   const isCompleted = !!displayAddress;
+
+  useEffect(() => {
+    const fetchCustomerAddress = async () => {
+      if (!user?.id) return;
+
+      try {
+        setLoading(true);
+        const response = await apiCall("get", `/customer/address/${user.id}`);
+        setCustomerAddress(response.data || []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomerAddress();
+  }, [user]);
 
   return (
     <div className="w-full flex-col bg-white shadow-sm rounded-[8px]">
@@ -53,29 +77,37 @@ const CheckOutLoggedInUserAccountInfo = () => {
       </div>
 
       <div className="p-3 text-sm text-slate-700 space-y-2 flex flex-col">
-        <div className="w-full p-3 flex items-start justify-between flex-col">
-          <h1>
-            {displayAddress ? (
-              <>
-                {displayAddress.firstName} {displayAddress.lastName}
-              </>
-            ) : (
-              "You have not added a delivery address"
-            )}
-          </h1>
+        {loading ? (
+          <div className="flex justify-center items-center flex-col gap-4">
+            <Skeleton className="h-20 w-full rounded-md" />
+          </div>
+        ) : (
+          <>
+            <div className="w-full p-3 flex items-start justify-between flex-col">
+              <h1>
+                {displayAddress ? (
+                  <>
+                    {displayAddress.first_name} {displayAddress.last_name}
+                  </>
+                ) : (
+                  "You have not added a delivery address"
+                )}
+              </h1>
 
-          {displayAddress && (
-            <span className="text-xs font-normal">
-              {displayAddress.delivery_address}&nbsp;|&nbsp;
-              {displayAddress.state}&nbsp;-&nbsp;
-              {displayAddress.city}&nbsp;|&nbsp;
-              {displayAddress.phone}
-              {displayAddress.additional_phone && (
-                <>&nbsp;|&nbsp;{displayAddress.additional_phone}</>
+              {displayAddress && (
+                <span className="text-xs font-normal">
+                  {displayAddress.delivery_address}&nbsp;|&nbsp;
+                  {displayAddress.state}&nbsp;-&nbsp;
+                  {displayAddress.city}&nbsp;|&nbsp;
+                  {displayAddress.phone}
+                  {displayAddress.additional_phone && (
+                    <>&nbsp;|&nbsp;{displayAddress.additional_phone}</>
+                  )}
+                </span>
               )}
-            </span>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

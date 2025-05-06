@@ -15,12 +15,14 @@ export default function LayoutWrapper({ children }) {
   const showLayout =
     !pathname.startsWith("/auth") && !pathname.startsWith("/dashboard");
 
+  const orderSuccess = pathname.startsWith("/store/checkout/success");
+
   return (
     <AuthProvider>
       <SessionProvider>
-        {showLayout && !isCourseOrChapterPage && <Navbar />}
+        {showLayout && !isCourseOrChapterPage && !orderSuccess && <Navbar />}
         {children}
-        {showLayout && !isCourseOrChapterPage && <Footer />}
+        {showLayout && !isCourseOrChapterPage && !orderSuccess && <Footer />}
         <ConfettiProvider />
       </SessionProvider>
     </AuthProvider>

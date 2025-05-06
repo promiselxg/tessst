@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/lib/utils/dbConnect";
 import { cookies } from "next/headers";
 import ROLES from "@/lib/utils/roles";
+import sanitizeHtml from "sanitize-html";
 
 const getAllUsers = async (req) => {
   const query = req.nextUrl.searchParams;
@@ -140,6 +141,74 @@ const deleteUserAccount = async (req, params) => {
   try {
     response = await deleteAccount(id);
     return response;
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
+const saveCustomerAddress = async (req) => {
+  const userId = req.user.id;
+
+  if (!userId) {
+    return customMessage("User ID is required", {}, 400);
+  }
+
+  try {
+    const { customerInfo } = await req.json();
+    const first_name = sanitizeHtml(customerInfo.firstName);
+    const last_name = sanitizeHtml(customerInfo.lastName);
+    const delivery_address = sanitizeHtml(customerInfo.delivery_address);
+
+    if (
+      !first_name ||
+      !last_name ||
+      !delivery_address ||
+      !customerInfo.city ||
+      !customerInfo.region
+    ) {
+      return customMessage(
+        "Please fill out the required fields.3dfdvd",
+        {},
+        400
+      );
+    }
+    const data = await prisma.address.create({
+      data: {
+        customerId: userId,
+        fullName: `${first_name} ${last_name}`,
+        phone: customerInfo.phone,
+        additional_phone: customerInfo.additional_phone || null,
+        delivery_address,
+        city: customerInfo.city,
+        state: customerInfo.state,
+        isDefault: customerInfo.isDefault || false,
+      },
+    });
+
+    return customMessage("Address saved successfully", { data }, 201);
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
+const getLoggedInCustomerAddress = async (req, params) => {
+  try {
+    const { id } = await params;
+    const customer = await prisma.address.findMany({
+      where: {
+        customerId: id,
+      },
+    });
+    const data = customer.map((item) => {
+      const [first_name, ...rest] = item.fullName.trim().split(/\s+/);
+      const last_name = rest.join(" ") || "";
+      return {
+        ...item,
+        first_name,
+        last_name,
+      };
+    });
+    return customMessage("Retrieved successfully", { data }, 200);
   } catch (error) {
     return ServerError(error, {}, 500);
   }
@@ -358,4 +427,6 @@ export const userControllers = {
   updateUserData,
   suspendUserAccount,
   deleteUserAccount,
+  saveCustomerAddress,
+  getLoggedInCustomerAddress,
 };

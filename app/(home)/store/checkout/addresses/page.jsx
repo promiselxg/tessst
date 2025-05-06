@@ -7,10 +7,11 @@ import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
 import AddressBook from "../_component/address-book";
 import CheckoutStepHeader from "../../_components/checkout/checkout-step-header";
 import { CheckCircle2 } from "lucide-react";
+import ProtectedRouteWrapper from "@/middleware/protectedRoute";
 
 const page = () => {
   return (
-    <>
+    <ProtectedRouteWrapper>
       <div className="w-full flex h-fit py-[40px] md:py-[85px] bg-[whitesmoke]">
         <div className="flex flex-col w-full mx-auto">
           <div className="py-5 bg-emerald-950 mt-[45px] md:mt-0">
@@ -55,7 +56,7 @@ const page = () => {
           </Container>
         </div>
       </div>
-    </>
+    </ProtectedRouteWrapper>
   );
 };
 

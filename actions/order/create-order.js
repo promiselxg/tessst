@@ -68,7 +68,7 @@ export async function createOrder({
           orderId: pendingOrder.id,
         };
       },
-      { timeout: 10000 }
+      { timeout: 15000 }
     );
   } catch (error) {
     console.error("Order creation failed:", error);

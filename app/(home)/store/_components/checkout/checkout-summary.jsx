@@ -14,7 +14,8 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const CheckoutSummary = () => {
-  const { subtotal, total, isValid, delivery_fee, cart } = useCartSummary();
+  const { subtotal, total, isValid, delivery_fee, cart, clearCart } =
+    useCartSummary();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [disableButton, setDisableButton] = useState(false);
@@ -22,6 +23,7 @@ const CheckoutSummary = () => {
   const router = useRouter();
 
   const {
+    resetCheckout,
     selectedDeliveryAddress,
     selectedCustomerAddress,
     customerAddress = [],
@@ -60,13 +62,17 @@ const CheckoutSummary = () => {
 
       if (result.success) {
         toast.success("Order placed successfully!");
-        // Optional: redirect to success page or clear cart
-        // Send invoice, order confirmation mail
-      } else {
-        throw new Error(result.error || "Unknown error");
+
+        resetCheckout();
+        clearCart();
+
+        setTimeout(() => {
+          router.replace(
+            `/store/checkout/success?reference=${result?.orderId}&method=${selectedPaymenthMethod?.method}`
+          );
+        }, 100);
       }
     } catch (error) {
-      console.error("Order confirmation error:", error);
       toast.error("Something went wrong while confirming your order.");
     } finally {
       setLoading(false);

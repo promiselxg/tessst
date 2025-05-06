@@ -2,7 +2,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 
 export const useCartSummary = () => {
-  const { cart } = useCartStore();
+  const { cart, clearCart } = useCartStore();
   const { selectedDeliveryAddress } = useCheckoutStore();
   let delivery_fee = 0;
 
@@ -27,5 +27,6 @@ export const useCartSummary = () => {
     total,
     isValid,
     invalidItems,
+    clearCart,
   };
 };
