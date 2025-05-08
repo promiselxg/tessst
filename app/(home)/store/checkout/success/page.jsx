@@ -10,8 +10,15 @@ import { redirect } from "next/navigation";
 import React from "react";
 import { BiCheckCircle } from "react-icons/bi";
 
+export const metadata = {
+  title: "Order Verified",
+  description: "Your order has been sucessfully placed.",
+};
+
 const page = async ({ searchParams }) => {
   const { reference, method } = searchParams;
+  const capitalizeFirstLetter = (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
   if (!reference || !method) redirect("/");
 
@@ -26,12 +33,11 @@ const page = async ({ searchParams }) => {
     }
   })();
 
-  console.log(verificationResult);
   if (!verificationResult?.success) {
-    //redirect("/store/checkout/failure");
+    redirect("/store/checkout/failure");
   }
 
-  const paymentData = verificationResult.data;
+  const order = verificationResult;
 
   return (
     <>
@@ -44,7 +50,7 @@ const page = async ({ searchParams }) => {
               big_sholders_text.className
             )}
           >
-            Hi Anuforo,
+            Hi, {capitalizeFirstLetter(order?.name)}
           </h1>
           <h2 className="text-lg font-semibold text-gray-700 mb-2">
             Your order has been confirmed!

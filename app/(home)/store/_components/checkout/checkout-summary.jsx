@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/authProvider";
 import { useCartSummary } from "@/hooks/use-cart-summary";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
+import { generateRandomString } from "@/lib/utils/randomStringGenerator";
 import { useCheckoutStore } from "@/store/useCheckoutStore";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -58,6 +59,7 @@ const CheckoutSummary = () => {
         delivery_fee,
         selectedCustomerAddress,
         selectedDeliveryAddress,
+        order_Id: generateRandomString(12),
       });
 
       if (result.success) {
@@ -67,10 +69,10 @@ const CheckoutSummary = () => {
         clearCart();
 
         setTimeout(() => {
-          router.replace(
+          router.push(
             `/store/checkout/success?reference=${result?.orderId}&method=${selectedPaymenthMethod?.method}`
           );
-        }, 100);
+        }, 50);
       }
     } catch (error) {
       toast.error("Something went wrong while confirming your order.");

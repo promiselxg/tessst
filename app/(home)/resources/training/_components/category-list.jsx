@@ -5,9 +5,11 @@ import React from "react";
 const CategoryList = ({ categories, isLoading }) => {
   return (
     <ul className="flex gap-2">
-      <li className="shrink-0">
-        <CategoryItem name="All Categories" />
-      </li>
+      {categories?.length > 0 && (
+        <li className="shrink-0">
+          <CategoryItem name="All Categories" />
+        </li>
+      )}
 
       {isLoading
         ? [...Array(8)].map((_, i) => (

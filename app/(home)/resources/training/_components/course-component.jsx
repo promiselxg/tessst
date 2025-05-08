@@ -3,7 +3,7 @@
 import Container from "@/components/container/container";
 import SearchInput from "@/components/search/search-input";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CategoryList from "./category-list";
 import { CourseCard } from "@/components/card/course-card";
 import { apiCall } from "@/lib/utils/api";
@@ -17,7 +17,7 @@ const AllCourses = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  const query = React.useMemo(
+  const query = useMemo(
     () => ({
       title: params?.title,
       categoryId: params.categoryId,

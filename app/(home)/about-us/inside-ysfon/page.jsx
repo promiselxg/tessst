@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import Tabs from "../_components/state/tabs";
-import StateSelector from "../_components/state/state-selector";
-import TeamGrid from "../_components/state/state-team-member-grid";
 import BreadcrumbBanner from "@/components/breadcrumb/banner-breadcrumb";
 import Container from "@/components/container/container";
+import Tabs from "../../_components/state/tabs";
+import StateSelector from "../../_components/state/state-selector";
+import TeamGrid from "../../_components/state/state-team-member-grid";
 
 const stateTeams = {
   Abia: [

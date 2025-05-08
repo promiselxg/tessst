@@ -148,6 +148,7 @@ model Order {
   id                String        @id @default(uuid())
   email             String
   customerId        String?
+  order_Id          String        @unique
   user              Customer?     @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   amount            Decimal       @db.Decimal(10, 2)

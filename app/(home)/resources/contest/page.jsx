@@ -21,9 +21,9 @@ const page = () => {
                   image="/img/contest/1.jpg"
                   title="Black And White Compositions"
                   startDate="15th April, 2025"
-                  endDate="08th May, 2025"
+                  endDate="08th May, 2026"
                   description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur blanditiis quas id obcaecati, voluptas laborum assumenda harum iste nemo ad."
-                  targetDate="2025-05-08"
+                  targetDate="2026-05-08"
                 />
                 <ContestCard
                   image="/img/contest/2.jpg"

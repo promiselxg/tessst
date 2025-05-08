@@ -11,7 +11,7 @@ import { Badge } from "../ui/badge";
 import { useCartStore } from "@/store/cartStore";
 import { navLinks } from "@/data/navbar";
 import { usePathname, useRouter } from "next/navigation";
-import CourseHeaderUserAvatar from "@/app/(home)/training/_components/course-details-header-avatar";
+import CourseHeaderUserAvatar from "@/app/(home)/resources/training/_components/course-details-header-avatar";
 import { useAuth } from "@/context/authProvider";
 import { cn } from "@/lib/utils";
 
@@ -24,18 +24,23 @@ export default function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const isParentLinkActive = (linkHref) => {
-    if (linkHref === "/store") {
-      return pathname.startsWith("/store");
+    const parentRoutes = [
+      { path: "/store" },
+      { path: "/projects" },
+      {
+        path: "/resources",
+        match: ["/resources/training", "/resources/news", "/resources/contest"],
+      },
+      { path: "/subscription" },
+      { path: "/about-us" },
+    ];
+
+    for (const { path, match } of parentRoutes) {
+      if (linkHref === path || (match && match.includes(linkHref))) {
+        return pathname.startsWith(path);
+      }
     }
-    if (linkHref === "/projects") {
-      return pathname.startsWith("/projects");
-    }
-    if (linkHref === "/training") {
-      return pathname.startsWith("/training");
-    }
-    if (linkHref === "/pro") {
-      return pathname.startsWith("/pro");
-    }
+
     return pathname === linkHref;
   };
 
@@ -60,17 +65,44 @@ export default function Navbar() {
               const isActive = isParentLinkActive(link.href);
 
               return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`font-euclid font-[500] text-base transition-all ${
-                    isActive
-                      ? "text-[--app-bg-red]"
-                      : "text-gray-600 hover:text-[--app-primary-color]"
-                  }`}
-                >
-                  {link.label}
-                </Link>
+                <div key={link.label} className="relative group">
+                  <Link
+                    href={link.href}
+                    className={`font-euclid font-[500] text-base transition-all ${
+                      isActive
+                        ? "text-[--app-bg-red]"
+                        : "text-gray-600 hover:text-[--app-primary-color]"
+                    } flex items-center gap-1 `}
+                  >
+                    {link.label}
+                    {link.children && (
+                      <svg
+                        className="w-3 h-3 ml-1 transition-transform group-hover:rotate-180"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.06z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </Link>
+                  {link.children && (
+                    <div className="absolute left-0 w-48 bg-white shadow-md rounded-md py-2 z-50 hidden group-hover:block">
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

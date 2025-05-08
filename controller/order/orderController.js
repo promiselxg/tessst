@@ -1,5 +1,5 @@
-const verifyOrder = async (req, params) => {};
+const getOrderByReference = async (req, params) => {};
 
 export const orderControllers = {
-  verifyOrder,
+  getOrderByReference,
 };

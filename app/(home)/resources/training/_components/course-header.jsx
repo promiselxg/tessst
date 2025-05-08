@@ -1,5 +1,5 @@
 import Container from "@/components/container/container";
-import { BreadcrumbNav } from "../../../../components/breadcrumb/breadcrumb";
+import { BreadcrumbNav } from "../../../../../components/breadcrumb/breadcrumb";
 import { CourseHero } from "./course-hero";
 
 export const CourseHeader = ({ prev, course, loading }) => {

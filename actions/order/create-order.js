@@ -15,6 +15,7 @@ export async function createOrder({
   delivery_fee,
   selectedCustomerAddress,
   selectedDeliveryAddress,
+  order_Id,
 }) {
   try {
     const metadata = {
@@ -34,6 +35,7 @@ export async function createOrder({
           customerId: user.id,
           metadata,
           delivery_fee: toKobo(delivery_fee),
+          order_Id,
         });
         // 2. Create or update customer
         const customerData = {
@@ -65,7 +67,7 @@ export async function createOrder({
         await createPayment(tx, pendingOrder.id, user.id, toKobo(total));
         return {
           success: true,
-          orderId: pendingOrder.id,
+          orderId: pendingOrder.order_Id,
         };
       },
       { timeout: 15000 }

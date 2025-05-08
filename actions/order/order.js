@@ -9,6 +9,7 @@ export async function createPendingOrder({
   customerId,
   metadata = {},
   delivery_fee,
+  order_Id,
 }) {
   const order = await tx.order.create({
     data: {
@@ -18,6 +19,7 @@ export async function createPendingOrder({
       metadata,
       status: "PENDING",
       ...(delivery_fee !== undefined && { delivery_fee: delivery_fee / 100 }),
+      order_Id,
     },
   });
 
