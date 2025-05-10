@@ -181,12 +181,12 @@ const ChaptersForm = ({ initialData, courseId }) => {
         <div
           className={cn("text-sm", !chapters.length && "text-slate-500 italic")}
         >
-          {!chapters.length &&
+          {!initialData?.chapters?.length &&
             "you have not added a chapter to this course yet."}
           <ChapterList
             onEdit={onEdit}
             onReorder={onReorder}
-            items={chapters}
+            items={initialData.chapters}
             courseId={courseId}
             onSuccess={fetchChapters}
           />

@@ -147,6 +147,7 @@ const TabsComponent = ({ initialData, courseId }) => {
     setActiveTab(tab);
   }, [searchParams]);
 
+  console.log(initialData);
   return (
     <>
       <div className="flex space-x-4 bg-gray-200 shadow  mt-5 rounded-tl-lg rounded-tr-lg overflow-hidden">

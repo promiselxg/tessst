@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useFormContext } from "@/context/contest.form.conext";
+import { LucideFileUp } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 const ContestUploadFile = () => {
@@ -50,12 +51,19 @@ const ContestUploadFile = () => {
 
   return (
     <>
-      <Label htmlFor="file">Upload Video File</Label>
+      <Label
+        htmlFor="file"
+        className="flex flex-col cursor-pointer w-fit items-center "
+      >
+        <LucideFileUp size={40} className="text-muted-foreground" />
+        <p className="text-sm text-muted-foreground mt-2">Upload a video</p>
+      </Label>
       <Input
         id="file"
         name="file"
         type="file"
         accept=".mp4,.mvi,.mkv,video/mp4,video/x-mvi"
+        className="hidden"
         onChange={handleChange}
       />
 

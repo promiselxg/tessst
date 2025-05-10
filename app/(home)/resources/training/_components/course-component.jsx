@@ -84,7 +84,7 @@ const AllCourses = ({ params }) => {
                       progress: course.progress,
                       font: big_sholders_text.className,
                     }}
-                    href={`/training/${course.id}`}
+                    href={`/resources/training/${course.id}`}
                   />
                 ))}
             {!loading && courses.length === 0 && "No course found"}

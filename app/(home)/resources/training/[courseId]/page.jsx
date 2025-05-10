@@ -20,7 +20,7 @@ import { BreadcrumbNav } from "@/components/breadcrumb/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const menuItems = [
-  { label: "Browse all courses", icon: Compass, href: "/training" },
+  { label: "Browse all courses", icon: Compass, href: "/resources/training" },
 ];
 
 const SingleCoursePage = ({ params }) => {
@@ -50,7 +50,7 @@ const SingleCoursePage = ({ params }) => {
           });
         }
       } catch (error) {
-        router.replace("/training");
+        router.replace("/resources/training");
       } finally {
         setLoading(false);
       }
@@ -81,7 +81,9 @@ const SingleCoursePage = ({ params }) => {
       );
       if (response) {
         toast.success(response?.message || "Enrolled successfully!");
-        router.replace(`/training/${courseId}/chapters/${response?.chapterId}`);
+        router.replace(
+          `/resources/training/${courseId}/chapters/${response?.chapterId}`
+        );
       }
     } catch (error) {
       toast.error(
@@ -96,7 +98,9 @@ const SingleCoursePage = ({ params }) => {
   };
 
   const handleContinueLearning = async () => {
-    router.push(`/training/${course.id}/chapters/${course?.chapters[0]?.id}`);
+    router.push(
+      `/resources/training/${course.id}/chapters/${course?.chapters[0]?.id}`
+    );
   };
 
   return (
@@ -171,7 +175,7 @@ const SingleCoursePage = ({ params }) => {
         </div>
 
         {/* Main Content */}
-        <div className="w-full md:w-[80%] md:h-screen md:flex md:left-[20%] relative py-8 px-5 flex-col md:flex-row">
+        <div className="w-full md:w-[80%]  md:flex md:left-[20%] relative py-8 px-5 flex-col md:flex-row">
           <div className="w-full flex gap-5 flex-col md:flex-row">
             {loading ? (
               <>

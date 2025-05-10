@@ -1,13 +1,11 @@
 "use client";
 import ReactPlayer from "react-player/lazy";
 
-const VideoPlayer = ({ url }) => {
+const VideoPlayer = ({ url, className }) => {
   return (
-    <>
-      <div className="flex w-full my-3">
-        <ReactPlayer url={url} controls className="w-full" width={1100} />
-      </div>
-    </>
+    <div className={`flex w-full my-3 ${className}`}>
+      <ReactPlayer url={url} controls className="w-full" width="100%" />
+    </div>
   );
 };
 

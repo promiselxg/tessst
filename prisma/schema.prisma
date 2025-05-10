@@ -250,7 +250,7 @@ model Course {
   id          String          @id @default(uuid())
   userId      String
   title       String          @unique
-  description String?
+  description String?         @db.LongText
   price       Float?          @db.Float
   asset       Json?
   isPublished Boolean         @default(false)
@@ -326,7 +326,7 @@ model Purchase {
 model Chapter {
   id           String         @id @default(uuid())
   title        String
-  description  String?        @db.Text
+  description  String?        @db.LongText
   videoUrl     String?        @db.Text
   position     Int
   isFree       Boolean        @default(false)

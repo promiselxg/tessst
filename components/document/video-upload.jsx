@@ -54,6 +54,7 @@ const VideoFileUpload = ({ chapterId, courseId }) => {
         window.location.reload();
       }
     } catch (error) {
+      console.log(error);
       toast.error("An error occurred while uploading the video.");
     } finally {
       setLoading(false);
