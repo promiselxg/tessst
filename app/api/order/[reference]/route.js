@@ -1,3 +1,3 @@
-import { getOrderByReference } from "@/controller/order/orderController";
+import { orderControllers } from "@/controller/order/orderController";
 
-export const GET = async (req) => getOrderByReference.verifyOrder(req);
+export const GET = async (req) => orderControllers.verifyOrder(req);
