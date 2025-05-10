@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { big_sholders_text } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 
 const radius = 36;
 const circumference = 2 * Math.PI * radius;
@@ -55,7 +56,7 @@ const CountdownCircle = ({ value, max, label, color, ring }) => {
   );
 };
 
-const CountdownTimer = ({ targetDate }) => {
+const CountdownTimer = ({ targetDate, total = 4 }) => {
   const calculateTimeLeft = useCallback(() => {
     const diff = +new Date(targetDate) - +new Date();
     const t = {
@@ -75,7 +76,7 @@ const CountdownTimer = ({ targetDate }) => {
   }, [calculateTimeLeft]);
 
   return (
-    <div className="w-full grid grid-cols-4 gap-6">
+    <div className={cn(`w-full grid grid-cols-2 md:grid-cols-${total} gap-6`)}>
       <CountdownCircle
         value={timeLeft.days}
         max={60}

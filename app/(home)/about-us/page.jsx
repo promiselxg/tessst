@@ -12,7 +12,7 @@ const page = () => {
   return (
     <>
       <BreadcrumbBanner
-        title="Blog"
+        title="About Us"
         pathname={[{ label: "Who We Are", href: "/about-us" }]}
         banner="/img/bg.png"
         description="Donec aliquam ultrices purus, nec laoreet elit scelerisque. Integer  eget nisi ultrices, hendrerit urna at, pulvinar diam. Donec sit amet  facilisis dolor nunc eget purusisque. "

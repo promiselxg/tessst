@@ -30,17 +30,19 @@ export default function StatePage() {
   const updateQuery = (key, value) => {
     const params = new URLSearchParams(searchParams);
     params.set(key, value);
-    if (key === "type" && value !== "state") {
+    if (key === "type" && value !== "inside-ysfon") {
       params.delete("region");
     }
-    router.replace(`/state?${params.toString()}`, { scroll: false });
+    router.replace(`/about-us/inside-ysfon?${params.toString()}`, {
+      scroll: false,
+    });
   };
 
   return (
     <>
       <BreadcrumbBanner
         title="Inside YSFON"
-        pathname={[{ label: "Inside YSFON", href: "/state" }]}
+        pathname={[{ label: "Inside YSFON", href: "/inside-ysfon" }]}
         banner="/img/bg.png"
         description="Donec aliquam ultrices purus, nec laoreet elit scelerisque. Integer  eget nisi ultrices, hendrerit urna at, pulvinar diam. Donec sit amet  facilisis dolor nunc eget purusisque. "
       />

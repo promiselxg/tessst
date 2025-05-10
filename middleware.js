@@ -15,5 +15,5 @@ export async function middleware(req) {
 
 // Apply to specific routes
 export const config = {
-  matcher: ["/api/:path*", "/dashboard/:path*", "/training/:path*"],
+  matcher: ["/api/:path*", "/dashboard/:path*", "/resources/training/:path*"],
 };

@@ -24,6 +24,7 @@ const page = () => {
                   endDate="08th May, 2026"
                   description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur blanditiis quas id obcaecati, voluptas laborum assumenda harum iste nemo ad."
                   targetDate="2026-05-08"
+                  url="/resources/contest/1111"
                 />
                 <ContestCard
                   image="/img/contest/2.jpg"
@@ -32,6 +33,7 @@ const page = () => {
                   endDate="08th June, 2025"
                   description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur blanditiis quas id obcaecati, voluptas laborum assumenda harum iste nemo ad."
                   targetDate="2025-06-08"
+                  url="/resources/contest/1111"
                 />
               </div>
             </div>

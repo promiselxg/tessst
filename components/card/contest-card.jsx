@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CalendarCheck2, CalendarX2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CountdownTimer from "../timer/countdown";
+import { useRouter } from "next/navigation";
 
 const ContestCard = ({
   image,
@@ -12,7 +13,9 @@ const ContestCard = ({
   endDate,
   description,
   targetDate,
+  url
 }) => {
+  const router = useRouter()
   return (
     <div className="w-full">
       <div className="w-full flex">
@@ -49,7 +52,7 @@ const ContestCard = ({
         <div className="py-5">
           <CountdownTimer targetDate={targetDate} />
         </div>
-        <Button className="bg-[--app-primary-color] text-white h-10 rounded-md hover:bg-[--app-primary-color] transition duration-300 ease-in-out w-full">
+        <Button onClick={() => router.push(url)} className="bg-[--app-primary-color] text-white h-10 rounded-md hover:bg-[--app-primary-color] transition duration-300 ease-in-out w-full" >
           Join now for free
         </Button>
       </div>
