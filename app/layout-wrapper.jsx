@@ -11,23 +11,22 @@ export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
 
   const isCourseOrChapterPage = pathname.match(
-    /^\/training\/[^/]+(\/chapters\/[^/]+)?$/
+    /^\/resources\/training\/[^/]+(\/chapters\/[^/]+)?$/
   );
-
   const showLayout =
-    pathname.startsWith("/auth") && !pathname.startsWith("/dashboard");
+    !pathname.startsWith("/auth") && !pathname.startsWith("/dashboard");
 
   const orderSuccess = pathname.startsWith("/store/checkout/success");
   const orderFailure = pathname.startsWith("/store/checkout/failure");
 
   const isExactResourcesPage = pathname === "/resources";
-  const isExactResourcesTraining = pathname === "/resources/training"; // ✅ new condition
 
   const shouldShowLayout =
-    (showLayout || isExactResourcesTraining || isExactResourcesPage) &&
+    showLayout &&
     !isCourseOrChapterPage &&
     !orderSuccess &&
-    !orderFailure;
+    !orderFailure &&
+    !isExactResourcesPage;
 
   return (
     <AuthProvider>
