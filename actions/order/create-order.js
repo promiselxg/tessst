@@ -7,6 +7,7 @@ import { createOrderItem } from "./order-item";
 import { updateProductStockQty } from "../product/update-product-qty";
 import { createPayment } from "../payment/payment";
 import prisma from "@/lib/utils/dbConnect";
+import { generateOrderInvoice } from "./generate-order-invoice";
 
 export async function createOrder({
   cart,
@@ -65,6 +66,10 @@ export async function createOrder({
 
         // 5. Create payment
         await createPayment(tx, pendingOrder.id, user.id, toKobo(total));
+
+        // 6. Generate Invoice
+        await generateOrderInvoice(pendingOrder.id, user.id);
+
         return {
           success: true,
           orderId: pendingOrder.order_Id,
@@ -73,7 +78,6 @@ export async function createOrder({
       { timeout: 15000 }
     );
   } catch (error) {
-    console.error("Order creation failed:", error);
     return { success: false, error: "Order creation failed" };
   }
 }

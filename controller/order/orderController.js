@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logAudit } from "@/actions/log/audit";
 import { logActivity } from "@/actions/log/logger";
@@ -9,6 +10,9 @@ import {
   validateRequestBodyFromArray,
   validateRequestBodyWithZod,
 } from "@/lib/utils/validateRequestBody";
+import InvoiceTemplate from "@/lib/templates/pdf/order-invoice-template";
+import { generateOrderInvoice } from "@/actions/order/generate-order-invoice";
+import ROLES from "@/lib/utils/roles";
 
 const updateSchema = z.object({
   orderId: z.string().min(1, "Order ID is required"),
@@ -78,6 +82,7 @@ const getAllOrders = async (req) => {
           },
         },
         orderItems: true,
+        invoice: true,
       },
     });
 
@@ -309,129 +314,269 @@ const cancelOrder = async (req, params) => {
   }
 };
 
-const generateOrderInvoice = async (req, params) => {
+// const refundOrder = async (req, params) => {
+//   try {
+//     const { orderId } = params;
+//     const { reason } = await req.json();
+
+//     const order = await prisma.order.findUnique({
+//       where: { id: orderId },
+//       include: { payment: true },
+//     });
+
+//     if (!order || order.status !== "PAID") {
+//       return customMessage("Only paid orders can be refunded", {}, 400);
+//     }
+
+//     const payment = order.payment;
+//     if (!payment?.reference) {
+//       return customMessage(
+//         "No valid Paystack reference found for this payment",
+//         {},
+//         400
+//       );
+//     }
+
+//     // Call Paystack API
+//     const refundResult = await refundViaPaystack(payment.reference);
+
+//     // Update records
+//     await prisma.order.update({
+//       where: { id: orderId },
+//       data: {
+//         status: "REFUNDED",
+//         metadata: {
+//           ...order.metadata,
+//           refundReason: reason,
+//           refundedAt: new Date(),
+//         },
+//       },
+//     });
+
+//     await prisma.payment.update({
+//       where: { id: payment.id },
+//       data: {
+//         status: "REFUNDED",
+//       },
+//     });
+
+//     // Notify user
+//     await sendEmail({
+//       to: order.email,
+//       subject: `Order #${orderId} Refunded`,
+//       html: `<p>Your payment has been refunded. Reason: ${reason}</p>`,
+//     });
+
+//     return customMessage("Order refunded successfully", { refundResult }, 200);
+//   } catch (error) {
+//     console.error(error);
+//     return ServerError(error, {}, 500);
+//   }
+// };
+
+const previewOrderInvoice = async (req, params) => {
   try {
     const { orderId } = await params;
 
-    if (!orderId) {
-      return customMessage("Order ID is required", {}, 400);
+    const order = await prisma.order.findUnique({
+      where: { order_Id: orderId },
+      include: { user: true, orderItems: true },
+    });
+
+    const invoice = await prisma.invoice.findUnique({
+      where: { orderId: order.id },
+    });
+
+    if (!order || !invoice) {
+      return customMessage("Invoice not found", {}, 404);
+    }
+
+    const pdfBuffer = await renderToBuffer(
+      <InvoiceTemplate invoice={invoice} order={order} />
+    );
+
+    return new NextResponse(pdfBuffer, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="invoice-${invoice.id}.pdf"`,
+      },
+    });
+  } catch (error) {
+    console.error("Preview error:", error);
+    return ServerError(error, {}, 500);
+  }
+};
+
+const generateManualInvoice = async (req) => {
+  try {
+    const { orderId, userId } = await req.json();
+
+    if (!orderId || !userId) {
+      return customMessage("Missing orderId or userId", {}, 400);
+    }
+
+    const response = await generateOrderInvoice(orderId, userId);
+
+    if (response.success) {
+      return customMessage("Invoice generated successfully", { response }, 200);
+    } else {
+      return customMessage("Failed to generate invoice", { response }, 200);
+    }
+  } catch (error) {
+    console.error("Error generating invoice for orderId/userId", error);
+    return ServerError(error, {}, 500);
+  }
+};
+
+const createOrderReview = async (req) => {
+  try {
+    const { orderId, productId, userId, rating, comment } = await req.json();
+
+    if (!orderId || !productId || !userId || !rating) {
+      return customMessage("Missing required fields", {}, 400);
     }
 
     const order = await prisma.order.findUnique({
-      where: { order_Id: orderId },
-      include: {
-        user: true,
-        orderItems: true,
-        payment: true,
-      },
+      where: { id: orderId },
+      include: { orderItems: true },
     });
 
     if (!order) {
       return customMessage("Order not found", {}, 404);
     }
 
-    const total = order.orderItems.reduce((acc, item) => {
-      return acc + Number(item.price) * item.quantity;
-    }, 0);
+    const purchasedProduct = order.orderItems.find(
+      (item) => item.productId === productId
+    );
 
-    const existingInvoice = await prisma.invoice.findUnique({
-      where: { orderId: order.id },
-    });
-
-    if (existingInvoice) {
-      return customMessage(
-        "Invoice already exists for this order.",
-        { invoice: existingInvoice },
-        200
-      );
+    if (!purchasedProduct) {
+      return customMessage("Product not found in this order", {}, 403);
     }
 
-    const newInvoice = await prisma.invoice.create({
-      data: {
-        orderId: order.id,
-        customerEmail: order.email,
-        amount: total,
-        issuedAt: new Date(),
-        status: "ISSUED",
-        metadata: {
-          customerName: order.user?.name || "",
-          paymentMethod: order.payment?.method || "N/A",
-        },
+    const existingReview = await prisma.productReview.findFirst({
+      where: {
+        userId,
+        productId,
+        orderId,
       },
     });
 
-    return customMessage(
-      "Invoice generated successfully",
-      { invoice: newInvoice },
-      201
-    );
+    if (existingReview) {
+      return customMessage(
+        "You already reviewed this product in this order",
+        {},
+        409
+      );
+    }
+
+    const review = await prisma.productReview.create({
+      data: {
+        userId,
+        orderId,
+        productId,
+        rating,
+        comment,
+      },
+    });
+
+    await recalculateAverageRating(productId);
+
+    return customMessage("Review submitted successfully", { review }, 201);
   } catch (error) {
-    console.error("Invoice generation error:", error);
+    console.error("Review Error:", error);
     return ServerError(error, {}, 500);
   }
 };
 
-const refundOrder = async (req, params) => {
+const updateOrderReview = async (req, params) => {
   try {
-    const { orderId } = params;
-    const { reason } = await req.json();
+    const { reviewId } = await params;
+    const { rating, comment, userId } = await req.json();
 
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: { payment: true },
+    if (!reviewId || !rating) {
+      return customMessage("Review ID and rating are required", {}, 400);
+    }
+
+    const existingReview = await prisma.productReview.findUnique({
+      where: { id: reviewId, userId },
     });
 
-    if (!order || order.status !== "PAID") {
-      return customMessage("Only paid orders can be refunded", {}, 400);
+    if (!existingReview) {
+      return customMessage("Review not found", {}, 404);
     }
 
-    const payment = order.payment;
-    if (!payment?.reference) {
-      return customMessage(
-        "No valid Paystack reference found for this payment",
-        {},
-        400
-      );
-    }
-
-    // Call Paystack API
-    const refundResult = await refundViaPaystack(payment.reference);
-
-    // Update records
-    await prisma.order.update({
-      where: { id: orderId },
+    const updatedReview = await prisma.productReview.update({
+      where: { id: reviewId },
       data: {
-        status: "REFUNDED",
-        metadata: {
-          ...order.metadata,
-          refundReason: reason,
-          refundedAt: new Date(),
-        },
+        rating,
+        comment,
       },
     });
 
-    await prisma.payment.update({
-      where: { id: payment.id },
-      data: {
-        status: "REFUNDED",
-      },
-    });
+    await recalculateAverageRating(existingReview.productId);
 
-    // Notify user
-    await sendEmail({
-      to: order.email,
-      subject: `Order #${orderId} Refunded`,
-      html: `<p>Your payment has been refunded. Reason: ${reason}</p>`,
-    });
-
-    return customMessage("Order refunded successfully", { refundResult }, 200);
+    return customMessage("Review updated", { updatedReview }, 200);
   } catch (error) {
-    console.error(error);
+    console.error("Update Review Error:", error);
+    return ServerError(error, {}, 500);
+  }
+};
+
+const deleteOrderReview = async (req, params) => {
+  try {
+    const { reviewId } = await params;
+
+    if (!reviewId || !req.user.id || !req?.user?.roles) {
+      return customMessage("Missing required fields", {}, 400);
+    }
+
+    const existingReview = await prisma.ProductReview.findUnique({
+      where: { id: reviewId },
+    });
+
+    if (!existingReview) {
+      return customMessage("Review not found", {}, 404);
+    }
+
+    // Extract roles from user.roles
+    const roleValues = req.user.roles.map((r) => r.role);
+    const isPrivileged =
+      roleValues.includes(ROLES.admin) || roleValues.includes(ROLES.moderator);
+    const isOwner = existingReview.userId === req.user.id;
+
+    if (!isPrivileged && !isOwner) {
+      return customMessage("Unauthorized to delete this review", {}, 403);
+    }
+
+    await prisma.ProductReview.delete({ where: { id: reviewId } });
+
+    // Recalculate average rating
+    await recalculateAverageRating(existingReview.productId);
+
+    return customMessage("Review deleted successfully", {}, 200);
+  } catch (error) {
+    console.error("Delete Review Error:", error);
     return ServerError(error, {}, 500);
   }
 };
 
 const getOrderByReference = async (req, params) => {};
+
+const recalculateAverageRating = async (productId) => {
+  const reviews = await prisma.productReview.findMany({
+    where: { productId },
+    select: { rating: true },
+  });
+
+  const avgRating =
+    reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length ||
+    0;
+
+  await prisma.product.update({
+    where: { id: productId },
+    data: { averageRating: Number(avgRating.toFixed(1)) },
+  });
+};
 
 export const orderControllers = {
   getOrderByReference,
@@ -439,6 +584,10 @@ export const orderControllers = {
   getOrderByOrderId,
   updateOrderDetails,
   cancelOrder,
-  refundOrder,
-  generateOrderInvoice,
+  //refundOrder,
+  previewOrderInvoice,
+  generateManualInvoice,
+  createOrderReview,
+  updateOrderReview,
+  deleteOrderReview,
 };

@@ -13,7 +13,7 @@ export const logAudit = async ({
       orderId,
       userId,
       action,
-      changes: JSON.stringify(changes),
+      changes: JSON.stringify(changes) || "",
     },
   });
 };
