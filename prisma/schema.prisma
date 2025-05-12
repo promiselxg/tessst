@@ -155,7 +155,9 @@ model Order {
   amount            Decimal       @db.Decimal(10, 2)
   delivery_fee      Decimal?      @db.Decimal(10, 2)
   paymentReference  String?
-  status            PaymentStatus @default(PENDING)
+  paymentStatus     PaymentStatus @default(PENDING)
+  orderStatus       OrderStatus  @default(PENDING)
+  deliveryStatus    DeliveryStatus @default(PENDING)
   metadata          Json?
   couponId          String?
   coupon            Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull)
@@ -202,11 +204,11 @@ model Payment {
   reference String?
   user      Customer?      @relation(fields: [userId], references: [id])
   order     Order?         @relation(fields: [orderId], references: [id])
-  amount    Decimal @db.Decimal(10, 2)
-  status    PaymentStatus @default(PENDING)
+  amount    Decimal        @db.Decimal(10, 2)
+  status    PaymentStatus  @default(PENDING)
   method    PaymentMethod?
   refund    Refund?
-  createdAt DateTime      @default(now())
+  createdAt DateTime       @default(now())
 
   @@index([userId])
 }
@@ -228,10 +230,12 @@ model Refund {
 model Invoice {
   id       String   @id @default(uuid())
   orderId  String   @unique
+  customerEmail String
   order    Order    @relation(fields: [orderId], references: [id])
   userId   String
   customer Customer @relation(fields: [userId], references: [id])
   total    Decimal @db.Decimal(10, 2)
+  status   String?
   issuedAt DateTime @default(now())
 
   @@index([userId])
@@ -497,7 +501,14 @@ model ContestSubmission {
   @@index([contestId])
 }
 
-
+model Audit {
+  id        String   @id @default(uuid())
+  orderId   String
+  userId    String
+  action    String
+  changes   Json
+  createdAt DateTime @default(now())
+}
 
 enum DonationStatus {
   PENDING
@@ -510,7 +521,8 @@ enum OrderStatus {
   PROCESSING
   SHIPPED
   DELIVERED
-  CANCELED
+  CANCELLED
+  PAID
 }
 
 enum PaymentStatus {
@@ -518,6 +530,7 @@ enum PaymentStatus {
   PAID
   FAILED
   REFUNDED
+  CANCELLED
 }
 
 enum PaymentMethod {
@@ -532,6 +545,14 @@ enum RefundStatus {
   APPROVED
   REJECTED
   PROCESSED
+}
+
+enum DeliveryStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  RETURNED
 }
 
 enum MediaType {

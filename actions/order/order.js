@@ -17,7 +17,7 @@ export async function createPendingOrder({
       email,
       customerId,
       metadata,
-      status: "PENDING",
+      orderStatus: "PENDING",
       ...(delivery_fee !== undefined && { delivery_fee: delivery_fee / 100 }),
       order_Id,
     },
@@ -35,7 +35,7 @@ export async function updatePendingOrder(orderId, paymentData) {
     where: { id: orderId },
     data: {
       customerId: paymentData.metadata.userId,
-      status: "PAID",
+      orderStatus: "PAID",
       paidAt: new Date(paymentData.paid_at),
       paymentReference: paymentData.reference,
     },
