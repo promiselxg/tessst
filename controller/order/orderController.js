@@ -13,6 +13,9 @@ import {
 import InvoiceTemplate from "@/lib/templates/pdf/order-invoice-template";
 import { generateOrderInvoice } from "@/actions/order/generate-order-invoice";
 import ROLES from "@/lib/utils/roles";
+import { exportOrdersAsCSV } from "@/lib/export/order/export-order-to-csv";
+import { renderToBuffer } from "@react-pdf/renderer";
+import ExportOrderTOPDF from "@/lib/templates/pdf/export-order-to-pdf";
 
 const updateSchema = z.object({
   orderId: z.string().min(1, "Order ID is required"),
@@ -83,6 +86,7 @@ const getAllOrders = async (req) => {
         },
         orderItems: true,
         invoice: true,
+        productReviews: true,
       },
     });
 
@@ -114,6 +118,7 @@ const getOrderByOrderId = async (req) => {
         orderItems: true,
         payment: true,
         invoice: true,
+        productReviews: true,
       },
     });
 
@@ -538,7 +543,6 @@ const deleteOrderReview = async (req, params) => {
       return customMessage("Review not found", {}, 404);
     }
 
-    // Extract roles from user.roles
     const roleValues = req.user.roles.map((r) => r.role);
     const isPrivileged =
       roleValues.includes(ROLES.admin) || roleValues.includes(ROLES.moderator);
@@ -550,14 +554,54 @@ const deleteOrderReview = async (req, params) => {
 
     await prisma.ProductReview.delete({ where: { id: reviewId } });
 
-    // Recalculate average rating
     await recalculateAverageRating(existingReview.productId);
 
     return customMessage("Review deleted successfully", {}, 200);
   } catch (error) {
-    console.error("Delete Review Error:", error);
     return ServerError(error, {}, 500);
   }
+};
+
+const exportOrdersToCSV = async (req) => {
+  const { selectedFields = [], filters = {} } = await req.json();
+
+  const orders = await prisma.order.findMany({
+    where: filters,
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const csv = exportOrdersAsCSV(orders, selectedFields);
+
+  return new NextResponse(csv, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/csv",
+      "Content-Disposition": "attachment; filename=filtered-orders.csv",
+    },
+  });
+};
+
+const exportOrdersToPDF = async (req) => {
+  const { selectedFields = [], filters = {} } = await req.json();
+
+  const orders = await prisma.order.findMany({
+    where: filters,
+    include: { user: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const pdfBuffer = await renderToBuffer(
+    <ExportOrderTOPDF orders={orders} selectedFields={selectedFields} />
+  );
+
+  return new NextResponse(pdfBuffer, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": "attachment; filename=filtered-orders.pdf",
+    },
+  });
 };
 
 const getOrderByReference = async (req, params) => {};
@@ -578,6 +622,26 @@ const recalculateAverageRating = async (productId) => {
   });
 };
 
+const filterQuery = (searchParams) => {
+  const where = {};
+
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  const status = searchParams.get("status");
+
+  if (from || to) {
+    where.createdAt = {};
+    if (from) where.createdAt.gte = new Date(from);
+    if (to) where.createdAt.lte = new Date(to);
+  }
+
+  if (status) {
+    where.status = status;
+  }
+
+  return where;
+};
+
 export const orderControllers = {
   getOrderByReference,
   getAllOrders,
@@ -590,4 +654,6 @@ export const orderControllers = {
   createOrderReview,
   updateOrderReview,
   deleteOrderReview,
+  exportOrdersToCSV,
+  exportOrdersToPDF,
 };

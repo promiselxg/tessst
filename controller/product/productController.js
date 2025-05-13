@@ -199,6 +199,7 @@ const getAllProducts = async (req) => {
         tags: true,
         product_variants: true,
         category: true,
+        reviews: true,
       },
     });
 
@@ -231,6 +232,7 @@ const getSingleProduct = async (req, params) => {
         tags: true,
         product_variants: true,
         category: true,
+        reviews: true,
       },
     });
 
@@ -278,7 +280,6 @@ const updateProduct = async (req, params) => {
       }
 
       if (!Number.isInteger(numericPrice * 100)) {
-        // Allows 2 decimal places
         return customMessage(
           "Price can only have up to 2 decimal places",
           {},
