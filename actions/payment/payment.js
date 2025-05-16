@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/utils/dbConnect";
+import { createShippingLog } from "../log/shipping-log";
 
 export async function createPayment(tx, orderId, userId, amount) {
   if (!orderId) {
@@ -48,6 +49,11 @@ export async function savePayment(paymentData) {
       currency,
       reference,
     },
+  });
+
+  await createShippingLog({
+    orderId: metadata.orderId,
+    status: "Payment made",
   });
 
   return {

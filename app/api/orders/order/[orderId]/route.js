@@ -9,3 +9,9 @@ export const PATCH = async (req, { params }) =>
     verifyToken,
     verifyUserRoles(ROLES.admin, ROLES.moderator, ROLES.user)
   )(req, () => orderControllers.cancelOrder(req, params));
+
+export const GET = async (req, { params }) =>
+  withMiddleware(
+    verifyToken,
+    verifyUserRoles(ROLES.admin, ROLES.moderator, ROLES.user)
+  )(req, () => orderControllers.getSingleOrderById(req, params));

@@ -1,13 +1,10 @@
 "use server";
 
+import prisma from "@/lib/utils/dbConnect";
 import { logActivity } from "../log/logger";
 import { logAudit } from "../log/audit";
-import prisma from "@/lib/utils/dbConnect";
-
-//import InvoiceTemplate from "@/lib/templates/pdf/order-invoice-template";
 
 export async function generateOrderInvoice(orderId, userId) {
-  console.log(orderId, userId);
   try {
     if (!orderId || !userId) {
       return { success: false, error: "Order ID is required" };
@@ -63,9 +60,10 @@ export async function generateOrderInvoice(orderId, userId) {
     //   <InvoiceTemplate invoice={newInvoice} order={order} />
     // );
 
-    // await resend.emails.send({
-    //   from: "no-reply@yourdomain.com",
-    //   to: order.email,
+    // await Resend.emails.send({
+    //   from: "Acme <onboarding@resend.dev>",
+    //   //to: order.email,
+    //   to: "okeydeede@gmail.com",
     //   subject: `Invoice for Order ${order.order_Id}`,
     //   html: `<p>Hello ${order.user?.name || "Customer"},</p><p>Your invoice is attached.</p>`,
     //   attachments: [
@@ -97,6 +95,7 @@ export async function generateOrderInvoice(orderId, userId) {
       success: true,
     };
   } catch (error) {
+    console.log(error);
     return { success: false, error: "Invoice generation failed" };
   }
 }

@@ -168,11 +168,13 @@ model Order {
   orderItems        OrderItem[]
   payment           Payment?
   invoice           Invoice?
+  shippingLogs      ShippingLog[]
+  productReviews    ProductReview[]
 
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   paidAt           DateTime?
-  productReviews   ProductReview[]
+  
 
   @@index([customerId])
   @@index([couponId])
@@ -180,6 +182,7 @@ model Order {
 
 model OrderItem {
   id         String   @id @default(uuid())
+  title      String?
   orderId    String
   order      Order    @relation(fields: [orderId], references: [id])
   productId  String
@@ -198,6 +201,21 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
   @@index([variantId])
+}
+
+model ShippingLog {
+  id        String   @id @default(uuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  status    String   
+  timestamp DateTime @default(now())
+  note      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
 }
 
 model Payment {

@@ -16,6 +16,7 @@ import ROLES from "@/lib/utils/roles";
 import { exportOrdersAsCSV } from "@/lib/export/order/export-order-to-csv";
 import { renderToBuffer } from "@react-pdf/renderer";
 import ExportOrderTOPDF from "@/lib/templates/pdf/export-order-to-pdf";
+import { createShippingLog } from "@/actions/log/shipping-log";
 
 const updateSchema = z.object({
   orderId: z.string().min(1, "Order ID is required"),
@@ -132,6 +133,55 @@ const getOrderByOrderId = async (req) => {
   }
 };
 
+const getSingleOrderById = async (req, params) => {
+  try {
+    const { orderId } = await params;
+
+    if (!orderId) {
+      return customMessage("Order ID is required", {}, 400);
+    }
+    const order = await prisma.order.findUnique({
+      where: {
+        order_Id: orderId,
+      },
+      include: {
+        user: true,
+        payment: true,
+        invoice: true,
+        productReviews: true,
+        orderItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                product_main_image: true,
+              },
+            },
+          },
+        },
+        shippingLogs: {
+          select: {
+            status: true,
+            timestamp: true,
+            note: true,
+          },
+          orderBy: {
+            createdAt: "asc",
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      return customMessage("No order found with this ID.", {}, 404);
+    }
+
+    return customMessage("Order retrieved successfully", { order }, 200);
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
 const updateOrderDetails = async (req) => {
   try {
     const { valid, data, errors } = await validateRequestBodyWithZod(
@@ -210,6 +260,12 @@ const updateOrderDetails = async (req) => {
         : existingOrder.payment;
 
     // Logging, Auditing, Notification
+    await createShippingLog({
+      orderId: orderId,
+      status: `Order ${orderStatus}`,
+      note: `Your order has been marked as ${orderStatus}`,
+    });
+
     await logActivity({
       action: "Order Update",
       description: `Order ${orderId} updated by ${req.user.username}`,
@@ -226,9 +282,10 @@ const updateOrderDetails = async (req) => {
 
     if (orderStatus === "PAID") {
       await notifyCustomerViaMail({
+        orderId: existingOrder.order_Id,
         email: existingOrder.email,
         subject: "Your order has been marked as PAID",
-        message: `Hi, your order #${orderId} has been marked as paid. Thank you!`,
+        message: `Hi, your order #${existingOrder.order_Id} has been marked as paid. Thank you!`,
       });
     }
 
@@ -309,8 +366,32 @@ const cancelOrder = async (req, params) => {
         data: { status: "CANCELLED" },
       });
     }
+    // audit
+    await createShippingLog({
+      orderId: updatedOrder.id,
+      status: `Order CANCELLED`,
+      note: `Your order has been marked as CANCELLED`,
+    });
 
-    // Optional email
+    await logActivity({
+      action: "Order CANCELLED",
+      description: `Order ${orderId} CANCELLED by ${req.user.username}`,
+      orderId: updatedOrder.id,
+      userId: req.user.id,
+    });
+
+    await logAudit({
+      orderId: updatedOrder.id,
+      userId: req.user.id,
+      action: "UPDATE",
+    });
+    // Send Email
+    await notifyCustomerViaMail({
+      orderId: orderId,
+      email: order.email,
+      subject: "Your order has been marked as CANCELLED",
+      message: `Hi, your order #${orderId} has been marked as Cancelled. Thank you!`,
+    });
 
     return customMessage("Order cancelled successfully", { updatedOrder }, 200);
   } catch (error) {
@@ -646,6 +727,7 @@ export const orderControllers = {
   getOrderByReference,
   getAllOrders,
   getOrderByOrderId,
+  getSingleOrderById,
   updateOrderDetails,
   cancelOrder,
   //refundOrder,

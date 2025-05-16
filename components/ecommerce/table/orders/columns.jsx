@@ -182,12 +182,16 @@ export const columns = [
   {
     accessorKey: "action",
     header: "Action",
-    cell: ({ row }) => (
-      <ActionMenu
-        id={row.original.id}
-        onView={(id) => console.log("View", id)}
-        onExport={(id, format) => console.log("Export", format, "for ID", id)}
-      />
-    ),
+    cell: ({ row }) => {
+      const { order_Id, id } = row.original;
+      return (
+        <ActionMenu
+          id={id}
+          orderId={order_Id}
+          onView={(orderId) => console.log("View", orderId)}
+          onExport={(id, format) => console.log("Export", format, "for ID", id)}
+        />
+      );
+    },
   },
 ];

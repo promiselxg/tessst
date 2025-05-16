@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,21 +11,29 @@ import {
 import { Eye, ChevronDown } from "lucide-react";
 import Image from "next/image";
 
-export default function ActionMenu({ id, onView, onExport }) {
+export default function ActionMenu({ id, orderId }) {
+  const router = useRouter();
+
+  const handleView = () => {
+    router.push(`/dashboard/ecommerce/orders/${orderId}`);
+  };
+
+  const handleExport = (format) => {
+    console.log("Export", format, "for ID", id);
+  };
+
   return (
     <div className="ml-auto pr-2 flex items-center">
       <div className="flex overflow-hidden rounded-md border">
-        {/* View Button */}
         <Button
           className="rounded-none w-14"
           size="icon"
           variant="outline"
-          onClick={() => onView?.(id)}
+          onClick={handleView}
         >
           <Eye />
         </Button>
 
-        {/* Export Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -40,7 +49,7 @@ export default function ActionMenu({ id, onView, onExport }) {
               <DropdownMenuItem
                 key={format}
                 className="flex items-center gap-2 cursor-pointer"
-                onClick={() => onExport?.(id, format)}
+                onClick={() => handleExport(format)}
               >
                 <Image
                   src={`/img/${format}-icon.svg`}

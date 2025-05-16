@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/utils/dbConnect";
+import { createShippingLog } from "../log/shipping-log";
 
 export async function handleRefund(refundData) {
   const { payment_reference, amount, customer } = refundData;
@@ -32,6 +33,12 @@ export async function handleRefund(refundData) {
     data: {
       status: "REFUNDED",
     },
+  });
+
+  await createShippingLog({
+    orderId: pendingOrder.id,
+    status: "Refund request initiated",
+    note: "Refund request placed",
   });
 
   return refund;

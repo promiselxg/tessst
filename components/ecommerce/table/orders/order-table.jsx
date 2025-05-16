@@ -71,7 +71,6 @@ const OrdersTable = () => {
             title="All Orders"
             loading={loading}
             orders={orders}
-            router={router}
           />
         );
       default:
@@ -80,7 +79,6 @@ const OrdersTable = () => {
             title="All Orders"
             loading={loading}
             orders={orders}
-            router={router}
           />
         );
     }
@@ -117,7 +115,7 @@ const TabButton = ({ tab, isActive, onClick }) => (
   </button>
 );
 
-const TableContainer = ({ title, loading, orders, router }) => (
+const TableContainer = ({ title, loading, orders }) => (
   <div className="w-full bg-white rounded-bl-lg rounded-br-lg overflow-hidden mt-10">
     <div className="flex w-full p-6">
       <div className="container mx-auto bg-white shadow p-4 rounded-lg">

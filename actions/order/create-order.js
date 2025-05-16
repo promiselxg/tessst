@@ -1,13 +1,15 @@
 "use server";
 
+import prisma from "@/lib/utils/dbConnect";
 import { toKobo } from "@/lib/paystack/toKobo";
 import { createPendingOrder } from "./order";
 import { createOrUpdateCustomerInfo } from "../customer/customer";
 import { createOrderItem } from "./order-item";
 import { updateProductStockQty } from "../product/update-product-qty";
 import { createPayment } from "../payment/payment";
-import prisma from "@/lib/utils/dbConnect";
 import { generateOrderInvoice } from "./generate-order-invoice";
+import { createShippingLog } from "../log/shipping-log";
+import { retryOperation } from "@/lib/retry/retry-operation";
 
 export async function createOrder({
   cart,
@@ -26,10 +28,12 @@ export async function createOrder({
       postalCode: selectedCustomerAddress?.postalCode,
     };
 
-    return await prisma.$transaction(
+    let pendingOrder;
+
+    await prisma.$transaction(
       async (tx) => {
         // 1. Create pending order
-        const pendingOrder = await createPendingOrder({
+        pendingOrder = await createPendingOrder({
           tx,
           amount: toKobo(total),
           email: user.email,
@@ -38,17 +42,20 @@ export async function createOrder({
           delivery_fee: toKobo(delivery_fee),
           order_Id,
         });
+
         // 2. Create or update customer
-        const customerData = {
-          first_name: selectedCustomerAddress?.firstName,
-          last_name: selectedCustomerAddress?.lastName,
-          userId: user.id,
-          email: user.email,
-        };
+        await createOrUpdateCustomerInfo(
+          tx,
+          {
+            first_name: selectedCustomerAddress?.firstName,
+            last_name: selectedCustomerAddress?.lastName,
+            userId: user.id,
+            email: user.email,
+          },
+          user.id
+        );
 
-        await createOrUpdateCustomerInfo(tx, customerData, user.id);
-
-        // 3. Create order items and variants
+        // 3. Create order items and update stock
         for (const item of cart) {
           await createOrderItem({
             tx,
@@ -60,24 +67,43 @@ export async function createOrder({
             productVariants: item.product_variants || [],
           });
 
-          // 4. Update stock using shared function
           await updateProductStockQty(tx, item.id, item.quantity);
         }
 
-        // 5. Create payment
+        // 4. Create payment
         await createPayment(tx, pendingOrder.id, user.id, toKobo(total));
 
-        // 6. Generate Invoice
-        await generateOrderInvoice(pendingOrder.id, user.id);
-
-        return {
-          success: true,
-          orderId: pendingOrder.order_Id,
-        };
+        await createShippingLog({
+          orderId: pendingOrder.id,
+          status: "Order Created",
+          note: "Order successfully placed",
+        });
       },
       { timeout: 15000 }
     );
+
+    // background post-processing
+    (async () => {
+      try {
+        await Promise.all([
+          // Retry invoice generation if it fails
+          retryOperation(
+            () => generateOrderInvoice(pendingOrder.id, user.id),
+            3,
+            1000
+          ),
+        ]);
+      } catch (err) {
+        console.error("Post-order task failed after retries", err);
+      }
+    })();
+
+    return {
+      success: true,
+      orderId: pendingOrder.order_Id,
+    };
   } catch (error) {
+    console.log(error);
     return { success: false, error: "Order creation failed" };
   }
 }
