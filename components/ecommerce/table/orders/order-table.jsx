@@ -50,7 +50,7 @@ const OrdersTable = () => {
     params.set("tab", key);
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
     setActiveTab(key);
-    await fetchProducts(key);
+    //await fetchProducts(key);
   };
 
   useEffect(() => {

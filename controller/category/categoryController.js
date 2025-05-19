@@ -1,3 +1,4 @@
+import { removeUploadedImage } from "@/lib/utils/cloudinary";
 import { customMessage, ServerError } from "@/lib/utils/customMessage";
 import prisma from "@/lib/utils/dbConnect";
 
@@ -49,11 +50,26 @@ const getAllCategories = async () => {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { createdAt: "desc" },
-      select: { id: true, name: true, createdAt: true },
+      include: {
+        _count: {
+          select: { products: true },
+        },
+      },
     });
+
+    const formatted = categories.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      createdAt: cat.createdAt,
+      productCount: cat._count.products,
+    }));
+
     return customMessage(
       "Categories retrieved successfully",
-      { count: categories.length, categories },
+      {
+        count: formatted.length,
+        categories: formatted,
+      },
       200
     );
   } catch (error) {
@@ -61,20 +77,33 @@ const getAllCategories = async () => {
   }
 };
 
-const deleteCategory = async (req, params) => {
-  const { id } = await params;
+const deleteCategory = async (_, params) => {
+  const { id } = params;
+
   if (!id) {
     return customMessage("Category ID is required", {}, 400);
   }
 
   try {
-    const categoryExist = await prisma.category.findUnique({
+    const category = await prisma.category.findUnique({
       where: { id },
       include: { products: true },
     });
 
-    if (!categoryExist) {
+    if (!category) {
       return customMessage("Category not found or does not exist.", {}, 404);
+    }
+
+    // Delete all uploaded product images
+    for (const product of category.products) {
+      if (product.product_main_image) {
+        removeUploadedImage(product.product_main_image);
+      }
+      if (product.product_images && Array.isArray(product.product_images)) {
+        product.product_images.forEach((img) => {
+          removeUploadedImage(img);
+        });
+      }
     }
 
     // Delete all products under the category
@@ -82,13 +111,14 @@ const deleteCategory = async (req, params) => {
       where: { categoryId: id },
     });
 
-    // delete the category
+    // Delete the category
     await prisma.category.delete({
       where: { id },
     });
 
     return customMessage("Category deleted successfully", {}, 200);
   } catch (error) {
+    console.log(error);
     return ServerError(error, {}, 500);
   }
 };

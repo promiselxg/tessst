@@ -7,7 +7,6 @@ export function handleCors(req) {
   if (req.method === "OPTIONS") {
     response.headers.set(
       "Access-Control-Allow-Origin",
-      "https://l7zxvdd4-3000.uks1.devtunnels.ms",
       "https://ysfon-official.vercel.app"
     ); // Change this to the exact origin
     response.headers.set(
@@ -25,7 +24,6 @@ export function handleCors(req) {
   // Handle other requests
   const allowedOrigins = [
     "http://localhost:3000", // Change to the origin of your local dev server
-    "https://l7zxvdd4-3000.uks1.devtunnels.ms", // This should match the origin of the frontend
     "https://ysfon-official.vercel.app",
   ];
 

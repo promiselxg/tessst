@@ -33,7 +33,7 @@ const DeleteDialog = ({
       setLoading(true);
       const response = await apiCall("delete", `${endpoint}/${itemID}`);
 
-      toast.success(response.message || "Item deleted successfully", {
+      toast.success(response?.message || "Item deleted successfully", {
         description: "We'll refresh the page for you",
       });
       setOpen(false);
@@ -42,7 +42,7 @@ const DeleteDialog = ({
         window.location.reload();
       }, 1000);
     } catch (error) {
-      toast.error(error.response.data.message || error.message, {
+      toast.error(error?.response?.data?.message || error?.message, {
         description: "Please try again",
       });
     } finally {
@@ -54,12 +54,12 @@ const DeleteDialog = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="w-[90%] md:w-2/6 flex flex-col justify-center items-center">
-          <LottieAnimation
+          {/* <LottieAnimation
             width="100px"
             height="100px"
             style={{ color: "red" }}
             animationData={require("../../public/animations/delete.json")}
-          />
+          /> */}
           <DialogHeader className="w-full flex items-center">
             <DialogTitle className="text-[15px] md:text-[30px] text-slate-700">
               Are you sure?

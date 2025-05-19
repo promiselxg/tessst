@@ -2,15 +2,11 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
-  BookOpen,
   Bot,
-  Command,
   Frame,
   GalleryVerticalEnd,
   Map,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react";
 
@@ -56,7 +52,7 @@ const data = {
         },
         {
           title: "Categories",
-          url: "/dashboard/training/categories",
+          url: "/dashboard/categories?tab=training",
         },
         {
           title: "Tags",
@@ -99,7 +95,7 @@ const data = {
         },
         {
           title: "Categories",
-          url: "/dashboard/ecommerce/categories",
+          url: "/dashboard/categories?tab=store",
         },
         {
           title: "Tags",

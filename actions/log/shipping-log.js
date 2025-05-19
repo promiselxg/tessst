@@ -29,7 +29,6 @@ export const createShippingLog = async ({
         note,
       },
     });
-    console.log("shipping log created");
   } catch (error) {
     console.error("Failed to create shipping log:", error);
     throw new Error("Could not create shipping log entry.");

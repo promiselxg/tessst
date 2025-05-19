@@ -11,30 +11,6 @@ import CustomerInfoCard from "../_components/order-customer-info";
 import { getSingleOrderById } from "@/service/ecommerce/orderService";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const logs = [
-  {
-    status: "Package has dispatched",
-    timestamp: "2023-08-18T06:29:00Z",
-  },
-  {
-    status: "Tracking number",
-    timestamp: "2023-08-18T06:29:00Z",
-    note: "3981241023109293",
-  },
-  {
-    status: "Package arrived at the final delivery station",
-    timestamp: "2023-08-19T02:00:00Z",
-  },
-  {
-    status: "Out for delivery",
-    timestamp: "2023-08-19T02:38:00Z",
-  },
-  {
-    status: "Delivered",
-    timestamp: "2023-08-19T04:17:00Z",
-  },
-];
-
 const OrderDetails = ({ orderId }) => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +31,13 @@ const OrderDetails = ({ orderId }) => {
     };
     fetchOrder();
   }, [orderId]);
+
+  const body = {
+    orderId: order?.id,
+    orderStatus: "PAID",
+    currency: order?.payment?.currency || "NGN",
+    paymentMethod: order?.payment?.method || "CASH_ON_DELIVERY",
+  };
 
   if (loading) {
     return (
@@ -102,7 +85,11 @@ const OrderDetails = ({ orderId }) => {
           date={order?.paidAt ?? order?.createdAt}
         />
         <div className="mr-10 text-sky-500 text-sm">
-          <OrderActionDropdown />
+          <OrderActionDropdown
+            orderId={orderId}
+            status={order?.paymentStatus}
+            body={body}
+          />
         </div>
       </div>
       <Separator className="my-4" />
@@ -112,7 +99,7 @@ const OrderDetails = ({ orderId }) => {
           <div className="bg-white p-4 border border-b-0">
             <h1 className="text-lg font-semibold flex items-center gap-3">
               Order Detail{" "}
-              <span className="bg-gray-400 text-white rounded-full px-2">
+              <span className="bg-gray-400 text-white rounded-full px-2 h-6 w-6 flex items-center justify-center text-sm">
                 {order?.orderItems?.length}
               </span>
             </h1>

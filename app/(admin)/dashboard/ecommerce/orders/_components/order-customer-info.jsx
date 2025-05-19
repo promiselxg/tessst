@@ -2,7 +2,6 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { AtSign, PhoneIcon, ShoppingBasket } from "lucide-react";
 
 const CustomerInfoCard = ({ order }) => {
-  console.log(order);
   return (
     <div className="w-full border rounded-[8px] border-[#eee] bg-white h-fit">
       <div className="w-full border-b-[1px] bg-white p-4">

@@ -698,12 +698,27 @@ const reorderCourceChapter = async (req, params) => {
 const getAllCategories = async () => {
   try {
     const categories = await prisma.courseCategory.findMany({
-      orderBy: { name: "asc" },
-      select: { id: true, name: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+      include: {
+        _count: {
+          select: { courses: true },
+        },
+      },
     });
+
+    const formatted = categories.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      createdAt: cat.createdAt,
+      courseCount: cat._count.courses,
+    }));
+
     return customMessage(
       "Categories retrieved successfully",
-      { count: categories.length, categories },
+      {
+        count: formatted.length,
+        categories: formatted,
+      },
       200
     );
   } catch (error) {

@@ -188,13 +188,15 @@ const updateOrderDetails = async (req) => {
       req,
       updateSchema
     );
-    if (!valid) return customMessage(errors, {}, 400);
+
+    if (!valid) return ServerError(errors, {}, 400);
 
     const { orderId, orderStatus, paymentMethod, currency } = data;
 
     if (!req.user.id) {
       return customMessage("Invalid user credentials", {}, 404);
     }
+
     const existingOrder = await prisma.order.findUnique({
       where: { id: orderId },
       include: { payment: true, user: true },
@@ -250,7 +252,7 @@ const updateOrderDetails = async (req) => {
         })
       : existingOrder;
 
-    // Update payment
+    // Update payment if applicable
     const updatedPayment =
       Object.keys(paymentUpdateData).length && existingOrder.payment
         ? await prisma.payment.update({
@@ -259,13 +261,14 @@ const updateOrderDetails = async (req) => {
           })
         : existingOrder.payment;
 
-    // Logging, Auditing, Notification
+    // create shipping log
     await createShippingLog({
       orderId: orderId,
       status: `Order ${orderStatus}`,
       note: `Your order has been marked as ${orderStatus}`,
     });
 
+    // Admin audit
     await logActivity({
       action: "Order Update",
       description: `Order ${orderId} updated by ${req.user.username}`,
