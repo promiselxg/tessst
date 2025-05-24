@@ -1,13 +1,13 @@
 import Reveal from "@/components/animation/reveal";
 import BreadcrumbBanner from "@/components/breadcrumb/banner-breadcrumb";
 import InfoCard from "@/components/card/info-card";
-import PricingCard from "@/components/card/pricing-card";
 import Container from "@/components/container/container";
 import StatCounter from "@/components/counter/stats-counter";
 import { big_sholders_text } from "@/lib/fonts";
 import { Clock1, Flame, Users, VideoIcon } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import SubscriptionPlans from "./subscription-plans";
 
 const page = () => {
   return (
@@ -75,45 +75,7 @@ const page = () => {
                     </h1>
                   </div>
                 </Reveal>
-                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-10">
-                  <PricingCard
-                    title="Freebie Plan"
-                    price={0}
-                    duration="/forever"
-                    features={[
-                      "Instant access to all courses",
-                      "Early access to new courses",
-                      "Access to premium & Udemy courses",
-                      "Cancel at any time",
-                    ]}
-                    ctaText="Join Now"
-                  />
-                  <PricingCard
-                    title="Monthly Subscription"
-                    price={4999}
-                    duration="/month"
-                    features={[
-                      "Instant access to all courses",
-                      "Early access to new courses",
-                      "Access to premium & Udemy courses",
-                      "Cancel at any time",
-                    ]}
-                    badge="Most popular"
-                    ctaText="Join Now"
-                  />
-                  <PricingCard
-                    title="Yearly Subscription"
-                    price={70000}
-                    duration="/year"
-                    features={[
-                      "Instant access to all courses",
-                      "Early access to new courses",
-                      "Access to premium & Udemy courses",
-                      "Cancel at any time",
-                    ]}
-                    ctaText="Join Now"
-                  />
-                </div>
+                <SubscriptionPlans />
               </div>
             </div>
           </Container>

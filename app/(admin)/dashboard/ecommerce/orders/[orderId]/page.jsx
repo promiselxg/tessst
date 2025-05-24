@@ -5,7 +5,7 @@ const page = async ({ params }) => {
   const breadcrumbs = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Orders", href: "/dashboard/ecommerce/orders" },
-    { name: params.orderId },
+    { name: "Order Details" },
   ];
 
   return (

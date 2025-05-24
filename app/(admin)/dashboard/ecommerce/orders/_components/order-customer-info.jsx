@@ -1,4 +1,4 @@
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import UserAvatar from "@/components/avatar/avatar";
 import { AtSign, PhoneIcon, ShoppingBasket } from "lucide-react";
 
 const CustomerInfoCard = ({ order }) => {
@@ -9,25 +9,25 @@ const CustomerInfoCard = ({ order }) => {
       </div>
       <div className="w-full flex flex-col">
         <div className="flex items-center gap-3 px-4 py-5 border-b-[1px]">
-          <Avatar>
-            <AvatarImage
-              src={order?.user?.avatar ?? "https://github.com/shadcn.png"}
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            name={order?.user?.name}
+            url={order?.user?.avatar ?? "https://github.com/shadcn.png"}
+          />
+
           <div>
             <h1>{order?.user?.name}</h1>
           </div>
         </div>
-
-        <div className="flex items-center gap-3 px-4 py-5 border-b-[1px]">
-          <div className="bg-sky-200 p-2 h-10 w-10 flex items-center justify-center rounded-full">
-            <ShoppingBasket className="w-5 h-5 text-sky-800" />
+        {order?.orderItems && (
+          <div className="flex items-center gap-3 px-4 py-5 border-b-[1px]">
+            <div className="bg-sky-200 p-2 h-10 w-10 flex items-center justify-center rounded-full">
+              <ShoppingBasket className="w-5 h-5 text-sky-800" />
+            </div>
+            <div>
+              <h1>{order?.orderItems?.length || 0} orders</h1>
+            </div>
           </div>
-          <div>
-            <h1>{order?.orderItems?.length || 0} orders</h1>
-          </div>
-        </div>
+        )}
 
         <div className="px-4 py-5 flex flex-col gap-2 border-b-[1px]">
           <h1>Contact info</h1>
@@ -45,20 +45,22 @@ const CustomerInfoCard = ({ order }) => {
             </div>
           )}
         </div>
-
-        <div className="px-4 py-5 flex flex-col gap-2 border-b-[1px]">
-          <h1>Delivery address</h1>
-          <p className="text-slate-600 text-sm">
-            {order?.metadata?.delivery_address}
-          </p>
-        </div>
-
-        <div className="px-4 py-5 flex flex-col gap-2">
-          <h1>Payment Method</h1>
-          <p className="text-slate-600 text-sm uppercase">
-            {order?.payment?.method || "None"}
-          </p>
-        </div>
+        {order?.metadata?.delivery_address && (
+          <div className="px-4 py-5 flex flex-col gap-2 border-b-[1px]">
+            <h1>Delivery address</h1>
+            <p className="text-slate-600 text-sm">
+              {order?.metadata?.delivery_address}
+            </p>
+          </div>
+        )}
+        {order?.payment?.method && (
+          <div className="px-4 py-5 flex flex-col gap-2">
+            <h1>Payment Method</h1>
+            <p className="text-slate-600 text-sm uppercase">
+              {order?.payment?.method || "None"}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

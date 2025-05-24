@@ -24,13 +24,8 @@ export default function ActionMenu({ id, orderId }) {
 
   return (
     <div className="ml-auto pr-2 flex items-center">
-      <div className="flex overflow-hidden rounded-md border">
-        <Button
-          className="rounded-none w-14"
-          size="icon"
-          variant="outline"
-          onClick={handleView}
-        >
+      <div className="flex overflow-hidden gap-2">
+        <Button className="" size="icon" variant="outline" onClick={handleView}>
           <Eye />
         </Button>
 
@@ -39,13 +34,13 @@ export default function ActionMenu({ id, orderId }) {
             <Button
               variant="outline"
               size="icon"
-              className="rounded-none border-l-0 w-14"
+              className="outline-none active:outline-none background-transparent"
             >
               <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40 bg-white shadow-lg">
-            {["excel", "csv", "pdf"].map((format) => (
+          <DropdownMenuContent className="w-40 bg-white outline-none border-none">
+            {["excel", "csv", "pdf", "invoice"].map((format) => (
               <DropdownMenuItem
                 key={format}
                 className="flex items-center gap-2 cursor-pointer"

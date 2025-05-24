@@ -1,16 +1,58 @@
 "use client";
+
+import { useAuth } from "@/context/authProvider";
 import { big_sholders_text } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
-import { Flame } from "lucide-react";
+import { Flame, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { toast } from "sonner";
+import axios from "axios";
 
 const PricingCard = ({
+  plan,
   title,
   price,
   duration = "/mo",
   features = [],
-  ctaText = "Join Now",
+  ctaText = "Join for free",
   badge,
 }) => {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscription = async (plan) => {
+    setLoading(true);
+    if (!user) {
+      router.push("/auth/login?callbackUrl=%2Fsubscription");
+    }
+    try {
+      console.log(plan);
+      const response = await axios.post("/api/paystack/initialize-payment", {
+        email: user.email,
+        amount: parseFloat(price) * 100,
+        plan,
+      });
+      console.log("Subscription response:", response);
+
+      if (response.status === 200) {
+        const authorizationUrl = response.data.authorizationUrl;
+        window.location.href = authorizationUrl;
+      } else {
+        toast.error("Failed to initialize subscription. Please try again.");
+      }
+    } catch (error) {
+      console.log("Subscription error:", error);
+      toast.error(
+        "An error occurred while processing your subscription. Please try again later."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -55,9 +97,21 @@ const PricingCard = ({
         ))}
       </ul>
 
-      <button className="mt-6 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded-md w-full transition-colors">
-        {ctaText}
-      </button>
+      <Button
+        className="mt-6 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded-md w-full transition-colors"
+        onClick={() => handleSubscription(plan)}
+        disabled={loading || price <= 0}
+        aria-label={`Subscribe to ${title} plan for ${price.toLocaleString()}${duration}`}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="animate-spin mr-2 inline-block w-4 h-4" />
+            Processing...
+          </>
+        ) : (
+          ctaText
+        )}
+      </Button>
     </div>
   );
 };

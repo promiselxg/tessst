@@ -6,7 +6,7 @@ import ROLES from "@/lib/utils/roles";
 import { withMiddleware } from "@/lib/utils/withMiddleware";
 
 export const GET = async (req) =>
-  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin))(
+  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin, ROLES.moderator))(
     req,
     userControllers.getAllUsers
   );

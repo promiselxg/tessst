@@ -14,14 +14,7 @@ import {
 import { useCategoryColumns } from "./useCategoryColumns";
 import { useCourseCategoryColumns } from "./useCourseCategoryColumns";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+
 import { CreateNewCategory } from "./create-new-catgeory-dialog";
 
 const CategoryTable = () => {
@@ -75,10 +68,6 @@ const CategoryTable = () => {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
     setActiveTab(key);
     setActiveColumn(key === "store" ? productColumns : courseColumns);
-  };
-
-  const openCategoryDialog = async (tab) => {
-    console.log(tab);
   };
 
   useEffect(() => {
