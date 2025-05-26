@@ -51,8 +51,12 @@ model Subscription {
   id                          String   @id @default(uuid())
   userId                      String
   planId                      String
-  paystack_subscription_code  String? @unique
-  status                      String   @default("active") 
+  paystack_subscription_code  String?  
+  status                      String   @default("active")
+  interval                    String   @default("monthly")
+  amount                      Decimal  @db.Decimal(10, 2)
+  currency                    String   @default("NGN")
+  reference_code              String?  @unique 
   startDate                   DateTime @default(now())
   endDate                     DateTime
   plan                        SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)

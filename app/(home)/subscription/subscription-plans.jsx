@@ -65,6 +65,7 @@ const SubscriptionPlans = () => {
                 ? "/forever"
                 : `/${plan.interval}`
             }
+            orderId={plan.id}
             badge={plan.interval === "annually" && "Most popular"}
             features={plan.features || []}
             ctaText={plan.price === 0 ? "Join for free" : "Subscribe Now"}

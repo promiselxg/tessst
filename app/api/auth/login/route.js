@@ -17,7 +17,19 @@ export const POST = async (req) => {
     // Find user in DB
     const user = await prisma.user.findFirst({
       where: { username },
-      include: { roles: true, refreshTokens: true },
+      include: {
+        roles: true,
+        refreshTokens: true,
+        subscriptions: {
+          select: {
+            id: true,
+            planId: true,
+            status: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+      },
     });
 
     // Validate user & password
@@ -60,6 +72,7 @@ export const POST = async (req) => {
           email: user.email_address,
           roles,
           isAdmin: user.isAdmin,
+          subscriptions: user.subscriptions,
         },
         accessToken,
         refreshToken,

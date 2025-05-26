@@ -7,7 +7,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import CategoryList from "./category-list";
 import { CourseCard } from "@/components/card/course-card";
 import { apiCall } from "@/lib/utils/api";
-import { getAllTrainingCategories } from "@/service/training/courseService";
 import { big_sholders_text } from "@/lib/fonts";
 import { CourseCardSkeleton } from "@/components/skeleton/course-skeleton";
 
@@ -47,8 +46,8 @@ const AllCourses = ({ params }) => {
     const fetchCategories = async () => {
       try {
         setIsLoading(true);
-        const data = await getAllTrainingCategories();
-        setCategories(data);
+        const data = await apiCall("get", "/training/course/category");
+        setCategories(data.categories);
       } catch (err) {
         console.error("Failed to fetch categories", err);
       } finally {

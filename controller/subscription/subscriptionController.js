@@ -359,7 +359,7 @@ const initializeSubscription = async (req) => {
   try {
     const data = await req.json();
 
-    const { email, plan, amount } = data;
+    const { email, plan, amount, callback_url, cancel_url, metadata } = data;
 
     if (!email || !plan) {
       return customMessage("Email and plan are required", {}, 400);
@@ -371,6 +371,9 @@ const initializeSubscription = async (req) => {
         email,
         amount,
         plan,
+        callback_url,
+        cancel_url,
+        metadata,
       },
       {
         headers: {

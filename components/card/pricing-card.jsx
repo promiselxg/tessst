@@ -18,6 +18,7 @@ const PricingCard = ({
   features = [],
   ctaText = "Join for free",
   badge,
+  orderId,
 }) => {
   const { user } = useAuth();
   const router = useRouter();
@@ -29,13 +30,19 @@ const PricingCard = ({
       router.push("/auth/login?callbackUrl=%2Fsubscription");
     }
     try {
-      console.log(plan);
       const response = await axios.post("/api/paystack/initialize-payment", {
         email: user.email,
         amount: parseFloat(price) * 100,
         plan,
+        callback_url: "http://localhost:3000/subscription/success",
+        cancel_url: "http://localhost:3000/subscription/cancel",
+        metadata: {
+          userId: user.id,
+          plan,
+          orderId,
+          transactionType: "subscription",
+        },
       });
-      console.log("Subscription response:", response);
 
       if (response.status === 200) {
         const authorizationUrl = response.data.authorizationUrl;
@@ -44,10 +51,11 @@ const PricingCard = ({
         toast.error("Failed to initialize subscription. Please try again.");
       }
     } catch (error) {
-      console.log("Subscription error:", error);
-      toast.error(
-        "An error occurred while processing your subscription. Please try again later."
-      );
+      if (error.response) {
+        toast.error(
+          "An error occurred while processing your subscription. Please try again later."
+        );
+      }
     } finally {
       setLoading(false);
     }
