@@ -1,5 +1,7 @@
+import { cancelExistingSubscription } from "@/actions/subscription/subscription";
 import { customMessage, ServerError } from "@/lib/utils/customMessage";
 import prisma from "@/lib/utils/dbConnect";
+import { generateRandomString } from "@/lib/utils/randomStringGenerator";
 import { isValidUUID } from "@/lib/utils/validateUUID";
 import axios from "axios";
 import sanitize from "sanitize-html";
@@ -152,6 +154,7 @@ const listAllSubscriptionPlans = async () => {
         features: true,
         isDefault: true,
         paystack_plan_code: true,
+        type: true,
       },
     });
 
@@ -398,6 +401,96 @@ const initializeSubscription = async (req) => {
   }
 };
 
+const freeSubscription = async (req) => {
+  try {
+    const { userId, plan } = await req.json();
+
+    if (!userId || !plan) {
+      return customMessage("User ID and plan are required", {}, 400);
+    }
+
+    if (plan !== "Freebie") {
+      return customMessage("Invalid plan for free subscription", {}, 400);
+    }
+
+    const existingSubscription = await prisma.subscription.findFirst({
+      where: { userId, status: "active" },
+    });
+
+    const freePlan = await prisma.subscriptionPlan.findFirst({
+      where: { type: "free" },
+    });
+
+    console.log(existingSubscription);
+    if (!freePlan) {
+      return customMessage("Free plan not found", {}, 404);
+    }
+    if (existingSubscription) {
+      await cancelExistingSubscription(existingSubscription);
+    }
+
+    const newSubscription = await prisma.subscription.create({
+      data: {
+        status: "active",
+        interval: "free-forever",
+        amount: 0,
+        currency: "NGN",
+        reference_code: generateRandomString(10),
+        startDate: new Date(),
+        endDate: null,
+        plan: {
+          connect: { id: freePlan.id },
+        },
+        user: {
+          connect: { id: userId },
+        },
+      },
+    });
+
+    return customMessage(
+      "Free subscription created successfully",
+      { subscription: newSubscription },
+      201
+    );
+  } catch (error) {
+    console.error("Free subscription error:", error);
+    return ServerError(error, {}, 500);
+  }
+};
+
+const getUserSubscription = async (_, params) => {
+  const { userId } = await params;
+
+  if (!userId || !isValidUUID(userId)) {
+    return customMessage("Valid User ID is required", {}, 400);
+  }
+
+  try {
+    const subscription = await prisma.subscription.findFirst({
+      where: { userId, status: "active" },
+      include: {
+        plan: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            interval: true,
+            features: true,
+            isDefault: true,
+            paystack_plan_code: true,
+          },
+        },
+      },
+    });
+
+    return customMessage("", { subscription }, 200);
+  } catch (error) {
+    console.error("Get user subscription error:", error);
+    return ServerError(error, {}, 500);
+  }
+};
+
 export const subscriptionControllers = {
   createSubscriptionPlan,
   listAllSubscriptionPlans,
@@ -405,4 +498,6 @@ export const subscriptionControllers = {
   getSubscriptionPlanById,
   updateSubscriptionPlan,
   initializeSubscription,
+  freeSubscription,
+  getUserSubscription,
 };

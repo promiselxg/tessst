@@ -14,21 +14,11 @@ export const POST = async (req) => {
       );
     }
 
-    // Find user in DB
     const user = await prisma.user.findFirst({
       where: { username },
       include: {
         roles: true,
         refreshTokens: true,
-        subscriptions: {
-          select: {
-            id: true,
-            planId: true,
-            status: true,
-            startDate: true,
-            endDate: true,
-          },
-        },
       },
     });
 

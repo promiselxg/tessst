@@ -4,14 +4,7 @@ import prisma from "@/lib/utils/dbConnect";
 import { addMonths, addYears } from "date-fns";
 
 export async function createSubscription(data) {
-  if (
-    !data ||
-    !data.paid_at ||
-    !data.amount ||
-    !data.currency ||
-    !data.plan ||
-    !data.metadata
-  ) {
+  if (!data || !data.paid_at || !data.amount || !data.currency || !data.plan) {
     throw new Error("Invalid subscription data provided");
   }
 
@@ -35,7 +28,7 @@ export async function createSubscription(data) {
 
   const subscriptionPlan = await prisma.subscriptionPlan.findUnique({
     where: {
-      paystack_plan_code: data?.plan?.plan_code || data?.metadata?.plan,
+      paystack_plan_code: data.plan.plan_code,
     },
   });
 
@@ -45,7 +38,7 @@ export async function createSubscription(data) {
 
   const existing = await prisma.subscription.findFirst({
     where: {
-      userId: data.metadata.userId,
+      userId: data.userId,
       status: "active",
     },
   });
@@ -54,15 +47,15 @@ export async function createSubscription(data) {
     if (existing) {
       await tx.subscription.update({
         where: { id: existing.id },
-        data: { status: "expired" },
+        data: { status: "non-renewing" },
       });
+      await cancelExistingSubscription(existing);
     }
 
     return await tx.subscription.create({
       data: {
-        userId: data.metadata.userId,
+        userId: data.userId,
         planId: subscriptionPlan.id,
-        paystack_subscription_code: data.subscription_code || null,
         reference_code: data.reference,
         status: "active",
         interval,
@@ -70,6 +63,7 @@ export async function createSubscription(data) {
         currency: data.currency,
         startDate,
         endDate,
+        authorization_code: data.auth_code,
       },
     });
   });
@@ -79,4 +73,107 @@ export async function createSubscription(data) {
   }
 
   return subscription;
+}
+
+export async function updateSubscription(data) {
+  if (!data || !data.paystack_subscription_code) {
+    throw new Error("Invalid subscription data provided");
+  }
+
+  const authCode = data.authorization_code || data.auth_code;
+
+  const existing = await prisma.subscription.findFirst({
+    where: {
+      authorization_code: authCode,
+    },
+  });
+
+  if (!existing) {
+    throw new Error("Subscription not found");
+  }
+
+  await prisma.subscription.update({
+    where: { id: existing.id },
+    data: {
+      next_payment_date: data.next_payment_date,
+      paystack_subscription_code: data.paystack_subscription_code,
+      paystack_subscription_token: data.paystack_subscription_token,
+    },
+  });
+
+  return { success: true };
+}
+
+export async function switchToFreePlan(userId) {
+  const existing = await prisma.subscription.findFirst({
+    where: { userId, status: "active" },
+  });
+
+  const freePlan = await prisma.subscriptionPlan.findFirst({
+    where: { name: "Free" },
+  });
+
+  if (!freePlan) throw new Error("Free plan not found");
+
+  const now = new Date();
+
+  const result = await prisma.$transaction(async (tx) => {
+    if (existing) {
+      if (existing.paystack_subscription_code) {
+        await cancelPaystackSubscription(existing.paystack_subscription_code);
+      }
+
+      await tx.subscription.update({
+        where: { id: existing.id },
+        data: { status: "expired", endDate: now },
+      });
+    }
+
+    return await tx.subscription.create({
+      data: {
+        userId,
+        planId: freePlan.id,
+        status: "active",
+        interval: "free",
+        amount: 0,
+        currency: "NGN",
+        startDate: now,
+        endDate: null,
+      },
+    });
+  });
+
+  return result;
+}
+
+export async function cancelExistingSubscription(subscription) {
+  if (!subscription) return;
+
+  try {
+    if (subscription.paystack_subscription_code) {
+      await axios.post(
+        "https://api.paystack.co/subscription/disable",
+        {
+          code: subscription.paystack_subscription_code,
+          token: subscription.paystack_subscription_token,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          },
+        }
+      );
+    }
+
+    await prisma.subscription.update({
+      where: { id: subscription.id },
+      data: {
+        status: "non-renewing",
+        endDate: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to cancel subscription:", error);
+    throw new Error("Subscription cancellation failed");
+  }
 }

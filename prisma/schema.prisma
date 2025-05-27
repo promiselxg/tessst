@@ -51,20 +51,24 @@ model Subscription {
   id                          String   @id @default(uuid())
   userId                      String
   planId                      String
-  paystack_subscription_code  String?  
+  paystack_subscription_code  String?  @unique
+  paystack_subscription_token String?
+  authorization_code          String?  @unique   
   status                      String   @default("active")
   interval                    String   @default("monthly")
   amount                      Decimal  @db.Decimal(10, 2)
   currency                    String   @default("NGN")
   reference_code              String?  @unique 
   startDate                   DateTime @default(now())
-  endDate                     DateTime
+  endDate                     DateTime?
+  next_payment_date           DateTime?
   plan                        SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
   user                        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
 
   @@index([userId])
   @@index([planId])
+  @@index([authorization_code])
 }
 
 

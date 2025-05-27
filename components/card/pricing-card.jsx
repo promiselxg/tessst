@@ -9,6 +9,8 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import axios from "axios";
+import { apiCall } from "@/lib/utils/api";
+import ConfirmAlertModal from "../alert/confirm-alert";
 
 const PricingCard = ({
   plan,
@@ -19,6 +21,7 @@ const PricingCard = ({
   ctaText = "Join for free",
   badge,
   orderId,
+  isSubscribed = false,
 }) => {
   const { user } = useAuth();
   const router = useRouter();
@@ -51,9 +54,41 @@ const PricingCard = ({
         toast.error("Failed to initialize subscription. Please try again.");
       }
     } catch (error) {
-      if (error.response) {
+      if (error.mesage) {
         toast.error(
-          "An error occurred while processing your subscription. Please try again later."
+          error.message ||
+            "An error occurred while initializing the subscription."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFreeSubscription = async (plan) => {
+    setLoading(true);
+    if (!user) {
+      router.push("/auth/login?callbackUrl=%2Fsubscription");
+    }
+    try {
+      const response = await apiCall(
+        "post",
+        "/subscription/free-subscription",
+        {
+          userId: user?.id,
+          plan,
+        }
+      );
+
+      if (response) {
+        toast.success("You have successfully subscribed to the free plan.");
+        window.location.reload();
+      }
+    } catch (error) {
+      if (error.message) {
+        toast.error(
+          error.message ||
+            "An error occurred while subscribing to the free plan."
         );
       }
     } finally {
@@ -74,7 +109,6 @@ const PricingCard = ({
           {badge}
         </div>
       )}
-
       <div className="py-10">
         <h3
           className={cn(
@@ -93,9 +127,7 @@ const PricingCard = ({
         </div>
         <p className="text-sm text-gray-400 mb-4">{duration}</p>
       </div>
-
       <hr className="border-gray-700 my-4" />
-
       <ul className="space-y-3 text-sm text-gray-300 text-left">
         {features.map((feature, index) => (
           <li key={index} className="flex items-center gap-2">
@@ -105,21 +137,42 @@ const PricingCard = ({
         ))}
       </ul>
 
-      <Button
-        className="mt-6 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded-md w-full transition-colors"
-        onClick={() => handleSubscription(plan)}
-        disabled={loading || price <= 0}
-        aria-label={`Subscribe to ${title} plan for ${price.toLocaleString()}${duration}`}
+      <ConfirmAlertModal
+        title={`Subscribe to ${title} plan`}
+        description={
+          user || isSubscribed
+            ? `You are currently have an active subscription. Switching plans will update your subscription.`
+            : `Are you sure you want to subscribe to the ${title} plan for ${price.toLocaleString()}${duration}?`
+        }
+        ctaText={ctaText}
+        isLoading={loading}
+        onConfirm={() =>
+          price > 0
+            ? handleSubscription(plan)
+            : handleFreeSubscription("Freebie")
+        }
+        requireReason={false}
       >
-        {loading ? (
-          <>
-            <Loader2 className="animate-spin mr-2 inline-block w-4 h-4" />
-            Processing...
-          </>
-        ) : (
-          ctaText
-        )}
-      </Button>
+        <Button
+          className={cn(
+            `mt-6 ${!isSubscribed && "bg-yellow-500 hover:bg-yellow-400"} text-black font-semibold py-2 px-4 rounded-md w-full transition-colors`
+          )}
+          variant={isSubscribed && "outline"}
+          disabled={loading || isSubscribed}
+          aria-label={`Subscribe to ${title} plan for ${price.toLocaleString()}${duration}`}
+        >
+          {loading ? (
+            <>
+              <Loader2 className="animate-spin mr-2 inline-block w-4 h-4" />
+              Processing...
+            </>
+          ) : isSubscribed ? (
+            <span className="font-semibold">Current Plan</span>
+          ) : (
+            ctaText
+          )}
+        </Button>
+      </ConfirmAlertModal>
     </div>
   );
 };

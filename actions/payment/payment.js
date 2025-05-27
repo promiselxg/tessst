@@ -27,7 +27,6 @@ export async function savePayment(paymentData) {
     paymentData;
 
   if (!metadata?.orderId || !customer?.id) {
-    console.warn("Missing orderId or customer id in payment data");
     return null;
   }
 

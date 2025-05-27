@@ -6,10 +6,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/authProvider";
+import { useSubscriptionStore } from "@/store/subscriptionStore";
 
 const SubscriptionPlans = () => {
   const [subscriptionsPlans, setSubscriptionsPlans] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  const { subscriptions, fetchSubscriptions } = useSubscriptionStore();
 
   useEffect(() => {
     const fetchAllSubscriptionPlans = async () => {
@@ -29,6 +33,12 @@ const SubscriptionPlans = () => {
     };
     fetchAllSubscriptionPlans();
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchSubscriptions(user.id);
+    }
+  }, [user?.id]);
 
   if (isLoading) {
     return (
@@ -66,6 +76,7 @@ const SubscriptionPlans = () => {
                 : `/${plan.interval}`
             }
             orderId={plan.id}
+            isSubscribed={subscriptions && subscriptions?.planId === plan.id}
             badge={plan.interval === "annually" && "Most popular"}
             features={plan.features || []}
             ctaText={plan.price === 0 ? "Join for free" : "Subscribe Now"}
