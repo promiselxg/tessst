@@ -4,7 +4,7 @@ import { CustomToolTip } from "@/components/tooltip/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatDateTime } from "@/lib/utils/getDateDifference";
 import { Calendar, Hash, Pencil, Trash2, User } from "lucide-react";
-import Link from "next/link";
+
 import { UpdateCategory } from "./update-category";
 
 export const useCourseCategoryColumns = () => {

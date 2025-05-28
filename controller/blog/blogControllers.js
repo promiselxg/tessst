@@ -3,7 +3,7 @@ import prisma from "@/lib/utils/dbConnect";
 import { isValidUUID } from "@/lib/utils/validateUUID";
 import sanitizeHtml from "sanitize-html";
 
-const createNewBlogCategory = async (req, res) => {
+const createNewBlogCategory = async (req, _) => {
   try {
     const { name } = await req.json();
     if (!name) {
@@ -27,7 +27,7 @@ const createNewBlogCategory = async (req, res) => {
   }
 };
 
-const createNewBlogPost = async (req, res) => {
+const createNewBlogPost = async (req, _) => {
   try {
     const {
       title,
@@ -107,10 +107,6 @@ const updateCategory = async (req, params) => {
       return customMessage("Category not found or does not exist.", {}, 404);
     }
 
-    if (await prisma.blogCategory.findFirst({ where: { name } })) {
-      return customMessage("Category already exists", {}, 409);
-    }
-
     const category = await prisma.blogCategory.update({
       where: { id },
       data: { name },
@@ -126,7 +122,16 @@ const getAllCategories = async () => {
   try {
     const categories = await prisma.blogCategory.findMany({
       orderBy: { createdAt: "desc" },
-      select: { id: true, name: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        _count: {
+          select: {
+            blogs: true,
+          },
+        },
+      },
     });
     return customMessage(
       "Categories retrieved successfully",
@@ -185,6 +190,8 @@ const getAllBlogs = async (req) => {
         content: true,
         createdAt: true,
         images: true,
+        author: true,
+        isPublished: true,
         category: { select: { id: true, name: true } },
       },
     });
@@ -201,7 +208,7 @@ const getAllBlogs = async (req) => {
   }
 };
 
-const getSigleBlogPost = async (req, params) => {
+const getSigleBlogPost = async (_, params) => {
   const { id } = await params;
   if (!id) {
     return customMessage("Post ID is required", {}, 400);
@@ -316,7 +323,7 @@ const updateBlogPost = async (req, params) => {
   }
 };
 
-const deleteCategory = async (req, params) => {
+const deleteCategory = async (_, params) => {
   const { id } = await params;
   if (!id) {
     return customMessage("Category ID is required", {}, 400);
@@ -351,7 +358,7 @@ const deleteCategory = async (req, params) => {
   }
 };
 
-const deleteBlogPost = async (req, params) => {
+const deleteBlogPost = async (_, params) => {
   try {
     const { id } = await params;
 
@@ -381,6 +388,49 @@ const deleteBlogPost = async (req, params) => {
   }
 };
 
+const deleteMultipleBlogCategories = async (req) => {
+  try {
+    const idsObj = await req.json();
+
+    if (!idsObj || typeof idsObj !== "object") {
+      return customMessage("No category IDs provided", {}, 400);
+    }
+
+    const ids = Object.values(idsObj);
+
+    const categories = await prisma.blogCategory.findMany({
+      where: { id: { in: ids } },
+    });
+
+    const invalidIds = ids.filter((id) => !isValidUUID(id));
+    if (invalidIds.length > 0) {
+      return customMessage("One or more invalid product IDs", {}, 400);
+    }
+
+    if (categories.length === 0) {
+      return customMessage("No item found for the provided IDs", {}, 404);
+    }
+
+    for (const category of categories) {
+      if (!category) {
+        return customMessage("Product not found", {}, 404);
+      }
+    }
+
+    await prisma.blogCategory.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return customMessage("categories deleted successfully", {}, 200);
+  } catch (error) {
+    return ServerError(error, {}, 500);
+  }
+};
+
 export const blogControllers = {
   createNewBlogCategory,
   createNewBlogPost,
@@ -391,4 +441,5 @@ export const blogControllers = {
   getSigleBlogPost,
   deleteCategory,
   deleteBlogPost,
+  deleteMultipleBlogCategories,
 };

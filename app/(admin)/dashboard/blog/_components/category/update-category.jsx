@@ -28,12 +28,11 @@ export function UpdateCategory({ children, tab, id, initialData }) {
       return;
     }
 
-    const endpoint =
-      tab === "store" ? `/category/${id}` : `/training/course/category/${id}`;
-
     try {
       setLoading(true);
-      const response = await apiCall("put", endpoint, { name: value.trim() });
+      const response = await apiCall("put", `/blog/category/${id}`, {
+        name: value.trim(),
+      });
       toast.success(response?.message || "Category updated successfully", {
         description: "We'll refresh the page for you",
       });

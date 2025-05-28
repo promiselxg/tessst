@@ -17,31 +17,26 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function UpdateCategory({ children, tab, id, initialData }) {
-  const [value, setValue] = useState(initialData || "");
+export function CreateNewCategory({ children, tab, fetchCategories }) {
+  const [value, setValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const handleUpdateCategory = async () => {
+  const handleCreateNewCategory = async () => {
     if (!value.trim()) {
       toast.error("Category name cannot be empty");
       return;
     }
 
-    const endpoint =
-      tab === "store" ? `/category/${id}` : `/training/course/category/${id}`;
-
     try {
       setLoading(true);
-      const response = await apiCall("put", endpoint, { name: value.trim() });
-      toast.success(response?.message || "Category updated successfully", {
-        description: "We'll refresh the page for you",
+      const response = await apiCall("post", "/blog/category", {
+        name: value.trim(),
       });
+      toast.success(response?.message || "Category created successfully");
+      setValue("");
       setOpen(false);
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      fetchCategories(tab);
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
@@ -59,7 +54,7 @@ export function UpdateCategory({ children, tab, id, initialData }) {
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Update</AlertDialogTitle>
+          <AlertDialogTitle>Create New Category</AlertDialogTitle>
           <AlertDialogDescription>
             <Input
               value={value}
@@ -75,16 +70,16 @@ export function UpdateCategory({ children, tab, id, initialData }) {
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
           <Button
-            onClick={handleUpdateCategory}
+            onClick={handleCreateNewCategory}
             disabled={loading || value.trim() === ""}
           >
             {loading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className=" animate-spin w-3 h-3" />{" "}
-                <span>updating...</span>
+                <span>creating...</span>
               </div>
             ) : (
-              "Update"
+              "Continue"
             )}
           </Button>
         </AlertDialogFooter>

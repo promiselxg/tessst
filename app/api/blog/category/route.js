@@ -11,3 +11,8 @@ export const POST = async (req) =>
   );
 
 export const GET = async (req) => blogControllers.getAllCategories(req);
+
+export const DELETE = async (req) =>
+  withMiddleware(verifyToken, verifyUserRoles(ROLES.admin))(req, () =>
+    blogControllers.deleteMultipleBlogCategories(req)
+  );

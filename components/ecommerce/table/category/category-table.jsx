@@ -78,7 +78,7 @@ const CategoryTable = () => {
   }, [searchParams, fetchCategories]);
 
   useEffect(() => {
-    if (!user?.id) router.replace("/auth/login");
+    if (!user?.id) router.replace("/auth/login?callback=/dashboard/category");
   }, [user?.id, router]);
 
   return (

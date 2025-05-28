@@ -101,7 +101,11 @@ export function CustomersDataTable({ columns, data, loading }) {
           ) : (
             <TableBody className="relative">
               {loading && (
-                <div className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-[rgba(0,0,0,0.1)] z-30 flex justify-center items-center"></div>
+                <tr>
+                  <td colSpan={columns.length}>
+                    <span className="absolute top-0 left-0 right-0 bottom-0 w-full h-full bg-[rgba(0,0,0,0.1)] z-30 flex justify-center items-center"></span>
+                  </td>
+                </tr>
               )}
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (

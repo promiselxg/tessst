@@ -11,11 +11,8 @@ const page = ({ params }) => {
   return (
     <>
       <BreadcrumbBanner
-        title={params.slug}
-        pathname={[
-          { label: "Blog", href: "/news" },
-          { label: `${params.slug}` },
-        ]}
+        title={params.id}
+        pathname={[{ label: "Blog", href: "/news" }, { label: `${params.id}` }]}
         banner="/img/bg.png"
       />
       <div className="w-full flex h-fit py-[40px] md:py-[85px]">
@@ -26,7 +23,7 @@ const page = ({ params }) => {
                 `${big_sholders_text.className} text-[20px] md:text-[40px] md:-mb-[10px] cursor-pointer w-fit`
               )}
             >
-              <Reveal>{params.slug}</Reveal>
+              <Reveal>{params.id}</Reveal>
             </h1>
             <Image
               src="/img/image1.png"

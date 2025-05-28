@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import {
+  BookDashed,
   Bot,
   Frame,
   GalleryVerticalEnd,
@@ -40,7 +41,7 @@ const data = {
       title: "Training & Courses",
       url: "/dashboard/training",
       icon: SquareTerminal,
-      isActive: true,
+
       items: [
         {
           title: "Create new training",
@@ -100,6 +101,60 @@ const data = {
         {
           title: "Tags",
           url: "/dashboard/ecommerce/tags",
+        },
+      ],
+    },
+    {
+      title: "Subscriptions",
+      url: "/dashboard/membership",
+      icon: Bot,
+      items: [
+        {
+          title: "All products",
+          url: "/dashboard/ecommerce",
+        },
+        {
+          title: "Add product",
+          url: "/dashboard/ecommerce/products/create",
+        },
+        {
+          title: "Orders",
+          url: "/dashboard/ecommerce/orders",
+        },
+        {
+          title: "Customers",
+          url: "/dashboard/ecommerce/customers",
+        },
+        {
+          title: "Discounts",
+          url: "/dashboard/ecommerce/discounts",
+        },
+        {
+          title: "Categories",
+          url: "/dashboard/categories?tab=store",
+        },
+        {
+          title: "Tags",
+          url: "/dashboard/ecommerce/tags",
+        },
+      ],
+    },
+    {
+      title: "Blog & Articles",
+      url: "/dashboard/membership",
+      icon: BookDashed,
+      items: [
+        {
+          title: "All Blog Posts",
+          url: "/dashboard/blog",
+        },
+        {
+          title: "Create new post",
+          url: "/dashboard/blog/create",
+        },
+        {
+          title: "Categories",
+          url: "/dashboard/blog?tab=blog_categories",
         },
       ],
     },
