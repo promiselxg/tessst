@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { BookDashed, Plus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/authProvider";
 import { toast } from "sonner";
 import { CategoryDataTable } from "./data-table";
@@ -11,16 +11,14 @@ import {
   getAllCourseCategories,
   getAllProductCategories,
 } from "@/service/category/categoryService";
-import { useCategoryColumns } from "./useCategoryColumns";
-import { useCourseCategoryColumns } from "./useCourseCategoryColumns";
+import { productColumns } from "./useCategoryColumns";
+import { courseColumns } from "./useCourseCategoryColumns";
 import { Button } from "@/components/ui/button";
 
 import { CreateNewCategory } from "./create-new-catgeory-dialog";
 
 const CategoryTable = () => {
   const { user } = useAuth();
-  const productColumns = useCategoryColumns();
-  const courseColumns = useCourseCategoryColumns();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -29,6 +27,7 @@ const CategoryTable = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [activeColumn, setActiveColumn] = useState(productColumns || "");
+  const tab = searchParams.get("tab") || "store";
 
   const tabs = [
     {
@@ -71,11 +70,10 @@ const CategoryTable = () => {
   };
 
   useEffect(() => {
-    const tab = searchParams.get("tab") || "store";
     setActiveTab(tab);
     setActiveColumn(tab === "store" ? productColumns : courseColumns);
     fetchCategories(tab);
-  }, [searchParams, fetchCategories]);
+  }, [tab, fetchCategories]);
 
   useEffect(() => {
     if (!user?.id) router.replace("/auth/login?callback=/dashboard/category");
