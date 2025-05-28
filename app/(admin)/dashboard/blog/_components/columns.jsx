@@ -67,7 +67,7 @@ export const columns = [
               <Link
                 href={`/resources/news/${id}`}
                 target="_blank"
-                className="hover:underline hover:text-[#e97688] transition-all delay-75"
+                className="hover:underline hover:text-[#e97688] transition-all delay-75 line-clamp-1"
               >
                 {truncateText(title, 50)}
               </Link>
@@ -86,7 +86,7 @@ export const columns = [
         <>
           <p
             className="text-sm text-slate-700"
-            dangerouslySetInnerHTML={{ __html: truncateText(content, 100) }}
+            dangerouslySetInnerHTML={{ __html: truncateText(content, 50) }}
           />
         </>
       );

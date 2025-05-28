@@ -1,3 +1,4 @@
+import { removeUploadedImage } from "@/lib/utils/cloudinary";
 import { customMessage, ServerError } from "@/lib/utils/customMessage";
 import prisma from "@/lib/utils/dbConnect";
 import { isValidUUID } from "@/lib/utils/validateUUID";
@@ -28,6 +29,8 @@ const createNewBlogCategory = async (req, _) => {
 };
 
 const createNewBlogPost = async (req, _) => {
+  const { formData } = await req.json();
+
   try {
     const {
       title,
@@ -36,12 +39,17 @@ const createNewBlogPost = async (req, _) => {
       author,
       images,
       isPublished = false,
-    } = await req.json();
+    } = formData;
+
+    const cleanupImages = () => {
+      removeUploadedImage(formData.images);
+    };
 
     if (
       (!title || !content || !categoryId || !author,
       !Array.isArray(images) || images.length === 0)
     ) {
+      cleanupImages();
       return customMessage("All fields are required", {}, 400);
     }
 
@@ -49,6 +57,7 @@ const createNewBlogPost = async (req, _) => {
     const cleanDescription = sanitizeHtml(content);
 
     if (!isValidUUID(categoryId)) {
+      cleanupImages();
       return customMessage("Invalid Category ID", {}, 400);
     }
 
@@ -57,6 +66,7 @@ const createNewBlogPost = async (req, _) => {
     });
 
     if (!categoryExist) {
+      cleanupImages();
       return customMessage("Category not found or does not exist.", {}, 404);
     }
 
@@ -66,9 +76,17 @@ const createNewBlogPost = async (req, _) => {
 
     const formattedImages = images.map((img) => {
       if (!img.publicId || !img.public_url) {
+        cleanupImages();
         throw new Error("Each image must have publicId and public_url");
       }
-      return { publicId: img.publicId, public_url: img.public_url };
+      return {
+        publicId: img.publicId,
+        public_url: img.public_url,
+        assetId: img.assetId,
+        format: img.format,
+        resource_type: img.resource_type,
+        original_filename: img.original_filename,
+      };
     });
 
     const blog = await prisma.blog.create({
@@ -238,6 +256,8 @@ const getSigleBlogPost = async (_, params) => {
     if (blogPost && Array.isArray(blogPost.images)) {
       blogPost.images = blogPost.images.map((img) => ({
         public_url: img.public_url,
+        assetId: img.assetId,
+        publicId: img.publicId,
       }));
     }
 
@@ -310,6 +330,22 @@ const updateBlogPost = async (req, params) => {
           400
         );
       }
+
+      const formatImages = (images) => {
+        return images.map(({ publicId, public_url, assetId }) => {
+          if (!publicId || !public_url) {
+            removeUploadedImage(updates.oldImage);
+            throw new Error("Each image must have a publicId and public_url.");
+          }
+          return { publicId, public_url, assetId };
+        });
+      };
+      const formattedProductMainImage = formatImages(updates.images);
+      removeUploadedImage(updates.oldImage);
+
+      updates.images = formattedProductMainImage;
+
+      delete updates.oldImage;
     }
 
     await prisma.blog.update({
