@@ -349,10 +349,10 @@ model CourseCategory {
 
 model Project {
   id          String           @id @default(uuid())
-  slug        String
+  slug        String           @unique
   userId      String
   title       String           @unique
-  description String
+  description String?          @db.Text
   categoryId  String?
   mediaType   MediaType
   mediaDoc    Json?

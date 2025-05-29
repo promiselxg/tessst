@@ -6,8 +6,8 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Reveal from "@/components/animation/reveal";
 import { big_sholders_text } from "@/lib/fonts";
-import { apiClient } from "@/lib/utils/host";
 import VideoPlayer from "@/components/video/videoPlayer";
+import { getAllProjects } from "@/service/project/projectService";
 
 const ProjectSkeleton = () => (
   <section className="space-y-4 animate-pulse">
@@ -26,8 +26,8 @@ const Listprojects = () => {
     const fetchAllProjects = async () => {
       try {
         setLoading(true);
-        const response = await apiClient.get("/project");
-        setProjects(response?.data?.projects || []);
+        const response = await getAllProjects();
+        setProjects(response.projects || []);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
@@ -38,6 +38,7 @@ const Listprojects = () => {
     fetchAllProjects();
   }, []);
 
+  console.log(projects);
   return (
     <>
       {loading
@@ -46,7 +47,7 @@ const Listprojects = () => {
           ))
         : projects?.map((project) => (
             <section key={project.id} className="space-y-4">
-              <Link href={`/projects/${project.id}`}>
+              <Link href={`/projects/${project.slug}`}>
                 <h1
                   className={cn(
                     `${big_sholders_text.className} text-[20px] md:text-[40px] md:-mb-[10px] cursor-pointer w-fit`
@@ -63,7 +64,7 @@ const Listprojects = () => {
               </Reveal>
 
               <Reveal>
-                <Link href={`/projects/${project.slug}`}>
+                <Link href={`/projects/${project?.slug}`}>
                   {project.mediaType.toLowerCase() === "video" ? (
                     <VideoPlayer
                       src={project.mediaDoc[0].public_url}

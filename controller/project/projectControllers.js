@@ -37,16 +37,22 @@ const createProjectCategory = async (req) => {
   }
 };
 
-const createNewProject = async (req) => {
+export const createNewProject = async (req) => {
   try {
-    const { title, description, categoryId, mediaType, mediaDoc } =
-      await req.json();
+    const { formData } = await req.json();
+    const { title, description, categoryId, mediaType, mediaDoc } = formData;
 
-    if (!title || !description) {
-      return customMessage("Title and description are required.", {}, 400);
+    // ✅ Required fields
+    if (!title || !description || !categoryId || !mediaType) {
+      return customMessage("All fields are required.", {}, 400);
     }
 
-    // Check if project title already exists
+    // ✅ Authentication
+    if (!req.user || !req.user.id) {
+      return customMessage("Unauthorized request.", {}, 401);
+    }
+
+    // ✅ Prevent duplicate title
     const existingProject = await prisma.project.findFirst({
       where: { title: sanitize(title) },
     });
@@ -55,59 +61,78 @@ const createNewProject = async (req) => {
       return customMessage("Project title already exists.", {}, 409);
     }
 
-    // Ensure `req.user` exists
-    if (!req.user || !req.user.id) {
-      return customMessage("Unauthorized request.", {}, 401);
+    // ✅ Validate mediaDoc array
+    if (!Array.isArray(mediaDoc) || mediaDoc.length === 0) {
+      return customMessage("mediaDoc must be a non-empty array.", {}, 400);
     }
 
-    // Validate `mediaDoc`
-    if (mediaDoc && !Array.isArray(mediaDoc)) {
-      return customMessage(
-        "Invalid mediaDoc format. It should be an array.",
-        {},
-        400
-      );
-    }
-
-    let formattedMedia = null;
-
-    if (mediaType && mediaType.toLowerCase() === "image") {
-      formattedMedia = mediaDoc.map((img) => {
-        if (!img.public_id || !img.public_url) {
-          throw new Error("Each image must have a public_id and public_url.");
+    // ✅ Mixed media validation
+    const formattedMedia = mediaDoc.map((item) => {
+      if (item.type === "image") {
+        if (!item.public_id || !item.public_url) {
+          throw new Error("Image must include public_id and public_url.");
         }
-        return { publicId: img.public_id, publicUrl: img.public_url };
-      });
-    } else {
-      formattedMedia = mediaDoc;
-    }
+        return {
+          type: "image",
+          publicId: item.public_id,
+          public_url: item.public_url,
+        };
+      }
 
+      if (item.type === "video") {
+        if (!item.url || !isValidVideoUrl(item.url)) {
+          throw new Error(
+            "Video URL must be a valid Mux, YouTube, or Cloudinary link."
+          );
+        }
+        return {
+          type: "video",
+          url: item.url,
+          provider: detectVideoProvider(item.url),
+        };
+      }
+
+      throw new Error("Unsupported media type in mediaDoc.");
+    });
+
+    // ✅ Save to database
     const newProject = await prisma.project.create({
       data: {
         title: sanitize(title),
         description: sanitize(description),
-        mediaType,
+        mediaType: mediaType.toUpperCase(),
         mediaDoc: JSON.parse(JSON.stringify(formattedMedia)),
-        category: { connect: { id: categoryId } },
         slug: generateSlug(title),
+        category: { connect: { id: categoryId } },
         userId: req.user.id,
       },
     });
 
     return customMessage("Project created successfully.", { newProject }, 201);
   } catch (error) {
-    console.error("Error creating project:", error);
-    return ServerError(error.message, {}, 500);
+    return ServerError(
+      error.message || "An unexpected error occurred",
+      {},
+      500
+    );
   }
 };
 
-const getAllProjectCategories = async (req) => {
+const getAllProjectCategories = async (_) => {
   try {
     const allCategories = await prisma.projectCategory.findMany({
       orderBy: {
         title: "asc",
       },
-      select: { id: true, title: true },
+      select: {
+        id: true,
+        title: true,
+        _count: {
+          select: {
+            projects: true,
+          },
+        },
+      },
     });
     return customMessage(
       "Categories retrieved successfully",
@@ -403,6 +428,22 @@ const deleteProject = async (req, params) => {
   }
 };
 
+const isValidVideoUrl = (url) => {
+  const muxRegex = /^https:\/\/stream\.mux\.com\/[\w-]+/;
+  const youtubeRegex = /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\/[\w-]+/;
+  const cloudinaryRegex =
+    /^https:\/\/res\.cloudinary\.com\/.+\/video\/upload\/.+/;
+  return (
+    muxRegex.test(url) || youtubeRegex.test(url) || cloudinaryRegex.test(url)
+  );
+};
+
+function detectVideoProvider(url) {
+  if (/stream\.mux\.com/.test(url)) return "mux";
+  if (/youtube\.com|youtu\.be/.test(url)) return "youtube";
+  if (/res\.cloudinary\.com/.test(url)) return "cloudinary";
+  return "unknown";
+}
 export const projectControllers = {
   createProjectCategory,
   createNewProject,

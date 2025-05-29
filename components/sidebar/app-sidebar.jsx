@@ -158,6 +158,25 @@ const data = {
         },
       ],
     },
+    {
+      title: "Projects Management",
+      url: "/dashboard/membership",
+      icon: BookDashed,
+      items: [
+        {
+          title: "Projects",
+          url: "/dashboard/project",
+        },
+        {
+          title: "Create new project",
+          url: "/dashboard/project/create",
+        },
+        {
+          title: "Categories",
+          url: "/dashboard/project?tab=project_categories",
+        },
+      ],
+    },
   ],
   projects: [
     {

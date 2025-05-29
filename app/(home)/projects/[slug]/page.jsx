@@ -5,12 +5,13 @@ import ImageViewer from "@/components/image/image-viewer";
 import VideoPlayer from "@/components/video/videoPlayer";
 import { big_sholders_text } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
+import prisma from "@/lib/utils/dbConnect";
 import { redirect } from "next/dist/server/api-utils";
 import React from "react";
 
 const page = async ({ params }) => {
   const project = await prisma.project.findUnique({
-    where: { id: params.id },
+    where: { slug: params.slug },
     include: { category: true },
   });
   if (!project) {
