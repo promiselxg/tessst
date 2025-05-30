@@ -24,6 +24,6 @@ export const getSingleProject = async (projectId) => {
 };
 
 export const getAllCategories = async () => {
-  const response = await apiClient("/blog/category");
+  const response = await apiClient("/project/category");
   return response.data;
 };

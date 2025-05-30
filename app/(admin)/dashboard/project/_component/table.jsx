@@ -9,7 +9,7 @@ import { ProjectsDataTable } from "./data-table";
 import { columns } from "./columns";
 import { categoryColumns } from "../category/columns";
 import { CreateNewCategory } from "../category/create-new-catgeory-dialog";
-import { BlogCategoryTable } from "../category/data-table";
+import { ProjectCategoryTable } from "../category/data-table";
 import {
   getAllProjectCategories,
   getAllProjects,
@@ -96,7 +96,7 @@ const Table = () => {
       case "project_categories":
         return (
           <CategoriesTable
-            title="Blog Categories"
+            title="Project Categories"
             loading={loading}
             projects={projects}
             activeTab="project_categories"
@@ -197,7 +197,7 @@ const CategoriesTable = ({
             </CreateNewCategory>
           </div>
         </div>
-        <BlogCategoryTable
+        <ProjectCategoryTable
           columns={categoryColumns}
           data={projects}
           loading={loading}

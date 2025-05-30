@@ -30,7 +30,7 @@ export function CreateNewCategory({ children, tab, fetchCategories }) {
 
     try {
       setLoading(true);
-      const response = await apiCall("post", "/blog/category", {
+      const response = await apiCall("post", "/project/category", {
         name: value.trim(),
       });
       toast.success(response?.message || "Category created successfully");

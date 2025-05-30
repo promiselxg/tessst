@@ -144,12 +144,12 @@ export const columns = [
       return (
         <div className="ml-auto pr-2 flex items-center gap-2">
           <CustomToolTip label="View post">
-            <Link href={`/projetcs/${slug}`} target="_blank">
+            <Link href={`/projects/${slug}`} target="_blank">
               <EyeIcon className="w-5 h-5 cursor-pointer hover:opacity-75" />
             </Link>
           </CustomToolTip>
           <CustomToolTip label="Edit post">
-            <Link href={`/dashboard/projetc/${id}/edit`}>
+            <Link href={`/dashboard/project/${id}/edit`}>
               <Pencil className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </Link>
           </CustomToolTip>

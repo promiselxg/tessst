@@ -8,6 +8,7 @@ import Reveal from "@/components/animation/reveal";
 import { big_sholders_text } from "@/lib/fonts";
 import VideoPlayer from "@/components/video/videoPlayer";
 import { getAllProjects } from "@/service/project/projectService";
+import { truncateText } from "@/lib/utils/trucateText";
 
 const ProjectSkeleton = () => (
   <section className="space-y-4 animate-pulse">
@@ -47,7 +48,10 @@ const Listprojects = () => {
           ))
         : projects?.map((project) => (
             <section key={project.id} className="space-y-4">
-              <Link href={`/projects/${project.slug}`}>
+              <Link
+                href={`/projects/${project.slug}`}
+                className="hover:text-red-700 transition-all delay-75 hover:underline"
+              >
                 <h1
                   className={cn(
                     `${big_sholders_text.className} text-[20px] md:text-[40px] md:-mb-[10px] cursor-pointer w-fit`
@@ -58,18 +62,23 @@ const Listprojects = () => {
               </Link>
 
               <Reveal direction="up">
-                <p className="text-sm text-slate-700 line-clamp-3">
-                  {project.description}
-                </p>
+                <p
+                  className="text-sm text-slate-700 line-clamp-3"
+                  dangerouslySetInnerHTML={{
+                    __html: truncateText(project.description, 200),
+                  }}
+                />
               </Reveal>
 
               <Reveal>
                 <Link href={`/projects/${project?.slug}`}>
                   {project.mediaType.toLowerCase() === "video" ? (
-                    <VideoPlayer
-                      src={project.mediaDoc[0].public_url}
-                      className="w-full h-[250px] md:h-[400px] object-cover rounded-[8px]"
-                    />
+                    <>
+                      <VideoPlayer
+                        url={project.mediaDoc?.[0].url}
+                        className="w-full h-[250px] md:h-[500px] object-cover rounded-[8px]"
+                      />
+                    </>
                   ) : (
                     <Image
                       src={

@@ -33,13 +33,15 @@ export const categoryColumns = [
   },
 
   {
-    accessorKey: "name",
+    accessorKey: "title",
     header: "Category Name",
     cell: ({ row }) => {
-      const { name } = row.original;
+      const { title } = row.original;
       return (
         <>
-          <p className="text-sm capitalize text-slate-700 font-[600]">{name}</p>
+          <p className="text-sm capitalize text-slate-700 font-[600]">
+            {title}
+          </p>
         </>
       );
     },
@@ -47,7 +49,7 @@ export const categoryColumns = [
 
   {
     accessorKey: "_count",
-    header: "Posts Count",
+    header: "Projects Count",
     cell: ({ row }) => {
       const { _count } = row.original;
       return (
@@ -56,7 +58,7 @@ export const categoryColumns = [
             variant={_count?.blogs > 0 ? "success" : "destructive"}
             className="capitalize"
           >
-            {_count?.blogs} {`${_count?.blogs > 1 ? "Posts" : "Post"}`}
+            {_count?.blogs} {`${_count?.projects > 1 ? "Projects" : "Project"}`}
           </Badge>
         </>
       );
@@ -79,19 +81,23 @@ export const categoryColumns = [
     accessorKey: "action",
     header: "Action",
     cell: ({ row }) => {
-      const { name, id } = row.original;
+      const { title, id } = row.original;
       return (
         <div className="ml-auto pr-2 flex items-center gap-2">
           <CustomToolTip label="Edit category">
-            <UpdateCategory tab="store" id={id} initialData={name}>
+            <UpdateCategory
+              tab="project_categories"
+              id={id}
+              initialData={title}
+            >
               <Pencil className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </UpdateCategory>
           </CustomToolTip>
           <CustomToolTip label="Delete category">
             <DeleteDialog
               id={id}
-              endpoint={`/blog/category`}
-              label="Delete this post?, this action cannot be undone."
+              endpoint={`/project/category`}
+              label="Delete this category?, this action cannot be undone."
             >
               <Trash2 className="w-4 h-4 cursor-pointer hover:opacity-75" />
             </DeleteDialog>

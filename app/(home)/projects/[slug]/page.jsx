@@ -1,6 +1,7 @@
 import Reveal from "@/components/animation/reveal";
 import BreadcrumbBanner from "@/components/breadcrumb/banner-breadcrumb";
 import Container from "@/components/container/container";
+import Preview from "@/components/editor/preview";
 import ImageViewer from "@/components/image/image-viewer";
 import VideoPlayer from "@/components/video/videoPlayer";
 import { big_sholders_text } from "@/lib/fonts";
@@ -17,6 +18,7 @@ const page = async ({ params }) => {
   if (!project) {
     redirect("/projects");
   }
+
   return (
     <>
       <BreadcrumbBanner
@@ -37,18 +39,16 @@ const page = async ({ params }) => {
               </h1>
 
               <Reveal>
-                <p className="text-sm text-slate-700 whitespace-pre-wrap">
-                  {project.description}
-                </p>
+                <Preview value={project.description} />
               </Reveal>
 
               <Reveal>
                 {/* Render Video if mediaType is VIDEO */}
-                {project.mediaType === "VIDEO" &&
-                project.mediaDoc?.[0]?.public_url ? (
+                {project.mediaType === "VIDEO" && project.mediaDoc?.[0]?.url ? (
                   <VideoPlayer
-                    src={project.mediaDoc[0].public_url}
+                    url={project.mediaDoc?.[0].url}
                     className="w-full h-[250px] md:h-[400px] object-cover rounded-[8px]"
+                    height="500px"
                   />
                 ) : (
                   <ImageViewer

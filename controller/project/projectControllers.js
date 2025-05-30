@@ -1,3 +1,4 @@
+import { removeUploadedImage } from "@/lib/utils/cloudinary";
 import { customMessage, ServerError } from "@/lib/utils/customMessage";
 import { generateSlug } from "@/lib/utils/generateSlug";
 import { isValidUUID } from "@/lib/utils/validateUUID";
@@ -95,7 +96,6 @@ export const createNewProject = async (req) => {
       throw new Error("Unsupported media type in mediaDoc.");
     });
 
-    // ✅ Save to database
     const newProject = await prisma.project.create({
       data: {
         title: sanitize(title),
@@ -127,6 +127,7 @@ const getAllProjectCategories = async (_) => {
       select: {
         id: true,
         title: true,
+        createdAt: true,
         _count: {
           select: {
             projects: true,
@@ -206,7 +207,7 @@ const getAllProjects = async (req) => {
   }
 };
 
-const getSingleProject = async (req, params) => {
+const getSingleProject = async (_, params) => {
   const { projectId } = await params;
   if (!projectId) {
     return customMessage("Project ID is required", {}, 400);
@@ -257,15 +258,15 @@ const updateProjectCategory = async (req, params) => {
       return customMessage("project category title must be a string", {}, 400);
     }
 
-    if (
-      await prisma.projectCategory.findFirst({
-        where: {
-          title: sanitize(title),
-        },
-      })
-    ) {
-      return customMessage("title already exist", {}, 409);
-    }
+    // if (
+    //   await prisma.projectCategory.findFirst({
+    //     where: {
+    //       title: sanitize(title),
+    //     },
+    //   })
+    // ) {
+    //   return customMessage("title already exist", {}, 409);
+    // }
 
     const category = await prisma.projectCategory.update({
       where: { id: categoryId },
@@ -287,40 +288,104 @@ const updateSingleProject = async (req, params) => {
     const { projectId } = await params;
     const updates = await req.json();
 
+    const cleanupImages = () => {
+      removeUploadedImage(updates.mediaDoc);
+    };
+
     if (!projectId) {
+      cleanupImages();
       return customMessage("Project ID is required", {}, 400);
     }
 
     if (!isValidUUID(projectId)) {
+      cleanupImages();
       return customMessage("Invalid Project ID", {}, 400);
     }
 
-    if (
-      !(await prisma.project.findUnique({
-        where: { id: projectId },
-      }))
-    ) {
+    const existingProject = await prisma.project.findUnique({
+      where: { id: projectId },
+    });
+
+    if (!existingProject) {
+      cleanupImages();
       return customMessage("Project not found", {}, 404);
     }
 
-    // Ensure updates contain at least one valid field
     if (Object.keys(updates).length === 0 || updates === null) {
+      cleanupImages();
       return customMessage("No update fields provided", {}, 400);
     }
 
-    // Validate category if included
     if (updates.categoryId) {
       const categoryExists = await prisma.projectCategory.findUnique({
         where: { id: updates.categoryId },
       });
 
       if (!categoryExists) {
+        cleanupImages();
         return customMessage("Category does not exist", {}, 400);
       }
     }
 
     if (updates.mediaType) {
       updates.mediaType = updates.mediaType.toUpperCase();
+    }
+
+    if (updates.mediaDoc && updates.mediaType !== "VIDEO") {
+      if (!Array.isArray(updates.mediaDoc)) {
+        cleanupImages();
+        return customMessage("Images must be an array of objects", {}, 400);
+      }
+
+      const validImages = updates.mediaDoc.every(
+        (img) => img.publicId && img.public_url
+      );
+
+      if (!validImages) {
+        cleanupImages();
+        return customMessage(
+          "Each image must have a valid public ID and public URL",
+          {},
+          400
+        );
+      }
+      updates.mediaType = "IMAGE";
+      updates.mediaDoc = updates.mediaDoc.map((img) => ({
+        type: "image",
+        assetId: img.assetId || null,
+        publicId: img.publicId,
+        public_url: img.public_url,
+        format: img.format || null,
+        resource_type: img.resource_type || "image",
+        original_filename: img.original_filename || null,
+      }));
+
+      removeUploadedImage(updates.oldImage);
+      delete updates.oldImage;
+    }
+
+    if (updates.mediaType === "VIDEO") {
+      if (!updates.videoUrl || !isValidVideoUrl(updates.videoUrl)) {
+        cleanupImages();
+        return customMessage(
+          "Video URL must be a valid Mux, YouTube, or Cloudinary link.",
+          {},
+          400
+        );
+      }
+
+      updates.mediaDoc = [
+        {
+          type: "video",
+          url: updates.videoUrl,
+          provider: detectVideoProvider(updates.videoUrl),
+        },
+      ];
+
+      delete updates.videoUrl;
+      delete updates.id;
+      delete updates.mediaType;
+      delete updates.provider;
     }
 
     if (updates.title) {
@@ -332,26 +397,7 @@ const updateSingleProject = async (req, params) => {
       updates.description = sanitize(updates.description);
     }
 
-    // Handle images update (expects an array of image objects)
-
-    if (updates.mediaDoc) {
-      if (!Array.isArray(updates.mediaDoc)) {
-        return customMessage("Images must be an array of objects", {}, 400);
-      }
-
-      const validImages = updates.mediaDoc.every(
-        (img) => img.public_id && img.public_url
-      );
-
-      if (!validImages) {
-        return customMessage(
-          "Each image must have a valid public_id and public_url",
-          {},
-          400
-        );
-      }
-    }
-
+    // Update project in DB
     await prisma.project.update({
       where: { id: projectId, userId: req.user.id },
       data: updates,
@@ -359,11 +405,12 @@ const updateSingleProject = async (req, params) => {
 
     return customMessage("Project updated successfully", {}, 200);
   } catch (error) {
+    console.error(error);
     return ServerError(error, {}, 500);
   }
 };
 
-const deleteProjectCategory = async (req, params) => {
+const deleteProjectCategory = async (_, params) => {
   const { categoryId } = await params;
 
   if (!categoryId) {

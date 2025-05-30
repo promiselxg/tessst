@@ -26,7 +26,7 @@ import { apiCall } from "@/lib/utils/api";
 import { toast } from "sonner";
 import ConfirmAlertModal from "@/components/alert/confirm-alert";
 
-export function BlogCategoryTable({ columns, data, loading }) {
+export function ProjectCategoryTable({ columns, data, loading }) {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -45,7 +45,7 @@ export function BlogCategoryTable({ columns, data, loading }) {
 
     try {
       setIsLoading(true);
-      const response = await apiCall("delete", "/blog/category", {
+      const response = await apiCall("delete", "/project", {
         ...selectedIds,
       });
       toast.success(response?.message || "categories deleted successfully!");
@@ -87,10 +87,10 @@ export function BlogCategoryTable({ columns, data, loading }) {
           <div className="flex w-1/2 gap-4">
             <Input
               placeholder="search by category name"
-              value={table.getColumn("name")?.getFilterValue() ?? ""}
+              value={table.getColumn("title")?.getFilterValue() ?? ""}
               disabled={isLoading}
               onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
+                table.getColumn("title")?.setFilterValue(event.target.value)
               }
               className="max-w-sm"
             />

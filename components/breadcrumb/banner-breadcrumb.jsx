@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "../animation/reveal";
 import { cn } from "@/lib/utils";
+import { truncateText } from "@/lib/utils/trucateText";
 
 export default function BreadcrumbBanner({
   title = "Page",
@@ -23,7 +24,9 @@ export default function BreadcrumbBanner({
       <Image src={banner} alt="Banner Image" fill className="object-cover" />
 
       <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center text-white space-y-2">
-        <h1 className="font-euclid text-3xl md:text-5xl font-bold">{title}</h1>
+        <h1 className="font-euclid text-3xl md:text-5xl font-bold">
+          {truncateText(title, 50)}
+        </h1>
 
         <div className="flex items-center gap-2 text-sm transition-all">
           <Link href="/" className="hover:text-[--app-bg-red] transition-all">
