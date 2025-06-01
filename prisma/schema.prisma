@@ -510,15 +510,16 @@ model Donation {
 model Contest{
   id            String     @id @default(uuid())
   title         String
-  startDate     String
-  endDate       String
+  startDate     DateTime
+  endDate       DateTime
   description   String   @db.LongText
   rules         String   @db.LongText
   criteria      Json?
+  image         Json
   views         Int      @default(0)  
   likes         Int      @default(0)  
   shares        Int      @default(0) 
-  rewards       ContestReward[]
+  rewards       Json?
   submissions   ContestSubmission[] 
 
   createdAt     DateTime @default(now())
@@ -526,17 +527,6 @@ model Contest{
 
 }
 
-model ContestReward{
-  id  String     @id @default(uuid())
-  title String
-  price String
-  metadata Json?
-  contestId    String
-  contest      Contest   @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  
-  @@index([contestId])
-  @@unique([contestId, id])
-}
 
 model ContestSubmission {
   id            String     @id @default(uuid())

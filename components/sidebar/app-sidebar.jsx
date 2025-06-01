@@ -9,6 +9,7 @@ import {
   Map,
   PieChart,
   SquareTerminal,
+  Trophy,
 } from "lucide-react";
 
 import {
@@ -55,14 +56,14 @@ const data = {
           title: "Categories",
           url: "/dashboard/categories?tab=training",
         },
-        {
-          title: "Tags",
-          url: "/dashboard/training/tags",
-        },
-        {
-          title: "Instructors",
-          url: "/dashboard/training/instructors",
-        },
+        // {
+        //   title: "Tags",
+        //   url: "/dashboard/training/tags",
+        // },
+        // {
+        //   title: "Instructors",
+        //   url: "/dashboard/training/instructors",
+        // },
         {
           title: "Students",
           url: "/dashboard/training/students",
@@ -174,6 +175,21 @@ const data = {
         {
           title: "Categories",
           url: "/dashboard/project?tab=project_categories",
+        },
+      ],
+    },
+    {
+      title: "Contest Management",
+      url: "/dashboard/contest",
+      icon: Trophy,
+      items: [
+        {
+          title: "All competitions",
+          url: "/dashboard/contest",
+        },
+        {
+          title: "Create new competition",
+          url: "/dashboard/contest/create",
         },
       ],
     },

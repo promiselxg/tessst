@@ -215,7 +215,7 @@ const getAllProducts = async (req) => {
   }
 };
 
-const getSingleProduct = async (req, params) => {
+const getSingleProduct = async (_, params) => {
   const { id } = await params;
   if (!id) {
     return customMessage("Product ID is required", {}, 400);
@@ -480,7 +480,7 @@ const updateProduct = async (req, params) => {
   }
 };
 
-const deleteProduct = async (req, params) => {
+const deleteProduct = async (_, params) => {
   try {
     const { id } = await params;
     if (!id) {

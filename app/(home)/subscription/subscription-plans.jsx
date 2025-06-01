@@ -38,7 +38,7 @@ const SubscriptionPlans = () => {
     if (user?.id) {
       fetchSubscriptions(user.id);
     }
-  }, [user?.id]);
+  }, [user?.id, fetchSubscriptions]);
 
   if (isLoading) {
     return (
